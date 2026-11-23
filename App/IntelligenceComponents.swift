@@ -163,8 +163,10 @@ struct AddAgentSheet: View {
     @State private var name = ""
     @State private var executable = ""
     @State private var interpreter = ""
-    @State private var arguments: [String] = []
-    @State private var selected: Int?
+    /// Rows with their own ids, so removing one never leaves a field bound to a gone index.
+    struct Argument: Identifiable { let id = UUID(); var text = "" }
+    @State private var arguments: [Argument] = []
+    @State private var selected: UUID?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -191,15 +193,15 @@ struct AddAgentSheet: View {
                     if arguments.isEmpty {
                         Text("No Arguments").foregroundStyle(.secondary).frame(maxWidth: .infinity)
                     }
-                    ForEach(arguments.indices, id: \.self) { i in
-                        TextField("Argument \(i + 1)", text: $arguments[i], prompt: Text("--acp")).labelsHidden()
-                            .onTapGesture { selected = i }
+                    ForEach($arguments) { $arg in
+                        TextField("Argument", text: $arg.text, prompt: Text("--acp")).labelsHidden()
+                            .onTapGesture { selected = arg.id }
                     }
                     HStack(spacing: 0) {
-                        Button { arguments.append(""); selected = arguments.count - 1 } label: { Image(systemName: "plus").frame(width: 22, height: 18) }
+                        Button { let a = Argument(); arguments.append(a); selected = a.id } label: { Image(systemName: "plus").frame(width: 22, height: 18) }
                             .accessibilityLabel("Add Argument")
                         Divider().frame(height: 14)
-                        Button { arguments.remove(at: min(selected ?? arguments.count - 1, arguments.count - 1)); selected = nil } label: { Image(systemName: "minus").frame(width: 22, height: 18) }
+                        Button { arguments.removeAll { $0.id == (selected ?? arguments.last?.id) }; selected = nil } label: { Image(systemName: "minus").frame(width: 22, height: 18) }
                             .disabled(arguments.isEmpty)
                             .accessibilityLabel("Remove Argument")
                         Spacer()
@@ -229,7 +231,7 @@ struct AddAgentSheet: View {
     }
 
     private func save() {
-        let words = (interpreter.isEmpty ? [] : [interpreter.trimmingCharacters(in: .whitespaces)]) + [path] + arguments.filter { !$0.isEmpty }
+        let words = (interpreter.isEmpty ? [] : [interpreter.trimmingCharacters(in: .whitespaces)]) + [path] + arguments.map(\.text).filter { !$0.isEmpty }
         var p = AssistantProvider(preset: AssistantPreset.named("acp-custom")!, name: name.trimmingCharacters(in: .whitespaces))
         // ACPProcess.words splits on spaces outside quotes.
         p.command = words.map { $0.contains(where: \.isWhitespace) ? "\"\($0)\"" : $0 }.joined(separator: " ")

@@ -26,12 +26,23 @@ struct PluginsSettings: View {
                         SettingsPageRow(title: s.name, subtitle: s.description, open: openSkills)
                     }
                 }
+            } header: {
+                // In the page, not .searchable: a toolbar search field left the window title under the Back/Forward capsule after this page closed.
+                HStack {
+                    Spacer()
+                    HStack(spacing: 4) {
+                        Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                        TextField("Search Plug-ins", text: $query).textFieldStyle(.plain)
+                    }
+                    .padding(.horizontal, 8).padding(.vertical, 4)
+                    .background(.quaternary.opacity(0.6), in: Capsule())
+                    .frame(width: 220)
+                }
             } footer: {
                 HStack { Spacer(); Button("Add Plug-in…") { adding = true } }
             }
         }
         .pane()
-        .searchable(text: $query, placement: .toolbar, prompt: "Search Plug-ins")
         .onAppear { store.reload() }
         .sheet(isPresented: $adding) { AddPluginSheet() }
     }

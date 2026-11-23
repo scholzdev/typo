@@ -189,7 +189,7 @@ struct SkillEditorSheet: View {
                 if let error { Text(error).font(.callout).foregroundStyle(.red).lineLimit(2) }
                 Spacer()
                 if draft.bundled {
-                    Button("Duplicate as My Skill") { dismiss(); duplicate(duplicated) }
+                    Button("Duplicate as My Skill") { duplicate(duplicated) }   // swaps this sheet for the editor
                     Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
                 } else {
                     Button("Cancel", role: .cancel) { if changed { confirmDiscard = true } else { dismiss() } }
