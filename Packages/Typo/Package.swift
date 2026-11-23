@@ -38,6 +38,9 @@ let package = Package(
         .target(name: "TypoMCP", dependencies: ["MCPProtocol", "TypoKit"]),
 
         .target(name: "TypoTestSupport", dependencies: ["TypoKit", "TypstEngine"], path: "Tests/TypoTestSupport", resources: [.copy("Fixtures")]),
+        .testTarget(name: "JSONRPCTests", dependencies: ["JSONRPC"]),
+        .testTarget(name: "ACPProtocolTests", dependencies: ["ACPProtocol", "JSONRPC"]),
+        .testTarget(name: "MCPProtocolTests", dependencies: ["MCPProtocol", "JSONRPC"]),
         .testTarget(name: "TypstEngineTests", dependencies: ["TypstEngine"]),
         .testTarget(name: "TypoKitTests", dependencies: ["TypoKit", "TypstEngine", "TypoTestSupport"]),
         .testTarget(name: "TypoAssistantTests", dependencies: ["TypoAssistant", "TypoTestSupport"]),

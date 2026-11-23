@@ -27,24 +27,6 @@ import TypoTestSupport
 private func text(_ result: JSONValue) -> String { result["content"]?.array?.first?["text"]?.string ?? "" }
 
 @MainActor @Suite(.timeLimit(.minutes(2))) struct MCPServerTests {
-    @Test func initializeAgreesOnAVersionItSpeaks() async throws {
-        let (s, _) = try await server(["main.typ": "Hi"])
-        let old = try #require(try await send(s, #"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05"}}"#))
-        #expect(old["id"] == 1 && old["result"]?["protocolVersion"] == "2024-11-05")
-        #expect(old["result"]?["serverInfo"]?["name"] == "typo" && old["result"]?["capabilities"]?["tools"] == [:])
-        let future = try #require(try await send(s, #"{"jsonrpc":"2.0","id":"a","method":"initialize","params":{"protocolVersion":"2099-01-01"}}"#))
-        #expect(future["id"] == "a" && future["result"]?["protocolVersion"] == "2025-06-18")
-    }
-
-    @Test func notificationsMalformedLinesAndUnknownMethods() async throws {
-        let (s, _) = try await server(["main.typ": "Hi"])
-        #expect(try await send(s, #"{"jsonrpc":"2.0","method":"notifications/initialized"}"#) == nil)
-        #expect(try await send(s, "{not json") == nil)
-        #expect(try await send(s, #"{"jsonrpc":"2.0","id":2,"method":"ping"}"#)?["result"] == [:])
-        let unknown = try #require(try await send(s, #"{"jsonrpc":"2.0","id":3,"method":"resources/list"}"#))
-        #expect(unknown["error"]?["code"]?.int == -32601 && unknown["result"] == nil)
-    }
-
     @Test func listsEveryToolWithItsSchema() async throws {
         let (s, _) = try await server(["main.typ": "Hi"])
         let tools = try #require(try await send(s, #"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#)?["result"]?["tools"]?.array)
