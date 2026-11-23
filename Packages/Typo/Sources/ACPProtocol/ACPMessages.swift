@@ -12,6 +12,12 @@ import JSONRPC
     func editStarted(_ call: ACPToolCall) async
     /// That call ended; `completed` is false when it failed. A call still running when the turn ends ends completed.
     func editEnded(_ call: ACPToolCall, completed: Bool) async
+    /// The agent's slash commands, sent when the session starts and again whenever they change.
+    func commandsChanged(_ commands: [ACPCommand])
+}
+
+extension ACPHost {
+    public func commandsChanged(_ commands: [ACPCommand]) {}
 }
 
 public struct ACPOption: Sendable, Equatable, Identifiable {
@@ -42,5 +48,26 @@ public struct ACPToolCall: Sendable, Equatable {
         if let c = u["content"]?.array { content = c }
         if let r = u["rawInput"], r != .null { rawInput = r }
         if let l = u["locations"]?.array { locations = l.compactMap { $0["path"]?.string } }
+    }
+}
+
+public struct ACPCommand: Sendable, Equatable, Identifiable {
+    public var name: String
+    public var description: String
+    public var hint: String?
+    public var id: String { name }
+
+    public init(name: String, description: String, hint: String? = nil) {
+        self.name = name
+        self.description = description
+        self.hint = hint
+    }
+
+    /// The commands of an `availableCommands` array; entries without a name are skipped.
+    public static func list(_ v: JSONValue?) -> [ACPCommand] {
+        (v?.array ?? []).compactMap { c in
+            guard let name = c["name"]?.string else { return nil }
+            return ACPCommand(name: name, description: c["description"]?.string ?? "", hint: c["input"]?["hint"]?.string)
+        }
     }
 }

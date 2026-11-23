@@ -96,6 +96,9 @@ private final class FakeAgent: @unchecked Sendable {
         edits.append("start \(call.id) \(call.paths.joined(separator: ","))")
     }
     func editEnded(_ call: ACPToolCall, completed: Bool) async { edits.append("end \(call.id) \(completed)") }
+
+    var commands: [ACPCommand] = []
+    func commandsChanged(_ commands: [ACPCommand]) { self.commands = commands }
 }
 
 private func update(_ u: JSONValue) -> JSONValue { ["sessionId": "s1", "update": u] }
@@ -218,6 +221,19 @@ private func update(_ u: JSONValue) -> JSONValue { ["sessionId": "s1", "update":
         #expect(blocks[0]["text"]?.string == "Earlier in this conversation:\n\nUser: one\n\nAssistant: two\n\nNow:\nthree")
         #expect(blocks[1] == ["type": "resource_link", "uri": "file:///p/a.typ", "name": "a.typ"])
         #expect(ACPClient.prompt(r, fresh: false, attachments: [])[0]["text"]?.string == "three")
+        let command = AssistantRequest(model: "", system: "S", files: nil, messages: [.init(role: .user, text: "one"), .init(role: .user, text: "/compact")])
+        #expect(ACPClient.prompt(command, fresh: true, attachments: [])[0]["text"]?.string == "/compact")
+    }
+
+    @MainActor @Test func commandsReachTheHostOutsideATurn() async throws {
+        let host = FakeHost()
+        let fake = FakeAgent()
+        let agent = try await fake.agent(host: host)
+        fake.peer.notify("session/update", update(["sessionUpdate": "available_commands_update", "availableCommands": [
+            ["name": "compact", "description": "Summarize"], ["name": "translate", "description": "Translate", "input": ["hint": "language"]]]]))
+        #expect(await eventually { host.commands.map(\.name) == ["compact", "translate"] })
+        #expect(host.commands.last?.hint == "language")
+        withExtendedLifetime(agent) {}
     }
 
     @Test func clientStreamsTheTurnAndMapsErrors() async throws {

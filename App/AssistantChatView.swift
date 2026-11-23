@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import TypoKit
+import ACPProtocol
 import TypoACP
 import TypoAssistant
 import TypstEngine
@@ -310,6 +311,7 @@ struct AssistantPromptBox: View {
     @Bindable var model: AssistantModel
     private let providers = AssistantProviderStore.shared
     @FocusState private var focused: Bool
+    @State private var commandIndex = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -334,6 +336,7 @@ struct AssistantPromptBox: View {
                         }
                     }
                 }
+                if !commandMatches.isEmpty { commandList }
                 TextField("Ask about your document…", text: $model.draft, axis: .vertical)
                     .textFieldStyle(.plain)
                     .lineLimit(1...8)
@@ -341,11 +344,24 @@ struct AssistantPromptBox: View {
                     .onKeyPress(.return, phases: .down) { press in
                         if press.modifiers.contains(.shift) {
                             NSApp.sendAction(#selector(NSResponder.insertNewlineIgnoringFieldEditor(_:)), to: nil, from: nil)
+                        } else if commandMatches.indices.contains(commandIndex) {
+                            useCommand(commandMatches[commandIndex])
                         } else {
                             model.send()
                         }
                         return .handled
                     }
+                    .onKeyPress(.upArrow) {
+                        guard !commandMatches.isEmpty else { return .ignored }
+                        commandIndex = max(commandIndex - 1, 0)
+                        return .handled
+                    }
+                    .onKeyPress(.downArrow) {
+                        guard !commandMatches.isEmpty else { return .ignored }
+                        commandIndex = min(commandIndex + 1, commandMatches.count - 1)
+                        return .handled
+                    }
+                    .onChange(of: model.draft) { commandIndex = 0 }
                 HStack(spacing: 10) {
                     if model.provider?.isOnDevice != true { attachMenu }
                     providerMenu
@@ -374,6 +390,33 @@ struct AssistantPromptBox: View {
         .padding(12)
         .onAppear { focused = true }
     }
+
+    /// The agent's commands matching what follows "/", until the first space.
+    private var commandMatches: [ACPCommand] {
+        guard model.draft.hasPrefix("/"), !model.draft.contains(" ") else { return [] }
+        let typed = model.draft.dropFirst().lowercased()
+        return Array(model.agentCommands.filter { typed.isEmpty || $0.name.lowercased().hasPrefix(typed) }.prefix(8))
+    }
+
+    private var commandList: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(commandMatches.enumerated()), id: \.element.id) { i, c in
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text("/" + c.name).font(.system(.callout, design: .monospaced))
+                    if let h = c.hint { Text("‹\(h)›").font(.caption).foregroundStyle(.tertiary) }
+                    Text(c.description).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 8).padding(.vertical, 4)
+                .background(i == commandIndex ? Color.accentColor.opacity(0.18) : .clear, in: RoundedRectangle(cornerRadius: 6))
+                .contentShape(Rectangle())
+                .onTapGesture { useCommand(c) }
+                .accessibilityAddTraits(.isButton)
+            }
+        }
+    }
+
+    private func useCommand(_ c: ACPCommand) { model.draft = "/\(c.name) " }
 
     @ViewBuilder private var suggestions: some View {
         HStack(spacing: 8) {
