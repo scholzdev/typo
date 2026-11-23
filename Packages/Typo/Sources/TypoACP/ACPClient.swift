@@ -521,7 +521,7 @@ public enum ACPFiles {
             while start > 0, o.character(at: start - 1) != 10 { start -= 1 }
             end = 0
             while end < limit - start, o.character(at: o.length - 1 - end) == n.character(at: n.length - 1 - end) { end += 1 }
-            while end > 0, o.character(at: o.length - end - 1) != 10 { end -= 1 }
+            while end > 0, o.length - end > 0, o.character(at: o.length - end - 1) != 10 { end -= 1 }
         }
         // Never split a surrogate pair.
         if start > 0, UTF16.isLeadSurrogate(o.character(at: start - 1)) { start -= 1 }

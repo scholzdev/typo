@@ -52,6 +52,9 @@ struct AssistantDiffPanel: View {
         }
         .buttonStyle(.plain)
         .help(c.path)
+        .contextMenu {
+            Button("Revert Changes in This File") { Task { await model.revert(c) } }
+        }
     }
 
     private func body(_ c: AssistantFileChange) -> some View {

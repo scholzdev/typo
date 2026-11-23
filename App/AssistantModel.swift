@@ -169,6 +169,7 @@ extension FocusedValues {
             if let c = editor.editor, let tv = c.textView, let b = c.buffer { selection = (b.path, tv.selectedRange()) } else { selection = nil }
             if attachments.isEmpty, let f = project.selectedFile, FileKind.isText(f.raw) { attachments = [f] }
             mode = .assistant
+            if let id = currentID { layout.unread.remove(id) }
         } else {
             mode = .navigator
         }
@@ -735,6 +736,14 @@ extension FocusedValues {
         ledger[key(m.id, index)] = nil
         update(id, m.id) { $0.edits[index] = .reverted }
         if let c = conversations.first(where: { $0.id == id }) { persist(c) }
+    }
+
+    /// Reverts a file's applied edits of the conversation, newest first.
+    func revert(_ change: AssistantFileChange) async {
+        for e in change.edits.reversed() {
+            guard let m = conversations.lazy.flatMap(\.messages).first(where: { $0.id == e.message }) else { continue }
+            await revert(m, e.index)
+        }
     }
 
     /// The gutter's "Discard Change": each change in the mark goes back, newest first, through Revert where the
