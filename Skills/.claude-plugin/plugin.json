@@ -1,0 +1,5 @@
+{
+  "name": "typo",
+  "description": "Typst skills that Typo hands to its agents: writing Typst, fixing compile errors, citations, tables, math, packages and accessible PDFs.",
+  "version": "0.1.0"
+}
