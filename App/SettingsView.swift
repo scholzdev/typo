@@ -151,6 +151,8 @@ struct SettingsView: View {
                     case .components: ComponentsSettings()
                     }
                 }
+                // A hard edge under the title bar, as in Xcode: scrolled content stops at a line instead of showing through the title.
+                .scrollEdgeEffectStyle(.hard, for: .top)
             }
             .navigationTitle(place.page?.title ?? current.title)   // the window title; the visible one is drawn in `header`
             .toolbar(removing: .title)
