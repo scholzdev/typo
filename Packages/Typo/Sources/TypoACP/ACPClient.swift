@@ -264,6 +264,12 @@ public final class ACPAgent: Sendable {
 
     private func notified(_ method: String, _ params: JSONValue) {
         guard method == "session/update", let u = params["update"] else { return }
+        // Arrives right after session/new, outside any turn, so it can't go through the turn below.
+        if u["sessionUpdate"]?.string == "available_commands_update" {
+            let commands = ACPCommand.list(u["availableCommands"])
+            Task { @MainActor [host] in host.value?.commandsChanged(commands) }
+            return
+        }
         let (events, emit) = state.withLock { [host] s -> ([AssistantEvent], (@Sendable ([AssistantEvent]) -> Void)?) in
             guard s.emit != nil else { return ([], nil) }
             let events = s.turn.apply(u)
@@ -402,7 +408,8 @@ public struct ACPClient: AssistantClient {
         let earlier = fresh ? r.messages.dropLast().suffix(10).map { m in
             "\(m.role == .user ? "User" : "Assistant"): " + (m.text.count > 1500 ? m.text.prefix(1500) + "…" : m.text)
         } : []
-        let text = earlier.isEmpty ? last : "Earlier in this conversation:\n\n" + earlier.joined(separator: "\n\n") + "\n\nNow:\n" + last
+        // A slash command only works at the very start of the prompt, so it goes without the recap.
+        let text = earlier.isEmpty || last.hasPrefix("/") ? last : "Earlier in this conversation:\n\n" + earlier.joined(separator: "\n\n") + "\n\nNow:\n" + last
         return [["type": "text", "text": .string(text)]]
             + attachments.map { ["type": "resource_link", "uri": .string($0.absoluteString), "name": .string($0.lastPathComponent)] }
     }

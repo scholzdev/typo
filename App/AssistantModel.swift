@@ -34,6 +34,8 @@ extension FocusedValues {
     private(set) var conversations: [AssistantConversation]
     var currentID: UUID?
     var draft = ""
+    /// The agent's slash commands, offered when the prompt starts with "/".
+    var agentCommands: [ACPCommand] = []
     /// Files sent with the next message; by default the file shown in the editor.
     var attachments: [RelPath] = []
     /// The first editor's selection when the window switched to the assistant (the editor is not on screen then).
@@ -187,6 +189,7 @@ extension FocusedValues {
     // MARK: Conversations
 
     func newConversation() {
+        agentCommands = []
         stop()
         currentID = nil
         draft = ""
@@ -226,6 +229,7 @@ extension FocusedValues {
 
     /// Changes the provider and model: of the open conversation, or for the next one.
     func choose(_ p: AssistantProvider, model: String) {
+        agentCommands = []
         if let id = currentID {
             if current?.providerID != p.id { agents.close(id.uuidString) }
             change(id) { $0.providerID = p.id; $0.model = model }
@@ -788,6 +792,8 @@ extension AssistantModel: ACPHost {
         // A stopped answer finished already and saved without these changes.
         if streamingID != e.message, let c = conversations.first(where: { $0.id == e.conversation }) { persist(c) }
     }
+
+    func commandsChanged(_ commands: [ACPCommand]) { agentCommands = commands }
 
     private func projectPath(_ path: String) throws -> RelPath {
         guard let rel = ACPFiles.projectPath(path, root: project.rootURL) else { throw ACPError(ACPError.invalidParams, "\(path) is outside the project folder.") }
