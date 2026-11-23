@@ -255,6 +255,8 @@ private struct SearchTab: View {
     var body: some View {
         @Bindable var model = model
         VStack(spacing: 0) {
+            // Scrolls when the fixed-size menus are wider than the column: the TabView sizes to its widest tab and clipped every tab on the left.
+            ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 2) {
                 pathMenu(model.searchReplaces ? "Replace" : "Find", selection: $model.searchReplaces) {
                     Text("Find").tag(false)
@@ -273,9 +275,9 @@ private struct SearchTab: View {
                         Text("Regular Expression").tag(Matching.regex)
                     }
                 }
-                Spacer(minLength: 0)
             }
             .padding(.horizontal, 10).padding(.top, 6).padding(.bottom, 2)
+            }
             if model.searchShowsReferences {
                 ReferencesResults(project: project)
             } else {

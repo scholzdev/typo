@@ -312,7 +312,7 @@ struct GitTab: View {
             if !model.branches.isEmpty { Divider() }
             Button("New Branch…", systemImage: "plus") { model.showNewBranchSheet = true }
         } label: {
-            Label(model.status?.branch ?? "detached HEAD", systemImage: "arrow.triangle.branch").lineLimit(1)
+            Label(model.status?.branch ?? "detached HEAD", systemImage: "arrow.triangle.branch").lineLimit(1).truncationMode(.middle).frame(maxWidth: 150)
         }
         .menuStyle(.button).buttonStyle(.borderless).fixedSize()
         .disabled(model.busy)
