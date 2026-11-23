@@ -23,6 +23,25 @@ extension ACPToolCall {
 
     var isEdit: Bool { changesFiles || !diffs.isEmpty }
 
+    /// The shell line an `execute` call runs: `rawInput.command` as a string, or as an argument list (quoted, so the
+    /// policy reads the same words), else the title without the backticks Claude Code wraps it in.
+    public var commandLine: String? {
+        guard kind == "execute" else { return nil }
+        if let s = rawInput?["command"]?.string { return s }
+        if let a = rawInput?["command"]?.array {
+            let words = a.compactMap(\.string)
+            return words.count == a.count && !words.isEmpty ? AgentAccess.quote(words) : nil
+        }
+        let t = title.trimmingCharacters(in: .whitespaces)
+        if t.count > 1, t.hasPrefix("`"), t.hasSuffix("`") { return String(t.dropFirst().dropLast()) }
+        return t.isEmpty ? nil : t
+    }
+
+    /// The call as the permission policy sees it.
+    public var accessRequest: AgentAccess.Request {
+        AgentAccess.Request(kind: kind, title: title, command: commandLine, paths: paths)
+    }
+
     /// The finished call for the transcript; the name is the kind (an identifier), the row shows the title.
     var event: AssistantEvent {
         let arguments: JSONValue = ["title": .string(title), "input": rawInput ?? [:]]
@@ -493,25 +512,11 @@ public struct ACPClient: AssistantClient {
 
 /// How the agent's file access maps onto the project.
 public enum ACPFiles {
-    /// The project path of an agent's absolute path, or nil outside `root`. Symlinks are resolved on both sides as far
-    /// as the path exists (/tmp is /private/tmp; a new file's folder may not exist yet).
+    /// The project path of an agent's absolute path, or nil outside `root`, with `..` and symlinks resolved on both sides.
     public static func projectPath(_ path: String, root: URL) -> RelPath? {
-        let base = real(root.path), full = real(path)
+        let base = AgentAccess.resolve(root.path), full = AgentAccess.resolve(path)
         guard full.hasPrefix(base + "/") else { return nil }
         return RelPath(String(full.dropFirst(base.count + 1)))
-    }
-
-    static func real(_ path: String) -> String {
-        var head = (path as NSString).standardizingPath, tail: [String] = []
-        while head.hasPrefix("/") {
-            if let r = realpath(head, nil) {
-                defer { free(r) }
-                return ([String(cString: r)] + tail.reversed()).joined(separator: "/")
-            }
-            tail.append((head as NSString).lastPathComponent)
-            head = (head as NSString).deletingLastPathComponent
-        }
-        return path
     }
 
     /// The smallest replacement that turns `old` into `new`: the common start and end stay, so undo, the AI marks and

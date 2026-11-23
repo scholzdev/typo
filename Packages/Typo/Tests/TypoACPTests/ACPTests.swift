@@ -312,6 +312,23 @@ private func update(_ u: JSONValue) -> JSONValue { ["sessionId": "s1", "update":
     }
 }
 
+@Suite struct ACPCommandLineTests {
+    func call(_ kind: String, title: String = "", input: JSONValue? = nil) -> ACPToolCall {
+        var c = ACPToolCall(id: "t"); c.kind = kind; c.title = title; c.rawInput = input; return c
+    }
+
+    @Test func commandComesFromRawInputThenTitle() {
+        #expect(call("execute", title: "`ls`", input: ["command": "cat main.typ", "description": "Show it"]).commandLine == "cat main.typ")
+        #expect(AgentAccess(commands: ["cat"]).rules(for: call("execute", input: ["command": ["bash", "-lc", "cat 'a b'"]]).commandLine) == ["cat"])
+        #expect(AgentAccess.split(call("execute", input: ["command": ["rm", "-rf", "x; y"]]).commandLine!) == [["rm", "-rf", "x; y"]])
+        #expect(call("execute", title: "`cat main.typ`").commandLine == "cat main.typ")
+        #expect(call("execute", title: "cat main.typ").commandLine == "cat main.typ")
+        #expect(call("execute").commandLine == nil)
+        #expect(call("execute", input: ["command": [1]]).commandLine == nil)
+        #expect(call("read", title: "`cat x`").commandLine == nil)
+    }
+}
+
 @Suite struct ACPFilesTests {
     @Test func replacementKeepsTheCommonStartAndEnd() {
         let r = ACPFiles.replacement(old: "one\ntwo\nthree", new: "one\n2\nthree")
