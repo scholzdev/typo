@@ -86,6 +86,8 @@ extension FocusedValues {
     private var turnStart: Date?
     /// The running turn's tool calls as the agent reports them, for the live rows.
     private(set) var liveTools: [ACPToolCall] = []
+    /// Whether the running turn's latest update was its plan, for the Planning status.
+    private var planIsLatest = false
     /// Conversations whose last turn the user stopped; not saved.
     private var stopped: Set<UUID> = []
     /// The modes and models each agent provider offered last, so the menus show them before a conversation's session starts.
@@ -146,7 +148,9 @@ extension FocusedValues {
     func status(of id: UUID) -> AssistantConversationStatus {
         let last = conversations.first { $0.id == id }?.messages.last
         let running = streamingConversation == id && streamingID != nil
+        let planMode = conversations.first { $0.id == id }.flatMap { providers.provider($0.providerID) }.flatMap { agentOptions[$0.id]?.modes?.current } == "plan"
         return .of(running: running, blocked: running && (pendingPermission != nil || pendingTool != nil),
+                   planning: running && AssistantPlan.isPlanning(planMode: planMode, latestUpdateIsPlan: planIsLatest, plan: last?.plan),
                    answering: running && last?.id == streamingID && last?.text.isEmpty == false,
                    failed: last?.role == .assistant && last?.error != nil, stopped: stopped.contains(id))
     }
@@ -468,6 +472,7 @@ extension FocusedValues {
         streamingConversation = id
         turnStart = .now
         liveTools = []
+        planIsLatest = false
         stopped.remove(id)
         // What earlier turns changed turns grey in the gutter.
         for b in project.openBuffers { b.previousAIChanges = Set(b.aiChanges.map(\.id)) }
@@ -602,7 +607,7 @@ extension FocusedValues {
     private func finishTurn(_ id: UUID, _ message: UUID, _ duration: TimeInterval?) {
         change(id) { c in
             // A stopped answer with nothing in it leaves no trace.
-            c.messages.removeAll { $0.id == message && $0.text.isEmpty && $0.error == nil && $0.reasoning == nil && $0.toolCalls == nil }
+            c.messages.removeAll { $0.id == message && $0.text.isEmpty && $0.error == nil && $0.reasoning == nil && $0.toolCalls == nil && $0.plan == nil }
             if let i = c.messages.lastIndex(where: { $0.role == .assistant }), c.messages[i].duration == nil { c.messages[i].duration = duration }
             c.updated = .now
         }
@@ -1040,7 +1045,16 @@ extension AssistantModel: ACPHost {
 
     func toolCallChanged(_ call: ACPToolCall) {
         guard streamingID != nil else { return }
+        planIsLatest = false
         Self.entrance { if let i = liveTools.firstIndex(where: { $0.id == call.id }) { liveTools[i] = call } else { liveTools.append(call) } }
+    }
+
+    /// The plan joins the running turn's answer, where it first appeared; later ones replace it there.
+    func planChanged(_ plan: ACPPlan) {
+        guard let id = streamingConversation, let message = streamingID else { return }
+        planIsLatest = true
+        let adds = conversations.first { $0.id == id }?.messages.first { $0.id == message }?.plan == nil
+        Self.entrance(adds) { update(id, message) { $0.plan = AssistantPlan.updated($0, with: plan.assistantEntries) } }
     }
 
     /// The permissions of the running turn's conversation; the shown one may be another.

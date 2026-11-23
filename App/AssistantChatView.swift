@@ -198,7 +198,11 @@ struct AssistantMessageView: View {
                 }
                 .assistantEntrance()
             }
-            ForEach(message.toolCalls ?? []) { AssistantToolRow(exchange: $0, note: model.accessNotes[$0.call.id]).assistantEntrance() }
+            // The plan stands among the tool calls where it first appeared.
+            let calls = message.toolCalls ?? [], split = min(message.plan?.after ?? calls.count, calls.count)
+            ForEach(calls.prefix(split)) { AssistantToolRow(exchange: $0, note: model.accessNotes[$0.call.id]).assistantEntrance() }
+            if let plan = message.plan { AssistantPlanCard(plan: plan).assistantEntrance() }
+            ForEach(calls.dropFirst(split)) { AssistantToolRow(exchange: $0, note: model.accessNotes[$0.call.id]).assistantEntrance() }
             let permissions = model.permissions
             let segments = AssistantEdits.segments(message.text)
             let files = Set(model.project.allFiles.map(\.raw))
