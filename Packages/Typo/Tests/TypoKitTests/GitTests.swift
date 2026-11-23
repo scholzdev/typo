@@ -161,6 +161,21 @@ import TypoTestSupport
         await #expect(throws: GitError.self) { try await p.createBranch("bad..name", git: git) }
     }
 
+    @Test func switchRefusedByLocalChangesFailsCleanly() async throws {
+        let (p, root) = try await TestEnv.project(files: ["main.typ": "one\n"])
+        try await p.initRepository(git: git)
+        try await p.commitAll("first", git: git)
+        #expect(try await p.shortHead(git: git)?.count ?? 0 >= 7)
+        try await p.createBranch("draft", git: git)
+        try "two\n".write(to: root.appending(path: "main.typ"), atomically: true, encoding: .utf8)
+        try await p.commitAll("second", git: git)
+        try await p.switchBranch("main", git: git)
+        try "local\n".write(to: root.appending(path: "main.typ"), atomically: true, encoding: .utf8)
+        await #expect(throws: GitError.self) { try await p.switchBranch("draft", git: git) }
+        #expect(try await p.gitStatus(git: git).branch == "main")
+        #expect(try String(contentsOf: root.appending(path: "main.typ"), encoding: .utf8) == "local\n")
+    }
+
     @Test func historyFollowsRenames() async throws {
         let (p, root) = try await TestEnv.project(files: ["old.typ": "a\nb\nc\nd\n"])
         try await p.initRepository(git: git)

@@ -11,6 +11,8 @@ import TypstEngine
     var busy = false
     var message = ""
     var branches: [GitBranch] = []
+    /// The short commit while HEAD is detached.
+    var detachedCommit: String?
     var stashes: [GitStash] = []
     var isMerging = false
     /// Sheets of the Changes tab; on the model so the Git menu and the palette can open them.
@@ -35,12 +37,14 @@ import TypstEngine
         let s = try? await project.gitStatus()
         let r = (try? await project.hasRemote()) ?? false
         let b = (try? await project.branches()) ?? []
+        let head = s?.branch == nil ? await project.shortHead() : nil
         let st = (try? await project.stashes()) ?? []
         guard mine == generation, pendingStages == 0 else { return }       // a newer refresh is on its way
         isRepository = true
         status = s
         hasRemote = r
         branches = b
+        detachedCommit = head
         stashes = st
         isMerging = project.isMerging
         NotificationCenter.default.post(name: .gitDidRefresh, object: project)     // the editor gutters reload HEAD
@@ -808,7 +812,7 @@ private struct StashSheet: View {
     }
 }
 
-private struct NewBranchSheet: View {
+struct NewBranchSheet: View {
     let project: Project
     let model: GitModel
     @Environment(\.dismiss) private var dismiss

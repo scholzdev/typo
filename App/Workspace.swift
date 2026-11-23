@@ -85,11 +85,7 @@ struct EditorBottomBar: View {
             Spacer()
             if actions.caretStatus != nil { CaretStatusButton(actions: actions, layout: layout) }
             WordCountButton(project: project, actions: actions).font(.system(size: 11))
-            if let branch = sidebar.git.status?.branch {
-                Label(branch, systemImage: "arrow.triangle.branch").font(.system(size: 11)).foregroundStyle(.secondary).lineLimit(1)
-                    .padding(.horizontal, 8).padding(.vertical, 2)
-                    .background(Color.primary.opacity(0.06), in: .capsule)
-            }
+            if sidebar.git.isRepository { BranchSwitcher(project: project, model: sidebar.git) }
             Button("Show or Hide Bottom Area", systemImage: "rectangle.bottomthird.inset.filled") { layout.bottom.isShown.toggle() }
                 .labelStyle(.iconOnly).buttonStyle(.borderless).font(.system(size: 12)).frame(width: 24, height: 20)
                 .foregroundStyle(layout.bottom.isShown ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
@@ -338,5 +334,42 @@ private struct VimHints: View {
         }
         .lineLimit(1)
         .accessibilityElement(children: .combine)
+    }
+}
+
+/// The branch capsule of the status bar: the current branch (or the short commit when detached) and a menu to switch or create.
+private struct BranchSwitcher: View {
+    let project: Project
+    let model: GitModel
+    @State private var creating = false
+
+    var body: some View {
+        Menu {
+            ForEach(model.branches) { b in
+                Toggle(b.name, isOn: Binding(get: { b.isCurrent }, set: { _ in switchTo(b) }))
+            }
+            if !model.branches.isEmpty { Divider() }
+            Button("New Branch…") { creating = true }
+        } label: {
+            Label(model.status?.branch ?? model.detachedCommit ?? "No commits", systemImage: "arrow.triangle.branch")
+                .font(.system(size: 11)).lineLimit(1)
+                .padding(.horizontal, 8).padding(.vertical, 2)
+                .background(Color.primary.opacity(0.06), in: .capsule)
+        }
+        .menuStyle(.button).buttonStyle(.borderless).menuIndicator(.hidden).fixedSize()
+        .foregroundStyle(.secondary)
+        .disabled(model.busy)
+        .help("Switch or create a branch")
+        .sheet(isPresented: $creating) { NewBranchSheet(project: project, model: model) }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { _ in
+            Task { await model.refresh(project) }
+        }
+    }
+
+    private func switchTo(_ b: GitBranch) {
+        guard !b.isCurrent else { return }
+        if project.hasUnsavedChanges,
+           !confirm("You have unsaved changes", "Switching to “\(b.name)” saves them first, and git may refuse if they conflict.", ok: "Switch Anyway") { return }
+        Task { await model.run(project, "Couldn’t Switch to “\(b.name)”") { try await project.switchBranch(b.name) } }
     }
 }
