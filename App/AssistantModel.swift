@@ -658,6 +658,8 @@ extension FocusedValues {
         guard !permissionQueue.isEmpty else { return }
         let (pending, answer) = permissionQueue.removeFirst()
         answer.resume(returning: option)
+        let kind = pending.options.first { $0.id == option }?.kind ?? "stopped"
+        Self.log.notice("\(pending.call.title, privacy: .public): the user answered \(kind, privacy: .public)")
         // "Always Allow" on a command or a file outside the project becomes a rule in Settings › Permissions; requests
         // waiting behind it that the rule now covers are answered too.
         guard let option, pending.options.first(where: { $0.id == option })?.kind == "allow_always" else { return }
@@ -665,7 +667,7 @@ extension FocusedValues {
         access.remember(pending.call.accessRequest, root: project.rootURL.path)
         guard access != AgentAccess.stored else { return }
         AgentAccess.stored = access
-        Self.log.info("Always Allow added rules for \(pending.call.title, privacy: .public)")
+        Self.log.notice("Always Allow added rules for \(pending.call.title, privacy: .public)")
         permissionQueue.removeAll { p in
             guard let id = automaticAnswer(p.pending) else { return false }
             p.answer.resume(returning: id)
@@ -926,7 +928,7 @@ extension AssistantModel: ACPHost {
     }
 
     private func note(_ call: ACPToolCall, _ text: String, builtIn: Bool = false) {
-        Self.log.info("\(call.kind ?? "tool", privacy: .public) \(call.title, privacy: .public): \(text, privacy: .public)")
+        Self.log.notice("\(call.kind ?? "tool", privacy: .public) \(call.title, privacy: .public): \(text, privacy: .public)")
         if !builtIn { accessNotes[call.id] = text }
     }
 
@@ -937,6 +939,8 @@ extension AssistantModel: ACPHost {
 
     /// The real path of a file outside the project once the settings or the user allow it; an error otherwise.
     private func outsideFile(_ path: String, write: Bool) async throws -> String {
+        // The card and the rule name the file the agent gets, not a spelling with ".." in it.
+        let path = AgentAccess.resolve(path)
         var call = ACPToolCall(id: "typo-file-\(UUID().uuidString)")
         call.kind = write ? "edit" : "read"
         call.title = (write ? "Write " : "Read ") + path
@@ -947,7 +951,7 @@ extension AssistantModel: ACPHost {
         var answer = automaticAnswer(p)
         if answer == nil, streamingID != nil { answer = await withCheckedContinuation { c in permissionQueue.append((p, c)) } }
         switch answer {
-        case "once", "always": return AgentAccess.resolve(path)
+        case "once", "always": return path
         case "reject" where !AgentAccess.stored.controlsFiles: throw ACPError(ACPError.invalidParams, "\(path) is outside the project folder.")
         default: throw ACPError(ACPError.invalidParams, "\(path) is outside the project folder, and the user did not allow access to it.")
         }
