@@ -14,10 +14,16 @@ import JSONRPC
     func editEnded(_ call: ACPToolCall, completed: Bool) async
     /// The agent's slash commands, sent when the session starts and again whenever they change.
     func commandsChanged(_ commands: [ACPCommand])
+    /// The session's modes and models, when it starts and whenever they change.
+    func optionsChanged(_ options: ACPSessionOptions)
+    /// A tool call of the running turn started or changed, for its live row.
+    func toolCallChanged(_ call: ACPToolCall)
 }
 
 extension ACPHost {
     public func commandsChanged(_ commands: [ACPCommand]) {}
+    public func optionsChanged(_ options: ACPSessionOptions) {}
+    public func toolCallChanged(_ call: ACPToolCall) {}
 }
 
 public struct ACPOption: Sendable, Equatable, Identifiable {

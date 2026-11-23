@@ -256,6 +256,7 @@ extension LineNumberRuler {
 
     /// A click on a row that starts a fold folds or unfolds it.
     override func mouseDown(with event: NSEvent) {
+        if clickRainbow(event) { return }                          // an assistant change bar
         if editor?.gitGutter.click(event) == true { return }      // a git change bar at the left edge
         guard let tv = textView, let tlm = tv.textLayoutManager, let tcs = tv.textContentStorage else { return super.mouseDown(with: event) }
         let p = tv.convert(event.locationInWindow, from: nil)

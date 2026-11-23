@@ -32,6 +32,11 @@ public struct AIMarks: Equatable, Sendable {
         }
     }
 
+    /// Drops the marks that overlap `r`; the text stays.
+    public mutating func remove(overlapping r: NSRange) {
+        ranges.removeAll { $0.location < max(NSMaxRange(r), r.location + 1) && r.location < NSMaxRange($0) }
+    }
+
     /// Whether the character range `[lo, hi)` (a layout fragment) overlaps a mark.
     public func touches(_ lo: Int, _ hi: Int) -> Bool { ranges.contains { $0.location < max(hi, lo + 1) && lo < NSMaxRange($0) } }
 }
@@ -64,6 +69,20 @@ extension Buffer {
         if let m = aiMarks.ranges.first(where: { $0.location < top && lo < NSMaxRange($0) }) { return m }
         return inlineDiff.map(\.range).flatMap { $0.location < top && lo < NSMaxRange($0) ? $0 : nil }
     }
+
+    /// A mark whose every tracked change was made before the running turn: drawn grey as "Previous changes".
+    public func isPreviousAIBlock(_ r: NSRange) -> Bool {
+        let inside = aiChanges.filter { $0.range.location < max(NSMaxRange(r), r.location + 1) && r.location < NSMaxRange($0.range) }
+        return !inside.isEmpty && inside.allSatisfy { previousAIChanges.contains($0.id) }
+    }
+
+    /// The tracked changes inside the mark, newest last.
+    public func aiChanges(in r: NSRange) -> [AIChange] {
+        aiChanges.filter { $0.range.location < max(NSMaxRange(r), r.location + 1) && r.location < NSMaxRange($0.range) }
+    }
+
+    /// Gutter "Dismiss": the mark goes, the text stays.
+    public func dismissAIMark(_ r: NSRange) { aiMarks.remove(overlapping: r) }
 
     /// Whether the text `[lo, hi)` (a layout fragment) is marked as written by the assistant or is what a pending inline diff replaces.
     public func marksAssistantChange(_ lo: Int, _ hi: Int) -> Bool { assistantBlock(lo, hi) != nil }

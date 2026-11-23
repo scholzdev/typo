@@ -365,6 +365,7 @@ public struct FileNode: Identifiable, Sendable, Equatable {
 
     /// Nil until the file has been opened; the app uses it to turn a diagnostic's range into a line number.
     public func buffer(for path: RelPath) -> Buffer? { buffers[path] }
+    public var openBuffers: [Buffer] { Array(buffers.values) }
 
     public func diagnostics(in file: RelPath) -> [Diagnostic] {
         mappedDiagnostics(in: file)

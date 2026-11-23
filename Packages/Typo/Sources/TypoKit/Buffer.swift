@@ -33,6 +33,8 @@ public typealias EditActions = NSTextStorage.EditActions
     /// Ranges written by accepted assistant edits (gutter ribbon); they shift with edits and go when edited by hand.
     public internal(set) var aiMarks = AIMarks() { didSet { if aiMarks != oldValue { NotificationCenter.default.post(name: .bufferAIMarksChanged, object: self) } } }
     /// The changes the assistant applied that Revert can still undo; they shift with edits (see `AIChange`).
+    /// Changes made before the assistant's running turn; their marks are drawn as previous changes.
+    public var previousAIChanges: Set<UUID> = [] { didSet { if previousAIChanges != oldValue { NotificationCenter.default.post(name: .bufferAIMarksChanged, object: self) } } }
     public internal(set) var aiChanges: [AIChange] = [] { didSet { if aiChanges != oldValue { NotificationCenter.default.post(name: .bufferAIChangesChanged, object: self) } } }
     /// The assistant's pending edit being reviewed in the editor; any edit to the text dismisses it.
     public var inlineDiff: InlineDiffPreview? { didSet { NotificationCenter.default.post(name: .bufferInlineDiffChanged, object: self) } }

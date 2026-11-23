@@ -1,127 +1,197 @@
 import SwiftUI
+import UniformTypeIdentifiers
 import TypoKit
 import TypoAssistant
 
-/// The sidebar in assistant mode: New Conversation, the conversations by date, and a collapsible Archive.
+/// The sidebar in assistant mode, like Xcode's: New Conversation and New Group, the conversations with their groups,
+/// and Archive at the bottom. The conversation itself fills the editor area.
 struct AssistantConversationList: View {
     @Bindable var model: AssistantModel
-    @State private var showsArchive = false
+    @State private var selection: Set<UUID> = []
     @State private var renaming: AssistantConversation?
     @State private var newTitle = ""
     @State private var deleting: AssistantConversation?
+    @State private var renamingGroup: UUID?
+    @State private var groupName = ""
+    @FocusState private var groupFieldFocused: Bool
 
     var body: some View {
-        let active = model.conversations.filter { !$0.archived }
-        let archived = model.conversations.filter(\.archived)
-        List(selection: Binding(get: { model.currentID }, set: { if let id = $0 { model.select(id) } })) {
-            ForEach(Self.groups(active), id: \.title) { group in
-                Section(group.title) {
-                    ForEach(group.items) { row($0) }
+        let byID = Dictionary(model.conversations.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let live = { (ids: [UUID]) in ids.compactMap { byID[$0] }.filter { !$0.archived } }
+        let archived = model.conversations.filter(\.archived).sorted { $0.updated > $1.updated }
+        List(selection: $selection) {
+            ForEach(model.layout.groups) { g in
+                DisclosureGroup(isExpanded: Binding(get: { g.expanded }, set: { model.layout.setExpanded(g.id, $0) })) {
+                    ForEach(live(g.items)) { row($0) }
+                        .onMove { from, to in move(live(g.items), from, to, group: g.id) }
+                } label: {
+                    groupLabel(g)
                 }
+                .dropDestination(for: String.self) { items, _ in drop(items, into: g.id) }
             }
+            ForEach(live(model.layout.order)) { row($0) }
+                .onMove { from, to in move(live(model.layout.order), from, to, group: nil) }
             if !archived.isEmpty {
-                Section(isExpanded: $showsArchive) {
+                DisclosureGroup(isExpanded: $model.layout.archiveExpanded) {
                     ForEach(archived) { row($0) }
-                } header: {
-                    Text("Archive")
+                } label: {
+                    Label("Archive", systemImage: "archivebox")
                 }
             }
         }
         .listStyle(.sidebar)
+        .onChange(of: selection) { _, s in if s.count == 1, let id = s.first { model.select(id) } }
+        .onChange(of: model.currentID, initial: true) { _, id in
+            if let id, !selection.contains(id) { selection = [id] } else if id == nil, selection.count == 1 { selection = [] }
+        }
         .overlay {
             if model.conversations.isEmpty {
                 ContentUnavailableView("No Conversations", systemImage: "sparkles", description: Text("Ask about your document to start one."))
             }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
-            Button { model.newConversation() } label: {
-                Label("New Conversation", systemImage: "square.and.pencil").frame(maxWidth: .infinity)
+            HStack(spacing: 8) {
+                capsule("New Conversation", "square.and.pencil", help: "Starts a new conversation with the assistant") { model.newConversation(); selection = [] }
+                capsule("New Group", "folder.badge.plus", help: "Adds a group to sort conversations into") { newGroup(with: []) }
             }
-            .controlSize(.large)
-            .padding(.horizontal, 12).padding(.vertical, 8)
-            .help("Starts a new conversation with the assistant")
+            .padding(.horizontal, 10).padding(.vertical, 8)
         }
         .alert("Rename Conversation", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Title", text: $newTitle)
             Button("Rename") { if let c = renaming { model.rename(c.id, to: newTitle) } }
             Button("Cancel", role: .cancel) {}
         }
-        .confirmationDialog("Delete “\(deleting?.title ?? "")”?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })) {
+        .alert("Delete Conversation?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })) {
             Button("Delete", role: .destructive) { if let c = deleting { model.delete(c.id) } }
+            Button("Cancel", role: .cancel) {}
         } message: {
-            Text("The conversation is removed from this Mac. This cannot be undone.")
+            Text("Are you sure you want to permanently delete “\(deleting?.title ?? "")”? This cannot be undone.")
         }
+    }
+
+    private func capsule(_ title: String, _ symbol: String, help: String, _ action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: symbol).font(.system(size: 12, weight: .medium)).lineLimit(1)
+                .frame(maxWidth: .infinity).padding(.vertical, 5)
+                .background(.quaternary.opacity(0.7), in: Capsule())
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .help(help)
+    }
+
+    @ViewBuilder private func groupLabel(_ g: AssistantConversationLayout.Group) -> some View {
+        if renamingGroup == g.id {
+            TextField("Group Name", text: $groupName)
+                .focused($groupFieldFocused)
+                .onSubmit { commitGroupName() }
+                .onChange(of: groupFieldFocused) { _, f in if !f { commitGroupName() } }
+        } else {
+            Label(g.name, systemImage: "folder")
+                .contextMenu {
+                    Button("Rename Group") { groupName = g.name; renamingGroup = g.id; groupFieldFocused = true }
+                    Divider()
+                    Button("Delete Group") { model.layout.deleteGroup(g.id) }
+                }
+        }
+    }
+
+    private func commitGroupName() {
+        if let id = renamingGroup { model.layout.renameGroup(id, to: groupName) }
+        renamingGroup = nil
+    }
+
+    private func newGroup(with items: [UUID]) {
+        let id = model.layout.newGroup(named: "New Group", with: items)
+        groupName = "New Group"
+        renamingGroup = id
+        groupFieldFocused = true
+    }
+
+    private func move(_ shown: [AssistantConversation], _ from: IndexSet, _ to: Int, group: UUID?) {
+        let before = to < shown.count ? shown[to].id : nil
+        for i in from { model.layout.move(shown[i].id, to: group, before: before) }
+    }
+
+    private func drop(_ items: [String], into group: UUID?) -> Bool {
+        let ids = items.compactMap(UUID.init)
+        ids.forEach { model.layout.move($0, to: group) }
+        return !ids.isEmpty
     }
 
     private func row(_ c: AssistantConversation) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(c.title).lineLimit(1)
-            Text(c.updated, format: Calendar.current.isDateInToday(c.updated) ? .dateTime.hour().minute() : .dateTime.day().month().hour().minute())
-                .font(.caption).foregroundStyle(.secondary)
-        }
-        .tag(c.id)
-        .contextMenu {
-            Button("Rename…") { newTitle = c.title; renaming = c }
-            Button(c.archived ? "Unarchive" : "Archive") { model.setArchived(c.id, !c.archived) }
-            Divider()
-            Button("Delete…", role: .destructive) { deleting = c }
-        }
-    }
-
-    private struct DateGroup { let title: String; let items: [AssistantConversation] }
-
-    /// Today, Yesterday, Previous 7 Days, Older; newest first within each.
-    private static func groups(_ items: [AssistantConversation]) -> [DateGroup] {
-        let cal = Calendar.current
-        func title(_ d: Date) -> String {
-            if cal.isDateInToday(d) { return "Today" }
-            if cal.isDateInYesterday(d) { return "Yesterday" }
-            if let days = cal.dateComponents([.day], from: cal.startOfDay(for: d), to: cal.startOfDay(for: .now)).day, days < 7 { return "Previous 7 Days" }
-            return "Older"
-        }
-        let sorted = items.sorted { $0.updated > $1.updated }
-        var out: [DateGroup] = []
-        for c in sorted {
-            let t = title(c.updated)
-            if out.last?.title == t { out[out.count - 1] = DateGroup(title: t, items: out[out.count - 1].items + [c]) } else { out.append(DateGroup(title: t, items: [c])) }
-        }
-        return out
+        AssistantConversationRow(conversation: c, status: model.status(of: c.id), unread: model.layout.unread.contains(c.id))
+            .tag(c.id)
+            .draggable(c.id.uuidString)
+            .contextMenu {
+                Button("Rename Conversation") { newTitle = c.title; renaming = c }
+                Button("New Group from Selection") { newGroup(with: selection.contains(c.id) ? Array(selection) : [c.id]) }
+                if !model.layout.groups.isEmpty {
+                    Menu("Move to Group") {
+                        ForEach(model.layout.groups) { g in Button(g.name) { model.layout.move(c.id, to: g.id) } }
+                        if model.layout.group(of: c.id) != nil {
+                            Divider()
+                            Button("No Group") { model.layout.move(c.id, to: nil, before: model.layout.order.first) }
+                        }
+                    }
+                }
+                Divider()
+                Button(c.archived ? "Unarchive Conversation" : "Archive Conversation") { model.setArchived(c.id, !c.archived) }
+                Divider()
+                Button("Delete Conversation", role: .destructive) { deleting = c }
+            }
     }
 }
 
-/// The sidebar in assistant mode, as in Xcode: the chat itself, with the conversations behind a button above it.
-struct AssistantSidebar: View {
-    @Bindable var model: AssistantModel
-    @State private var showsList = false
-    @State private var showsPermissions = false
+/// Title, then the status (Blocked, Working, Failed…) or when it was last active; a dot while unread.
+struct AssistantConversationRow: View {
+    let conversation: AssistantConversation
+    let status: AssistantConversationStatus
+    let unread: Bool
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 6) {
-                Button { showsList.toggle() } label: {
-                    HStack(spacing: 4) {
-                        Text(model.current?.title ?? "New Conversation").font(.system(size: 12, weight: .medium)).lineLimit(1)
-                        Image(systemName: "chevron.down").font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
-                    }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .help("Show all conversations")
-                .popover(isPresented: $showsList, arrowEdge: .bottom) {
-                    AssistantConversationList(model: model).frame(width: 300, height: 420)
-                }
-                Spacer()
-                Button("Permissions", systemImage: "checkmark.shield") { showsPermissions.toggle() }
-                    .buttonStyle(.borderless).labelStyle(.iconOnly)
-                    .help("What the assistant may do in this conversation")
-                    .popover(isPresented: $showsPermissions, arrowEdge: .bottom) { AssistantPermissionsPopover(model: model) }
-                Button("New Conversation", systemImage: "square.and.pencil") { model.newConversation() }
-                    .buttonStyle(.borderless).labelStyle(.iconOnly)
-                    .help("Starts a new conversation with the assistant")
+        HStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(conversation.title).lineLimit(1).fontWeight(unread ? .semibold : .regular)
+                subtitle.font(.caption).foregroundStyle(.secondary).lineLimit(1)
             }
-            .padding(.horizontal, 12).frame(height: 30)
-            AssistantChatView(model: model)
+            Spacer(minLength: 0)
+            if unread {
+                Circle().fill(.blue).frame(width: 7, height: 7).accessibilityLabel("Unread")
+            }
         }
-        .onChange(of: model.currentID) { showsList = false }
+        .padding(.vertical, 2)
+    }
+
+    @ViewBuilder private var subtitle: some View {
+        switch status {
+        case .blocked:
+            HStack(spacing: 5) {
+                Label("Blocked", systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption2.weight(.semibold)).foregroundStyle(.black.opacity(0.75))
+                    .padding(.horizontal, 5).padding(.vertical, 1)
+                    .background(.yellow, in: Capsule())
+                Text("Permission Required")
+            }
+        case .working, .responding:
+            HStack(spacing: 5) {
+                ProgressView().controlSize(.mini)
+                Text(status == .working ? "Working" : "Responding")
+            }
+        case .failed:
+            Text("Failed").foregroundStyle(.red)
+        case .stopped:
+            Text("Stopped")
+        case .idle:
+            Text(Self.relative(conversation.updated))
+        }
+    }
+
+    /// "Today, 21:57", "Yesterday, 09:10", else the date with the time.
+    static func relative(_ d: Date) -> String {
+        let cal = Calendar.current, time = d.formatted(date: .omitted, time: .shortened)
+        if cal.isDateInToday(d) { return "Today, \(time)" }
+        if cal.isDateInYesterday(d) { return "Yesterday, \(time)" }
+        return d.formatted(date: .abbreviated, time: .shortened)
     }
 }

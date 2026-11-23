@@ -38,6 +38,8 @@ extension FocusedValues {
     var agentCommands: [ACPCommand] = []
     /// Files sent with the next message; by default the file shown in the editor.
     var attachments: [RelPath] = []
+    /// Files from outside the project sent with the next message.
+    var externalAttachments: [URL] = []
     /// The first editor's selection when the window switched to the assistant (the editor is not on screen then).
     private(set) var selection: (path: RelPath, range: NSRange)?
     /// Provider and model for a new conversation; a conversation keeps its own.
@@ -73,6 +75,21 @@ extension FocusedValues {
     private var draftPermissions: AssistantPermissions?
     /// The assistant message being streamed.
     private(set) var streamingID: UUID?
+    /// The conversation of the running turn; one turn runs per window, and it keeps running while another conversation is shown.
+    private(set) var streamingConversation: UUID?
+    /// When the running turn started, for its duration.
+    private var turnStart: Date?
+    /// The running turn's tool calls as the agent reports them, for the live rows.
+    private(set) var liveTools: [ACPToolCall] = []
+    /// Conversations whose last turn the user stopped; not saved.
+    private var stopped: Set<UUID> = []
+    /// The modes and models each agent provider offered last, so the menus show them before a conversation's session starts.
+    private(set) var agentOptions: [UUID: ACPSessionOptions] = [:]
+    /// The mode picked before the first message.
+    var draftAgentMode: String?
+    /// Groups, order, unread and disclosure state of the sidebar list.
+    var layout: AssistantConversationLayout { didSet { if layout != oldValue { layoutStore.save(layout) } } }
+    private let layoutStore: AssistantConversationLayoutStore
     /// True while the context of a message is being gathered, before it is sent.
     private(set) var preparing = false
     private var task: Task<Void, Never>?
@@ -91,9 +108,18 @@ extension FocusedValues {
     init(project: Project) {
         self.project = project
         store = AssistantConversationStore(folder: AssistantConversationStore.folder(for: project.rootURL))
-        conversations = store.loadAll()
+        let loaded = store.loadAll()
+        conversations = loaded
+        layoutStore = AssistantConversationLayoutStore(project.id)
+        var l = layoutStore.load()
+        l.reconcile(loaded.map(\.id))
+        layout = l
         NotificationCenter.default.addObserver(forName: .bufferAIChangesChanged, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.changesRevision += 1 }
+        }
+        NotificationCenter.default.addObserver(forName: .assistantDiscardChange, object: nil, queue: .main) { [weak self] n in
+            guard let b = n.object as? Buffer, let r = (n.userInfo?["range"] as? NSValue)?.rangeValue else { return }
+            MainActor.assumeIsolated { guard let self, self.project.buffer(for: b.path) === b else { return }; Task { await self.discard(r, in: b) } }
         }
     }
 
@@ -103,7 +129,26 @@ extension FocusedValues {
     func closeAgents() { agents.closeAll() }
 
     var current: AssistantConversation? { conversations.first { $0.id == currentID } }
-    var isStreaming: Bool { streamingID != nil || preparing }
+    /// Whether the shown conversation's turn runs (or a message is being prepared).
+    var isStreaming: Bool { (streamingID != nil && streamingConversation == currentID) || preparing }
+    /// Whether any turn of the window runs; a second one waits.
+    var isBusy: Bool { streamingID != nil || preparing }
+
+    /// The permission card of the shown conversation, if its turn waits for one.
+    var shownPermission: PendingPermission? { streamingConversation == currentID ? pendingPermission : nil }
+    var shownTool: PendingTool? { streamingConversation == currentID ? pendingTool : nil }
+
+    func status(of id: UUID) -> AssistantConversationStatus {
+        let last = conversations.first { $0.id == id }?.messages.last
+        let running = streamingConversation == id && streamingID != nil
+        return .of(running: running, blocked: running && (pendingPermission != nil || pendingTool != nil),
+                   answering: running && last?.id == streamingID && last?.text.isEmpty == false,
+                   failed: last?.role == .assistant && last?.error != nil, stopped: stopped.contains(id))
+    }
+
+    /// The options of the shown conversation's agent, or of the agent a new conversation would use.
+    var shownAgentOptions: ACPSessionOptions? { provider.flatMap { $0.isAgent ? agentOptions[$0.id] : nil } }
+    var agentMode: String? { current.map { $0.agentMode } ?? draftAgentMode }
 
     var provider: AssistantProvider? {
         if let c = current { return providers.provider(c.providerID) }
@@ -124,6 +169,7 @@ extension FocusedValues {
             if let c = editor.editor, let tv = c.textView, let b = c.buffer { selection = (b.path, tv.selectedRange()) } else { selection = nil }
             if attachments.isEmpty, let f = project.selectedFile, FileKind.isText(f.raw) { attachments = [f] }
             mode = .assistant
+            if let id = currentID { layout.unread.remove(id) }
         } else {
             mode = .navigator
         }
@@ -190,8 +236,8 @@ extension FocusedValues {
 
     func newConversation() {
         agentCommands = []
-        stop()
         currentID = nil
+        draftAgentMode = nil
         draft = ""
         notice = nil
         pendingConsent = nil
@@ -202,8 +248,8 @@ extension FocusedValues {
 
     func select(_ id: UUID) {
         guard id != currentID else { return }
-        stop()
         currentID = id
+        layout.unread.remove(id)
         notice = nil
         pendingConsent = nil
         pendingSearch = nil
@@ -221,9 +267,11 @@ extension FocusedValues {
     }
 
     func delete(_ id: UUID) {
-        if id == currentID { stop(); currentID = nil }
+        if id == streamingConversation { stop() }
+        if id == currentID { currentID = nil }
         agents.close(id.uuidString)
         conversations.removeAll { $0.id == id }
+        layout.remove(id)
         store.delete(id)
     }
 
@@ -231,11 +279,19 @@ extension FocusedValues {
     func choose(_ p: AssistantProvider, model: String) {
         agentCommands = []
         if let id = currentID {
-            if current?.providerID != p.id { agents.close(id.uuidString) }
+            if current?.providerID != p.id { agents.close(id.uuidString); change(id) { $0.agentMode = nil } }
             change(id) { $0.providerID = p.id; $0.model = model }
+            if p.isAgent, !model.isEmpty { Task { await agents.running(id.uuidString)?.select(model: model) } }
         } else {
             draftProviderID = p.id; draftModel = model
         }
+    }
+
+    /// The mode menu: the conversation's agent switches at once when it runs.
+    func setAgentMode(_ mode: String?) {
+        guard let id = currentID else { draftAgentMode = mode; return }
+        change(id) { $0.agentMode = mode }
+        if let mode { Task { await agents.running(id.uuidString)?.select(mode: mode) } } else { applyAgentMode(id) }
     }
 
     private func change(_ id: UUID, save: Bool = true, _ f: (inout AssistantConversation) -> Void) {
@@ -265,6 +321,7 @@ extension FocusedValues {
     func send(_ text: String? = nil, diagnostics: Bool = false, search: Bool? = nil) {
         let question = (text ?? draft).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !question.isEmpty, !isStreaming, let provider, providers.isReady(provider) else { return }
+        guard !isBusy else { notice = "Another conversation is still working. Wait for it or stop it first."; return }
         notice = nil
         if providers.needsConsent(provider) {
             pendingConsent = PendingConsent(provider: provider, files: attachments.map(\.raw)) { [weak self] in
@@ -294,7 +351,9 @@ extension FocusedValues {
                 guard currentID == conversation else { return }    // the user moved to another conversation meanwhile
                 if text == nil { draft = "" }
                 let id = conversation ?? start(provider: provider, model: model, title: question)
-                change(id) { $0.messages.append(AssistantMessage(role: .user, text: question, context: context)); $0.updated = .now }
+                var message = AssistantMessage(role: .user, text: question, context: context)
+                message.created = .now
+                change(id) { [message] in $0.messages.append(message); $0.updated = .now }
                 preparing = false
                 respond(in: id, search: searching)
             } catch let e as AssistantError {
@@ -308,9 +367,12 @@ extension FocusedValues {
     private func start(provider: AssistantProvider, model: String, title: String) -> UUID {
         var c = AssistantConversation(providerID: provider.id, model: model)
         c.permissions = draftPermissions
+        c.agentMode = draftAgentMode
         draftPermissions = nil
+        draftAgentMode = nil
         c.title = AssistantConversation.title(from: title)
         conversations.insert(c, at: 0)
+        layout.add(c.id)
         currentID = c.id
         return c.id
     }
@@ -370,6 +432,7 @@ extension FocusedValues {
 
     private func attachedFiles() async throws -> [AssistantContext.File] {
         attachments.compactMap { p in project.assistantText(of: p).map { AssistantContext.File(path: p.raw, text: $0) } }
+            + externalAttachments.compactMap { u in (try? String(contentsOf: u, encoding: .utf8)).map { AssistantContext.File(path: u.lastPathComponent, text: $0) } }
     }
 
     /// Streams an answer to the conversation's last user message.
@@ -390,6 +453,12 @@ extension FocusedValues {
         let answer = AssistantMessage(role: .assistant, text: "")
         change(id, save: false) { $0.messages.append(answer) }
         streamingID = answer.id
+        streamingConversation = id
+        turnStart = .now
+        liveTools = []
+        stopped.remove(id)
+        // What earlier turns changed turns grey in the gutter.
+        for b in project.openBuffers { b.previousAIChanges = Set(b.aiChanges.map(\.id)) }
         let tools = provider.isAgent ? [] : permissions.offered(provider: provider, model: conversation.model)
         task = Task { [weak self] in
             guard let self else { return }
@@ -449,7 +518,8 @@ extension FocusedValues {
     private func client(for p: AssistantProvider) -> any AssistantClient {
         guard p.isAgent else { return providers.client(for: p) }
         let command = p.command ?? "", root = project.rootURL, mcp = Bundle.main.path(forAuxiliaryExecutable: "typo-mcp")
-        return ACPClient(provider: p, sessions: agents, attachments: attachments.map(project.url(for:)), changeFiles: permissions.policy(.changeFiles)) { [weak self] in
+        return ACPClient(provider: p, sessions: agents, attachments: attachments.map(project.url(for:)) + externalAttachments, changeFiles: permissions.policy(.changeFiles),
+                         mode: current?.agentMode) { [weak self] in
             try await ACPAgent.launch(command: command, cwd: root, host: self, mcp: mcp).agent
         }
     }
@@ -494,15 +564,26 @@ extension FocusedValues {
     }
 
     private func finish(_ id: UUID, _ message: UUID) {
+        let duration = turnStart.map { Date.now.timeIntervalSince($0) }
         change(id) { c in
             // A stopped answer with nothing in it leaves no trace.
             c.messages.removeAll { $0.id == message && $0.text.isEmpty && $0.error == nil && $0.reasoning == nil && $0.toolCalls == nil }
+            if let i = c.messages.lastIndex(where: { $0.role == .assistant }), c.messages[i].duration == nil { c.messages[i].duration = duration }
             c.updated = .now
         }
-        if streamingID == message { streamingID = nil; task = nil }
+        if streamingID == message {
+            streamingID = nil; streamingConversation = nil; task = nil; turnStart = nil; liveTools = []
+            if id != currentID || mode != .assistant { layout.unread.insert(id) }
+            // Like Xcode, a turn that changed files opens the diff panel under it.
+            if id == currentID, let c = current, let t = AssistantTurn.split(c.messages).last, !t.changes.isEmpty {
+                diffFile = t.changes.first?.path
+                showsDiff = true
+            }
+        }
     }
 
     func stop() {
+        if let id = streamingConversation, task != nil { stopped.insert(id) }
         task?.cancel()
         answerTool(.deny)
         while pendingPermission != nil { answerPermission(nil) }
@@ -513,7 +594,7 @@ extension FocusedValues {
     /// Runs a call of the model if the permissions say so; a refusal goes back to the model as an error result.
     private func runTool(_ call: ToolCall) async -> ToolResult {
         func fail(_ why: String) -> ToolResult { ToolResult(callID: call.id, content: why, isError: true) }
-        var decision = permissions.decide(call, attached: Set(attachments.map(\.raw)))
+        var decision = runningPermissions.decide(call, attached: Set(attachments.map(\.raw)))
         if case .ask(let question) = decision {
             let answer = await withCheckedContinuation { (c: CheckedContinuation<ToolAnswer, Never>) in
                 pendingTool = PendingTool(call: call, question: question)
@@ -542,7 +623,7 @@ extension FocusedValues {
 
     /// Sends the last question again after a failed answer.
     func retry(_ message: AssistantMessage) {
-        guard let id = currentID, !isStreaming else { return }
+        guard let id = currentID, !isBusy else { return }
         change(id) { $0.messages.removeAll { $0.id == message.id } }
         respond(in: id)
     }
@@ -640,7 +721,8 @@ extension FocusedValues {
 
     /// Puts the text of the change back, or trashes the file it created; other edits of the file stay.
     func revert(_ m: AssistantMessage, _ index: Int) async {
-        guard let id = currentID, revertBlocker(m, index) == nil, let a = ledger[key(m.id, index)] else { return }
+        guard let id = conversations.first(where: { $0.messages.contains { $0.id == m.id } })?.id, revertBlocker(m, index) == nil,
+              let a = ledger[key(m.id, index)] else { return }
         do {
             if a.created {
                 try await project.moveToTrash(a.path)
@@ -653,7 +735,29 @@ extension FocusedValues {
         }
         ledger[key(m.id, index)] = nil
         update(id, m.id) { $0.edits[index] = .reverted }
-        if let c = current { persist(c) }
+        if let c = conversations.first(where: { $0.id == id }) { persist(c) }
+    }
+
+    /// Reverts a file's applied edits of the conversation, newest first.
+    func revert(_ change: AssistantFileChange) async {
+        for e in change.edits.reversed() {
+            guard let m = conversations.lazy.flatMap(\.messages).first(where: { $0.id == e.message }) else { continue }
+            await revert(m, e.index)
+        }
+    }
+
+    /// The gutter's "Discard Change": each change in the mark goes back, newest first, through Revert where the
+    /// transcript tracks it, so its card says reverted.
+    func discard(_ range: NSRange, in buffer: Buffer) async {
+        for c in buffer.aiChanges(in: range).reversed() {
+            let tracked = ledger.first { $0.value.changeID == c.id && $0.value.path == buffer.path }?.key.split(separator: "#")
+            if let tracked, tracked.count == 2, let mid = UUID(uuidString: String(tracked[0])), let index = Int(tracked[1]),
+               let m = conversations.lazy.flatMap(\.messages).first(where: { $0.id == mid }) {
+                await revert(m, index)
+            } else {
+                buffer.revertAssistant(c.id)
+            }
+        }
     }
 
     /// The accepted changes of the answer, as (edit index, edit).
@@ -672,6 +776,32 @@ extension FocusedValues {
         for (i, _) in appliedChanges(m).reversed() {
             guard let fresh = current?.messages.first(where: { $0.id == m.id }) else { return }
             await revert(fresh, i)
+        }
+    }
+
+    // MARK: Transcript
+
+    func setFeedback(_ m: AssistantMessage, _ good: Bool?) {
+        guard let id = conversations.first(where: { $0.messages.contains { $0.id == m.id } })?.id else { return }
+        change(id) { c in if let i = c.messages.firstIndex(where: { $0.id == m.id }) { c.messages[i].feedback = good } }
+    }
+
+    /// The diff panel under the conversation, and the file it scrolls to.
+    var showsDiff = false
+    var diffFile: String?
+
+    func showDiff(_ path: String) {
+        diffFile = path
+        showsDiff = true
+    }
+
+    /// Opens a project file the transcript links to, at `line` when given.
+    func openFile(_ path: String, line: Int? = nil) {
+        guard let rel = RelPath(path) ?? ACPFiles.projectPath(path, root: project.rootURL) else { return }
+        Task {
+            do { _ = try await project.open(rel) } catch { notice = "The file could not be opened: \(error.localizedDescription)"; return }
+            mode = .navigator
+            if let line { project.showLine(rel, line: line, column: nil) } else { project.openPermanently(rel) }
         }
     }
 
@@ -718,6 +848,7 @@ extension AssistantModel: ACPHost {
     /// Edits follow the "Change files" permission where it decides alone; everything else asks with the agent's options.
     func permission(for call: ACPToolCall, options: [ACPOption]) async -> String? {
         func option(_ kind: String) -> String? { options.first { $0.kind == kind }?.id }
+        let permissions = runningPermissions
         // Typo's own MCP tools only read the project; a page preview still asks, since its image goes to the provider.
         if call.title.hasPrefix("typo: "), !call.title.hasSuffix("view_preview"), let id = option("allow_once") { return id }
         if call.changesFiles {
@@ -740,8 +871,9 @@ extension AssistantModel: ACPHost {
     /// Lands in the editor as one undoable step with AI marks, and in the answer as an applied change that Revert takes back.
     func writeTextFile(_ path: String, content: String) async throws {
         let rel = try projectPath(path)
+        let permissions = runningPermissions
         guard permissions.policy(.changeFiles) != .never else { throw ACPError(ACPError.internalError, "The user does not allow changes to files.") }
-        guard let id = currentID, let message = streamingID else { throw ACPError(ACPError.internalError, "No answer is in progress.") }
+        guard let id = streamingConversation, let message = streamingID else { throw ACPError(ACPError.internalError, "No answer is in progress.") }
         let url = project.url(for: rel)
         guard FileKind.isText(rel.raw) else {
             // No editor buffer can hold it, so nothing to keep in step: write it as it is.
@@ -771,7 +903,7 @@ extension AssistantModel: ACPHost {
     /// Claude's own Edit and Write tools write the file themselves: hold its reload and note its text, so the write
     /// can land like `writeTextFile`'s.
     func editStarted(_ call: ACPToolCall) async {
-        guard let id = currentID, let message = streamingID, agentEdits[call.id] == nil else { return }
+        guard let id = streamingConversation, let message = streamingID, agentEdits[call.id] == nil else { return }
         var snapshots: [AgentSnapshot] = []
         for path in call.paths.compactMap({ ACPFiles.projectPath($0, root: project.rootURL) }) where FileKind.isText(path.raw) {
             if let s = await project.holdForAgent(path) { snapshots.append(s) }
@@ -794,6 +926,20 @@ extension AssistantModel: ACPHost {
     }
 
     func commandsChanged(_ commands: [ACPCommand]) { agentCommands = commands }
+
+    func optionsChanged(_ options: ACPSessionOptions) {
+        let id = streamingConversation ?? currentID
+        guard let p = conversations.first(where: { $0.id == id }).flatMap({ providers.provider($0.providerID) }) ?? provider, p.isAgent else { return }
+        agentOptions[p.id] = options
+    }
+
+    func toolCallChanged(_ call: ACPToolCall) {
+        guard streamingID != nil else { return }
+        if let i = liveTools.firstIndex(where: { $0.id == call.id }) { liveTools[i] = call } else { liveTools.append(call) }
+    }
+
+    /// The permissions of the running turn's conversation; the shown one may be another.
+    private var runningPermissions: AssistantPermissions { streamingConversation.map(permissions(of:)) ?? permissions }
 
     private func projectPath(_ path: String) throws -> RelPath {
         guard let rel = ACPFiles.projectPath(path, root: project.rootURL) else { throw ACPError(ACPError.invalidParams, "\(path) is outside the project folder.") }

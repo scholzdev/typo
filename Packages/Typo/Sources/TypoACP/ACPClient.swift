@@ -105,8 +105,8 @@ public final class ACPAgent: Sendable {
         var permissions: [UUID: CheckedContinuation<String?, Never>] = [:]
         var inFlight: Task<Void, Never>?
         var turnNumber = 0
-        /// The mode ids the session offers.
-        var modes: [String] = []
+        /// The modes and models the session offers.
+        var options = ACPSessionOptions()
         /// The host's edit steps run one after another, so a call's end never overtakes its start.
         var hostWork: Task<Void, Never>?
 
@@ -176,8 +176,9 @@ public final class ACPAgent: Sendable {
         }
         let session = try await connection.request("session/new", ["cwd": .string(cwd.path), "mcpServers": .array(mcp.map { [["name": "typo", "command": .string($0), "args": ["--project", .string(cwd.path)], "env": []]] } ?? [])])
         guard let id = session["sessionId"]?.string else { throw ACPError(ACPError.internalError, "The agent opened no session.") }
-        let modes = session["modes"]?["availableModes"]?.array?.compactMap { $0["id"]?.string } ?? []
-        state.withLock { $0.sessionID = id; $0.modes = modes }
+        let options = ACPSessionOptions.parse(session)
+        state.withLock { $0.sessionID = id; $0.options = options }
+        Task { @MainActor [host] in host.value?.optionsChanged(options) }
         let a = info["agentInfo"]
         return [a?["title"]?.string ?? a?["name"]?.string ?? "The agent", a?["version"]?.string].compactMap { $0 }.joined(separator: " ")
     }
@@ -193,9 +194,28 @@ public final class ACPAgent: Sendable {
 
     /// Puts the session in the mode of `policy`, when the agent offers that mode.
     public func apply(_ policy: PermissionPolicy) async {
-        let mode = Self.mode(for: policy)
-        guard let session = state.withLock({ $0.modes.contains(mode) ? $0.sessionID : nil }) else { return }
-        _ = try? await connection.request("session/set_mode", ["sessionId": .string(session), "modeId": .string(mode)])
+        await select(mode: Self.mode(for: policy))
+    }
+
+    /// Puts the session in mode `id`, when the agent offers it.
+    public func select(mode id: String) async {
+        await select(id, in: \.modes, always: true)
+    }
+
+    /// Switches the session to model `id` when the agent offers it and it isn't the current one.
+    public func select(model id: String) async {
+        await select(id, in: \.models, always: false)
+    }
+
+    /// `always`: sent even when the option is current already (the agent may change its mode by itself).
+    private func select(_ id: String, in key: WritableKeyPath<ACPSessionOptions, ACPSelector?>, always: Bool) async {
+        let r: (method: String, params: JSONValue)? = state.withLock { s in
+            guard let sel = s.options[keyPath: key], sel.choices.contains(where: { $0.id == id }), always || sel.current != id else { return nil }
+            return sel.request(id, session: s.sessionID)
+        }
+        guard let r, (try? await connection.request(r.method, r.params)) != nil else { return }
+        let options = state.withLock { s in s.options[keyPath: key]?.current = id; return s.options }
+        await MainActor.run { [host] in host.value?.optionsChanged(options) }
     }
 
     /// Ends the process in the background.
@@ -270,12 +290,18 @@ public final class ACPAgent: Sendable {
             Task { @MainActor [host] in host.value?.commandsChanged(commands) }
             return
         }
-        let (events, emit) = state.withLock { [host] s -> ([AssistantEvent], (@Sendable ([AssistantEvent]) -> Void)?) in
-            guard s.emit != nil else { return ([], nil) }
-            let events = s.turn.apply(u)
-            if let id = u["toolCallId"]?.string, let step = s.turn.editStep(id) { s.send([step], to: host) }
-            return (events, s.emit)
+        if let options = state.withLock({ s in s.options.apply(update: u) ? s.options : nil }) {
+            Task { @MainActor [host] in host.value?.optionsChanged(options) }
+            return
         }
+        let (events, emit, call) = state.withLock { [host] s -> ([AssistantEvent], (@Sendable ([AssistantEvent]) -> Void)?, ACPToolCall?) in
+            guard s.emit != nil else { return ([], nil, nil) }
+            let events = s.turn.apply(u)
+            let id = u["toolCallId"]?.string
+            if let id, let step = s.turn.editStep(id) { s.send([step], to: host) }
+            return (events, s.emit, id.flatMap { s.turn.calls[$0] })
+        }
+        if let call { Task { @MainActor [host] in host.value?.toolCallChanged(call) } }
         if !events.isEmpty { emit?(events) }
     }
 
@@ -394,11 +420,13 @@ public struct ACPClient: AssistantClient {
     let attachments: [URL]
     /// The "Change files" permission, applied as the agent's mode at each turn.
     let changeFiles: PermissionPolicy?
+    /// The mode picked for the conversation, which wins over `changeFiles`.
+    let mode: String?
     let start: @Sendable () async throws -> ACPAgent
 
-    public init(provider: AssistantProvider, sessions: ACPSessions?, attachments: [URL], changeFiles: PermissionPolicy? = nil,
+    public init(provider: AssistantProvider, sessions: ACPSessions?, attachments: [URL], changeFiles: PermissionPolicy? = nil, mode: String? = nil,
                 start: @escaping @Sendable () async throws -> ACPAgent) {
-        self.provider = provider; self.sessions = sessions; self.attachments = attachments; self.changeFiles = changeFiles; self.start = start
+        self.provider = provider; self.sessions = sessions; self.attachments = attachments; self.changeFiles = changeFiles; self.mode = mode; self.start = start
     }
 
     /// The newest user message with its context block, after a recap of earlier turns when the session is new
@@ -425,7 +453,7 @@ public struct ACPClient: AssistantClient {
     }
 
     public func stream(_ request: AssistantRequest) -> AsyncThrowingStream<AssistantEvent, Error> {
-        let sessions = sessions, start = start, attachments = attachments, changeFiles = changeFiles, preset = provider.preset, command = provider.command ?? ""
+        let sessions = sessions, start = start, attachments = attachments, changeFiles = changeFiles, mode = mode, preset = provider.preset, command = provider.command ?? ""
         return AsyncThrowingStream { c in
             let task = Task {
                 do {
@@ -433,7 +461,9 @@ public struct ACPClient: AssistantClient {
                     let (agent, fresh) = try await sessions.agent(for: request.session ?? "", command: command, start: start)
                     try Task.checkCancellation()    // stopped while the agent was starting
                     // Every turn, not once: the agent may change its mode by itself.
-                    if let changeFiles { await agent.apply(changeFiles) }
+                    if let mode { await agent.select(mode: mode) } else if let changeFiles { await agent.apply(changeFiles) }
+                    // The request's model is the conversation's pick; empty keeps the agent's default.
+                    if !request.model.isEmpty { await agent.select(model: request.model) }
                     let reason = try await agent.prompt(Self.prompt(request, fresh: fresh, attachments: attachments)) { events in
                         for e in events { c.yield(e) }
                     }
@@ -484,6 +514,15 @@ public enum ACPFiles {
         while start < limit, o.character(at: start) == n.character(at: start) { start += 1 }
         while end < limit - start, o.character(at: o.length - 1 - end) == n.character(at: n.length - 1 - end) { end += 1 }
         guard start + end < max(o.length, n.length) else { return nil }
+        // A change across lines covers whole lines, so its gutter bar starts and ends with the lines it changed rather than
+        // at a shared "#" of the next line.
+        let middle = { (s: NSString, from: Int, to: Int) in s.substring(with: NSRange(location: from, length: max(to - from, 0))).contains("\n") }
+        if middle(o, start, o.length - end) || middle(n, start, n.length - end) {
+            while start > 0, o.character(at: start - 1) != 10 { start -= 1 }
+            end = 0
+            while end < limit - start, o.character(at: o.length - 1 - end) == n.character(at: n.length - 1 - end) { end += 1 }
+            while end > 0, o.length - end > 0, o.character(at: o.length - end - 1) != 10 { end -= 1 }
+        }
         // Never split a surrogate pair.
         if start > 0, UTF16.isLeadSurrogate(o.character(at: start - 1)) { start -= 1 }
         if end > 0, UTF16.isTrailSurrogate(o.character(at: o.length - end)) { end -= 1 }
