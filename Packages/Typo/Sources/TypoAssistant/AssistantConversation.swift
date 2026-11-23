@@ -36,6 +36,8 @@ public struct AssistantMessage: Codable, Identifiable, Hashable, Sendable {
     public var feedback: Bool?
     /// When the user sent it; nil in files saved before.
     public var created: Date?
+    /// User turns: the project paths "@"-mentioned in `text` by file name; nil in files saved before mentions.
+    public var mentions: [String]?
 
     public init(role: Role, text: String, context: String? = nil) {
         self.role = role; self.text = text; self.context = context

@@ -21,12 +21,13 @@ struct AssistantTurnView: View {
                     .font(.caption).foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
             }
-            if let u = turn.user { AssistantUserBubble(text: u.text) }
-            ForEach(turn.changes) { c in AssistantFileCapsule(change: c) { model.openChange(c) } }
+            if let u = turn.user { AssistantUserBubble(text: u.text, mentions: u.mentions ?? []).assistantEntrance() }
+            ForEach(turn.changes) { c in AssistantFileCapsule(change: c) { model.openChange(c) }.assistantEntrance() }
             ForEach(turn.answers) { m in AssistantMessageView(model: model, message: m) }
             if running { live }
             if !running, !turn.answers.isEmpty, let last = turn.answers.last {
                 AssistantTurnFooter(duration: turn.duration, files: turn.changes.count, feedback: last.feedback) { model.setFeedback(last, $0) }
+                    .assistantEntrance()
             }
         }
     }
@@ -37,16 +38,17 @@ struct AssistantTurnView: View {
         let pending = model.liveTools.filter { !shown.contains($0.id) }
         ForEach(pending, id: \.id) { c in
             AssistantToolRow(kind: c.kind, title: c.title.isEmpty ? "Tool" : c.title, status: AssistantToolStatus(acp: c.status), detail: Self.detail(c))
+                .assistantEntrance()
         }
         let current = turn.answers.last
         if let current, current.text.isEmpty, let r = current.reasoning, !r.isEmpty {
-            AssistantThinkingRow(text: r)
+            AssistantThinkingRow(text: r).assistantEntrance()
         } else if current?.text.isEmpty != false, !pending.contains(where: { AssistantToolStatus(acp: $0.status).isRunning }) {
-            AssistantWorkingRow()
+            AssistantWorkingRow().assistantEntrance()
         }
     }
 
-    /// What a running call shows when expanded: its command, else its text.
+    /// What a running call shows under its title: its command, else its text.
     static func detail(_ c: ACPToolCall) -> String? {
         if let cmd = c.rawInput?["command"]?.string { return "Running \(cmd)" }
         return c.content.compactMap { $0["content"]?["text"]?.string }.first
@@ -56,15 +58,27 @@ struct AssistantTurnView: View {
 /// The user's message: a wide pill with a light blue gradient.
 struct AssistantUserBubble: View {
     let text: String
+    /// The "@"-mentioned paths, whose file names show in grey monospace.
+    var mentions: [String] = []
 
     var body: some View {
-        Text(text)
+        Text(styled)
             .font(.system(size: 13, weight: .medium))
             .textSelection(.enabled)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16).padding(.vertical, 10)
             .background(LinearGradient(colors: [Color.blue.opacity(0.16), Color.blue.opacity(0.26)], startPoint: .top, endPoint: .bottom),
                         in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+    }
+
+    private var styled: AttributedString {
+        var out = AttributedString(text)
+        for r in AssistantMentions.ranges(of: mentions, in: text) {
+            guard let lo = AttributedString.Index(r.lowerBound, within: out), let hi = AttributedString.Index(r.upperBound, within: out) else { continue }
+            out[lo..<hi].font = .system(size: 13, design: .monospaced)
+            out[lo..<hi].foregroundColor = .secondary
+        }
+        return out
     }
 }
 
@@ -191,13 +205,13 @@ struct AssistantToolRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Button { if detail?.isEmpty == false { expanded.toggle() } } label: {
+            Button { if detail?.isEmpty == false, !status.isRunning { expanded.toggle() } } label: {
                 HStack(spacing: 8) {
                     Image(systemName: AssistantToolStatus.symbol(kind: kind)).frame(width: 16)
                     Text(title).lineLimit(1).truncationMode(.middle)
                     Spacer(minLength: 8)
                     switch status {
-                    case .pending, .inProgress: ProgressView().controlSize(.small)
+                    case .pending, .inProgress: AssistantSpinner()
                     case .completed: Image(systemName: "checkmark").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                     case .failed: Image(systemName: "xmark.octagon.fill").foregroundStyle(.red)
                     }
@@ -206,20 +220,61 @@ struct AssistantToolRow: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            if expanded, let detail {
+            // A running call shows what it does on one line; a finished one only when expanded, in full.
+            if status.isRunning, let line = detail?.split(whereSeparator: \.isNewline).first {
+                Text(line).foregroundStyle(.secondary).lineLimit(1).truncationMode(.tail)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 10).padding(.vertical, 6)
+                    .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .transition(.opacity)
+            } else if expanded, let detail {
                 ScrollView {
                     Text(detail).font(.system(size: 11, design: .monospaced)).textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading).padding(8)
                 }
                 .frame(maxHeight: 160)
                 .fixedSize(horizontal: false, vertical: true)
-                .background(.background, in: RoundedRectangle(cornerRadius: 10))
+                .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 10))
             }
         }
         .font(.system(size: 12))
         .padding(.horizontal, 12).padding(.vertical, 8)
         .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .animation(.easeOut(duration: 0.25), value: status)
+        .animation(.easeOut(duration: 0.2), value: expanded)
     }
+}
+
+/// A small ring with a turning blue arc, like Xcode's tool-call progress.
+struct AssistantSpinner: View {
+    @State private var turning = false
+
+    var body: some View {
+        ZStack {
+            Circle().stroke(.quaternary, lineWidth: 2)
+            Circle().trim(from: 0, to: 0.3).stroke(Color.accentColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .rotationEffect(.degrees(turning ? 360 : 0))
+                .animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: turning)
+        }
+        .frame(width: 13, height: 13)
+        .onAppear { turning = true }
+        .accessibilityLabel("In progress")
+    }
+}
+
+/// New transcript items fade in and rise a little (a plain fade with Reduce Motion); removed ones fade out.
+/// They animate only inside the model's animated changes, so opening a conversation shows it at once.
+struct AssistantEntrance: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func body(content: Content) -> some View {
+        content.transition(reduceMotion ? .opacity : .asymmetric(insertion: .opacity.combined(with: .offset(y: 8)).combined(with: .scale(scale: 0.98, anchor: .top)), removal: .opacity))
+    }
+}
+
+extension View {
+    func assistantEntrance() -> some View { modifier(AssistantEntrance()) }
 }
 
 /// "11s · 1 file edited · feedback" under a finished turn.
@@ -261,12 +316,17 @@ struct AssistantMarkdown: View {
     var open: (String) -> Void = { _ in }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ForEach(Array(Self.blocks(text).enumerated()), id: \.offset) { _, b in
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(Self.blocks(text).enumerated()), id: \.offset) { i, b in
                 if b.code {
-                    AssistantCodeCard(code: b.text, language: b.language)
+                    AssistantCodeCard(code: b.text, language: b.language).padding(.top, i > 0 ? 10 : 0)
                 } else {
-                    ForEach(Array(Self.lines(b.text).enumerated()), id: \.offset) { _, l in line(l) }
+                    let lines = Self.lines(b.text)
+                    ForEach(Array(lines.enumerated()), id: \.offset) { j, l in
+                        // About a line between paragraphs; list items closer together.
+                        let listed = j > 0 && l.kind.isBullet && lines[j - 1].kind.isBullet
+                        line(l).padding(.top, i == 0 && j == 0 ? 0 : listed ? 4 : 10)
+                    }
                 }
             }
         }
@@ -281,25 +341,55 @@ struct AssistantMarkdown: View {
         switch l.kind {
         case .heading(let level):
             inline(l.text).font(level == 1 ? .title3.bold() : .headline).padding(.top, 4)
-        case .bullet(let marker):
+        case .bullet(let marker, let level):
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text(marker).foregroundStyle(.secondary)
                 inline(l.text)
             }
-            .padding(.leading, 6)
+            .padding(.leading, 6 + 20 * CGFloat(level))
         case .paragraph:
             inline(l.text)
         }
     }
 
     private func inline(_ s: String) -> some View {
-        Text((try? AttributedString(markdown: Self.linkingFiles(s, files), options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(s))
+        let (text, linksFiles) = Self.styled(s, files: files)
+        return text
             .textSelection(.enabled)
-            .lineSpacing(2)
+            .lineSpacing(4)
+            // File links read as bold text; the system tint would color them like web links.
+            .tint(linksFiles ? .primary : nil)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    enum LineKind { case heading(Int), bullet(String), paragraph }
+    /// Inline Markdown like Xcode: code in body-size monospace (bold inside bold), project files bold with a grey
+    /// arrow after them. The file name is the link: an image in a Text cannot be one.
+    static func styled(_ s: String, files: Set<String>) -> (Text, linksFiles: Bool) {
+        var a = (try? AttributedString(markdown: linkingFiles(s, files), options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(s)
+        var fileLinks: [Range<AttributedString.Index>] = []
+        for run in a.runs {
+            let intent = run.inlinePresentationIntent ?? []
+            let bold = intent.contains(.stronglyEmphasized)
+            if intent.contains(.code) {
+                a[run.range].font = .system(size: 13, weight: bold || run.link?.scheme == "typo-file" ? .bold : .regular, design: .monospaced)
+            } else if run.link?.scheme == "typo-file" {
+                a[run.range].font = .system(size: 13, weight: .bold)
+            }
+        }
+        for (link, range) in a.runs[\.link] where link?.scheme == "typo-file" { fileLinks.append(range) }
+        var text = Text("")
+        var from = a.startIndex
+        for r in fileLinks {
+            text = text + Text(AttributedString(a[from..<r.upperBound])) + Text(" ") + Text(Image(systemName: "arrow.right.circle.fill")).foregroundStyle(.secondary)
+            from = r.upperBound
+        }
+        return (text + Text(AttributedString(a[from..<a.endIndex])), !fileLinks.isEmpty)
+    }
+
+    enum LineKind {
+        case heading(Int), bullet(String, level: Int), paragraph
+        var isBullet: Bool { if case .bullet = self { true } else { false } }
+    }
 
     /// A prose block as headings, list items and paragraphs (lines of a paragraph joined).
     static func lines(_ block: String) -> [(kind: LineKind, text: String)] {
@@ -308,13 +398,16 @@ struct AssistantMarkdown: View {
         func flush() { if !para.isEmpty { out.append((.paragraph, para.joined(separator: "\n"))); para = [] } }
         for raw in block.components(separatedBy: "\n") {
             let t = raw.trimmingCharacters(in: .whitespaces)
+            // Two to four spaces (or a tab) of indentation nest a list item one level.
+            let indent = raw.prefix { $0 == " " || $0 == "\t" }.reduce(0) { $0 + ($1 == "\t" ? 4 : 1) }
+            let level = (indent + 1) / 3
             if t.isEmpty { flush(); continue }
             if let hashes = t.firstIndex(where: { $0 != "#" }), t.hasPrefix("#"), t[hashes] == " " {
                 flush(); out.append((.heading(t.distance(from: t.startIndex, to: hashes)), String(t[hashes...]).trimmingCharacters(in: .whitespaces)))
             } else if t.hasPrefix("- ") || t.hasPrefix("* ") {
-                flush(); out.append((.bullet("•"), String(t.dropFirst(2))))
+                flush(); out.append((.bullet("•", level: level), String(t.dropFirst(2))))
             } else if let dot = t.firstIndex(of: "."), t[..<dot].allSatisfy(\.isNumber), !t[..<dot].isEmpty, t[t.index(after: dot)...].hasPrefix(" ") {
-                flush(); out.append((.bullet(String(t[...dot])), String(t[t.index(dot, offsetBy: 2)...])))
+                flush(); out.append((.bullet(String(t[...dot]), level: level), String(t[t.index(dot, offsetBy: 2)...])))
             } else {
                 para.append(t)
             }
@@ -330,7 +423,7 @@ struct AssistantMarkdown: View {
         func flushWord() {
             let core = word.trimmingCharacters(in: CharacterSet(charactersIn: "*_.,:;()!?"))
             if !inCode, !core.isEmpty, files.contains(core), let r = word.range(of: core) {
-                word.replaceSubrange(r, with: "[\(core) ↗](typo-file:\(core.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? core))")
+                word.replaceSubrange(r, with: "[\(core)](typo-file:\(core.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? core))")
             }
             out += word; word = ""
         }

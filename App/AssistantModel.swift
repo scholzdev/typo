@@ -38,6 +38,8 @@ extension FocusedValues {
     var agentCommands: [ACPCommand] = []
     /// Files sent with the next message; by default the file shown in the editor.
     var attachments: [RelPath] = []
+    /// The files "@"-mentioned in the draft; attached when it is sent.
+    var mentions: [RelPath] = []
     /// Files from outside the project sent with the next message.
     var externalAttachments: [URL] = []
     /// The first editor's selection when the window switched to the assistant (the editor is not on screen then).
@@ -239,6 +241,7 @@ extension FocusedValues {
         currentID = nil
         draftAgentMode = nil
         draft = ""
+        mentions = []
         notice = nil
         pendingConsent = nil
         pendingSearch = nil
@@ -323,6 +326,9 @@ extension FocusedValues {
         guard !question.isEmpty, !isStreaming, let provider, providers.isReady(provider) else { return }
         guard !isBusy else { notice = "Another conversation is still working. Wait for it or stop it first."; return }
         notice = nil
+        // Mentioned files are attached like picked ones, so the provider or agent gets them.
+        let mentioned = text == nil ? mentions : []
+        for m in mentioned where !attachments.contains(m) { attachments.append(m) }
         if providers.needsConsent(provider) {
             pendingConsent = PendingConsent(provider: provider, files: attachments.map(\.raw)) { [weak self] in
                 self?.providers.consent(provider)
@@ -349,11 +355,12 @@ extension FocusedValues {
             do {
                 let context = try await context(for: question, provider: provider, diagnostics: diagnostics)
                 guard currentID == conversation else { return }    // the user moved to another conversation meanwhile
-                if text == nil { draft = "" }
+                if text == nil { draft = ""; mentions = [] }
                 let id = conversation ?? start(provider: provider, model: model, title: question)
                 var message = AssistantMessage(role: .user, text: question, context: context)
                 message.created = .now
-                change(id) { [message] in $0.messages.append(message); $0.updated = .now }
+                if !mentioned.isEmpty { message.mentions = mentioned.map(\.raw) }
+                Self.entrance { change(id) { [message] in $0.messages.append(message); $0.updated = .now } }
                 preparing = false
                 respond(in: id, search: searching)
             } catch let e as AssistantError {
@@ -451,8 +458,10 @@ extension FocusedValues {
         // Retry cannot ask again: it searches only when search is allowed outright.
         let search = search ?? (permissions.policy(.webSearch) == .allow)
         let answer = AssistantMessage(role: .assistant, text: "")
-        change(id, save: false) { $0.messages.append(answer) }
-        streamingID = answer.id
+        Self.entrance {
+            change(id, save: false) { $0.messages.append(answer) }
+            streamingID = answer.id
+        }
         streamingConversation = id
         turnStart = .now
         liveTools = []
@@ -473,17 +482,28 @@ extension FocusedValues {
                     case .nextRound:
                         let next = AssistantMessage(role: .assistant, text: "")
                         rounds.append(current)
-                        change(id, save: false) { $0.messages.append(next) }
                         current = next.id
-                        streamingID = next.id
+                        Self.entrance {
+                            change(id, save: false) { $0.messages.append(next) }
+                            streamingID = next.id
+                        }
                     case .result(let r):
-                        update(id, current) { m in
+                        Self.entrance { update(id, current) { m in
                             guard let i = m.toolCalls?.firstIndex(where: { $0.id == r.callID }) else { return }
                             m.toolCalls![i].result = r.content
                             m.toolCalls![i].isError = r.isError
-                        }
+                        } }
                     case .stream(let event):
-                        update(id, current) { m in
+                        let m = conversations.first { $0.id == id }?.messages.first { $0.id == current }
+                        // Only what adds or removes an item animates, not every streamed chunk; an agent's finished call
+                        // replaces its live row unanimated, as it looks the same.
+                        let adds = switch event {
+                        case .text: m?.text.isEmpty == true
+                        case .reasoning: m?.reasoning?.isEmpty != false
+                        case .toolCall(let c): !liveTools.contains { $0.id == c.id }
+                        default: false
+                        }
+                        Self.entrance(adds) { update(id, current) { m in
                             switch event {
                             case .text(let t): m.text += t
                             case .reasoning(let r): m.reasoning = (m.reasoning ?? "") + r
@@ -497,7 +517,7 @@ extension FocusedValues {
                             case .done(.paused, _): m.text += "\n\n*The web search limit was reached before the answer was finished.*"
                             case .done: break
                             }
-                        }
+                        } }
                     }
                 }
             } catch is CancellationError {
@@ -566,8 +586,17 @@ extension FocusedValues {
         }
     }
 
+    /// Runs a change of the transcript's items so new ones animate in (see `AssistantEntrance`).
+    static func entrance(_ animated: Bool = true, _ f: () -> Void) {
+        if animated { withAnimation(.easeOut(duration: 0.28), f) } else { f() }
+    }
+
     private func finish(_ id: UUID, _ message: UUID) {
         let duration = turnStart.map { Date.now.timeIntervalSince($0) }
+        Self.entrance { finishTurn(id, message, duration) }
+    }
+
+    private func finishTurn(_ id: UUID, _ message: UUID, _ duration: TimeInterval?) {
         change(id) { c in
             // A stopped answer with nothing in it leaves no trace.
             c.messages.removeAll { $0.id == message && $0.text.isEmpty && $0.error == nil && $0.reasoning == nil && $0.toolCalls == nil }
@@ -579,8 +608,11 @@ extension FocusedValues {
             if id != currentID || mode != .assistant { layout.unread.insert(id) }
             // Like Xcode, a turn that changed files opens the diff panel under it.
             if id == currentID, let c = current, let t = AssistantTurn.split(c.messages).last, !t.changes.isEmpty {
-                diffFile = t.changes.first?.path
-                showsDiff = true
+                // Not animated: the panel splits the view, which would fade the whole transcript.
+                withTransaction(Transaction(animation: nil)) {
+                    diffFile = t.changes.first?.path
+                    showsDiff = true
+                }
             }
         }
     }
@@ -931,7 +963,7 @@ extension AssistantModel: ACPHost {
 
     func toolCallChanged(_ call: ACPToolCall) {
         guard streamingID != nil else { return }
-        if let i = liveTools.firstIndex(where: { $0.id == call.id }) { liveTools[i] = call } else { liveTools.append(call) }
+        Self.entrance { if let i = liveTools.firstIndex(where: { $0.id == call.id }) { liveTools[i] = call } else { liveTools.append(call) } }
     }
 
     /// The permissions of the running turn's conversation; the shown one may be another.

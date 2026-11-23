@@ -74,6 +74,9 @@ struct ProjectView: View {
             if let prompt = UserDefaults.standard.string(forKey: "TypoDebugAssistantPrompt") {
                 assistant.toggle(editor: actions)
                 if !prompt.isEmpty { assistant.send(prompt) }
+                // `-TypoDebugAssistantOpenLatest YES` shows the newest conversation; `-TypoDebugAssistantDraft "text"` types into the prompt.
+                if UserDefaults.standard.bool(forKey: "TypoDebugAssistantOpenLatest"), let c = assistant.conversations.max(by: { $0.updated < $1.updated }) { assistant.select(c.id) }
+                if let draft = UserDefaults.standard.string(forKey: "TypoDebugAssistantDraft") { assistant.draft = draft }
                 // `-TypoDebugAssistantBack n`: back to the editor after n seconds.
                 let back = UserDefaults.standard.double(forKey: "TypoDebugAssistantBack")
                 if back > 0 { Task { try? await Task.sleep(for: .seconds(back)); assistant.mode = .navigator } }
