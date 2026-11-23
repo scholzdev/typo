@@ -225,6 +225,25 @@ private final class ScriptedClient: AssistantClient, Sendable {
         #expect(m.ranges == [NSRange(location: 15, length: 5)])
     }
 
+    @Test func removeDropsOnlyOverlappingMarks() {
+        var m = marks(NSRange(location: 0, length: 3), NSRange(location: 10, length: 3))
+        m.remove(overlapping: NSRange(location: 11, length: 0))
+        #expect(m.ranges == [NSRange(location: 0, length: 3)])
+    }
+
+    @MainActor @Test func dismissKeepsTheTextAndOlderChangesArePrevious() async throws {
+        let (project, _) = try await TestEnv.project(files: ["main.typ": "one\ntwo\nthree\n"])
+        let b = try await project.open(RelPath("main.typ")!)
+        b.applyAssistant([Replacement(range: NSRange(location: 0, length: 3), text: "ONE")])
+        let mark = b.aiMarks.ranges[0]
+        #expect(!b.isPreviousAIBlock(mark))
+        b.previousAIChanges = Set(b.aiChanges.map(\.id))
+        #expect(b.isPreviousAIBlock(mark))
+        b.dismissAIMark(mark)
+        #expect(b.aiMarks.isEmpty)
+        #expect(b.storage.string.hasPrefix("ONE"))
+    }
+
     @Test func anEditInsideOrOverlappingDropsTheMark() {
         for edit in [NSRange(location: 12, length: 0), NSRange(location: 12, length: 1), NSRange(location: 8, length: 4), NSRange(location: 0, length: 40)] {
             var m = marks(NSRange(location: 10, length: 5), NSRange(location: 30, length: 2))

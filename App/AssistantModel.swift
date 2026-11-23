@@ -115,6 +115,10 @@ extension FocusedValues {
         NotificationCenter.default.addObserver(forName: .bufferAIChangesChanged, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.changesRevision += 1 }
         }
+        NotificationCenter.default.addObserver(forName: .assistantDiscardChange, object: nil, queue: .main) { [weak self] n in
+            guard let b = n.object as? Buffer, let r = (n.userInfo?["range"] as? NSValue)?.rangeValue else { return }
+            MainActor.assumeIsolated { guard let self, self.project.buffer(for: b.path) === b else { return }; Task { await self.discard(r, in: b) } }
+        }
     }
 
     deinit { agents.closeAll() }
@@ -449,6 +453,8 @@ extension FocusedValues {
         turnStart = .now
         liveTools = []
         stopped.remove(id)
+        // What earlier turns changed turns grey in the gutter.
+        for b in project.openBuffers { b.previousAIChanges = Set(b.aiChanges.map(\.id)) }
         let tools = provider.isAgent ? [] : permissions.offered(provider: provider, model: conversation.model)
         task = Task { [weak self] in
             guard let self else { return }
@@ -706,7 +712,8 @@ extension FocusedValues {
 
     /// Puts the text of the change back, or trashes the file it created; other edits of the file stay.
     func revert(_ m: AssistantMessage, _ index: Int) async {
-        guard let id = currentID, revertBlocker(m, index) == nil, let a = ledger[key(m.id, index)] else { return }
+        guard let id = conversations.first(where: { $0.messages.contains { $0.id == m.id } })?.id, revertBlocker(m, index) == nil,
+              let a = ledger[key(m.id, index)] else { return }
         do {
             if a.created {
                 try await project.moveToTrash(a.path)
@@ -719,7 +726,21 @@ extension FocusedValues {
         }
         ledger[key(m.id, index)] = nil
         update(id, m.id) { $0.edits[index] = .reverted }
-        if let c = current { persist(c) }
+        if let c = conversations.first(where: { $0.id == id }) { persist(c) }
+    }
+
+    /// The gutter's "Discard Change": each change in the mark goes back, newest first, through Revert where the
+    /// transcript tracks it, so its card says reverted.
+    func discard(_ range: NSRange, in buffer: Buffer) async {
+        for c in buffer.aiChanges(in: range).reversed() {
+            let tracked = ledger.first { $0.value.changeID == c.id && $0.value.path == buffer.path }?.key.split(separator: "#")
+            if let tracked, tracked.count == 2, let mid = UUID(uuidString: String(tracked[0])), let index = Int(tracked[1]),
+               let m = conversations.lazy.flatMap(\.messages).first(where: { $0.id == mid }) {
+                await revert(m, index)
+            } else {
+                buffer.revertAssistant(c.id)
+            }
+        }
     }
 
     /// The accepted changes of the answer, as (edit index, edit).

@@ -45,8 +45,8 @@ extension Notification.Name {
 
     /// Width the gutter reserves for the bars when it shows no numbers.
     static let barZone: CGFloat = 8
-    /// The change bar is 3 pt wide at the gutter's left edge (as Xcode); a click within `barWidth + 1` opens its popover.
-    static let barWidth: CGFloat = 3
+    /// The change bar is 5 pt wide at the gutter's left edge, like the assistant's bars; a click within `barWidth + 2` opens its popover.
+    static let barWidth: CGFloat = 5
 
     override init() {
         super.init()
@@ -224,7 +224,7 @@ extension Notification.Name {
     func click(_ event: NSEvent) -> Bool {
         guard let ruler, let buffer, let base else { return false }
         let p = ruler.convert(event.locationInWindow, from: nil)
-        guard p.x < Self.barWidth + 1, let hit = line(at: p) else { return false }
+        guard p.x < Self.barWidth + 2, let hit = line(at: p) else { return false }
         hideCard()
         let text = buffer.storage.string
         // Computed afresh: the drawn marks can be a keystroke behind.
@@ -333,47 +333,27 @@ struct GutterPopover: View {
 }
 
 extension LineNumberRuler {
-    /// A bar in the change bar's place on lines an applied assistant edit wrote, or a pending inline diff would
-    /// change; drawn after the git mark, so it wins. One block is one vertical gradient from its first to its last
-    /// line, blue to purple to pink to orange, like Xcode's.
-    func drawAIMark(from lo: Int, to hi: Int, docY: CGFloat, y: CGFloat, height: CGFloat) {
-        guard let buffer = editor?.buffer, let block = buffer.assistantBlock(lo, hi),
-              let tv = textView, let tlm = tv.textLayoutManager, let tcs = tv.textContentStorage else { return }
-        func span(_ offset: Int) -> (min: CGFloat, max: CGFloat)? {
-            guard let loc = tcs.location(tcs.documentRange.location, offsetBy: offset), let f = tlm.textLayoutFragment(for: loc) else { return nil }
-            return (f.layoutFragmentFrame.minY, f.layoutFragmentFrame.maxY)
-        }
-        let top = span(block.location)?.min ?? docY, bottom = span(max(NSMaxRange(block) - 1, block.location))?.max ?? (docY + height)
-        let stops: [(CGFloat, CGFloat, CGFloat)] = [(0.25, 0.52, 1.0), (0.62, 0.38, 0.96), (1.0, 0.36, 0.62), (1.0, 0.62, 0.2)]
-        func color(_ d: CGFloat) -> NSColor {
-            let t = bottom > top ? min(max((d - top) / (bottom - top), 0), 1) * CGFloat(stops.count - 1) : 0
-            let i = min(Int(t), stops.count - 2), f = t - CGFloat(i), a = stops[i], b = stops[i + 1]
-            return NSColor(red: a.0 + (b.0 - a.0) * f, green: a.1 + (b.1 - a.1) * f, blue: a.2 + (b.2 - a.2) * f, alpha: 1)
-        }
-        var dy: CGFloat = 0
-        while dy < height {
-            color(docY + dy).setFill()
-            NSRect(x: 0, y: y + dy, width: 3, height: min(2, height - dy)).fill()
-            dy += 2
-        }
-    }
-
-    /// A 3 pt bar at the gutter's left edge, on added (green) and modified (blue) lines; a red wedge
-    /// where lines were deleted.
-    func drawGitMark(line: Int, start: Int, y: CGFloat, height: CGFloat) {
+    /// A blue pill at the gutter's left edge over each run of changed lines, a blue wedge where lines were deleted.
+    /// Lines the assistant changed get its rainbow bar instead (`layoutRainbow`).
+    func drawGitMark(line: Int, start: Int, end: Int, y: CGFloat, height: CGFloat) {
         guard let marks = editor?.gitGutter.marks, !marks.isEmpty else { return }
-        let x: CGFloat = 0, colors = Highlighter.style.colors
-        if let kind = marks.lines[line] {
-            (kind == .added ? colors.gitAdded : colors.gitModified).setFill()
-            NSRect(x: x, y: y, width: 3, height: height).fill()
+        if editor?.buffer?.marksAssistantChange(start, end) == true { return }
+        let x: CGFloat = 1, w = GitGutter.barWidth
+        NSColor.systemBlue.setFill()
+        if marks.lines[line] != nil {
+            // Rounded only where the run starts and ends: the pill runs on behind the neighbouring changed lines.
+            let above = marks.lines[line - 1] != nil, below = marks.lines[line + 1] != nil
+            let pill = NSRect(x: x, y: y - (above ? w : 0), width: w, height: height + (above ? w : 0) + (below ? w : 0))
+            NSGraphicsContext.saveGraphicsState()
+            NSRect(x: x, y: y, width: w, height: height).clip()
+            NSBezierPath(roundedRect: pill, xRadius: w / 2, yRadius: w / 2).fill()
+            NSGraphicsContext.restoreGraphicsState()
         } else if editor?.foldMark(at: start) == true, let hidden = editor?.buffer?.foldRegions.first(where: { $0.heading == start })?.lines {
             // A folded heading stands for its hidden lines: a dashed bar when any of them changed.
-            let inside = ((line + 1)...(line + max(hidden, 1))).compactMap { marks.lines[$0] }
-            let deleted = ((line + 1)...(line + max(hidden, 1))).contains { marks.deletedAfter.contains($0) }
-            if !inside.isEmpty || deleted {
-                (inside.isEmpty ? colors.gitDeleted : inside.allSatisfy { $0 == .added } ? colors.gitAdded : colors.gitModified).setFill()
+            let range = (line + 1)...(line + max(hidden, 1))
+            if range.contains(where: { marks.lines[$0] != nil || marks.deletedAfter.contains($0) }) {
                 var dy: CGFloat = 0
-                while dy < height { NSRect(x: x, y: y + dy, width: 3, height: min(2, height - dy)).fill(); dy += 4 }
+                while dy < height { NSRect(x: x, y: y + dy, width: w, height: min(2, height - dy)).fill(); dy += 4 }
             }
         }
         var edges: [CGFloat] = []
@@ -386,7 +366,6 @@ extension LineNumberRuler {
             wedge.line(to: NSPoint(x: 0, y: edge - s))
             wedge.line(to: NSPoint(x: 0, y: edge + s))
             wedge.close()
-            colors.gitDeleted.setFill()
             wedge.fill()
         }
     }

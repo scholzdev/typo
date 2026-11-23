@@ -1016,6 +1016,8 @@ final class LineNumberRuler: NSRulerView {
     private var newlineOffsets: [Int]?                // offsets of every "\n" in the text; nil after an edit or a swapped storage
     private weak var indexedStorage: NSTextStorage?
     var hovered = false { didSet { if hovered != oldValue { needsDisplay = true } } }   // as in Xcode, open sections show their chevron only under the pointer
+    var rainbowLayers: [RainbowBarLayer] = []         // one per assistant change in view, reused while scrolling
+    var rainbowHits: [RainbowHit] = []
 
     init(scrollView: NSScrollView, textView: NSTextView, editor: EditorView.Coordinator) {
         self.textView = textView
@@ -1096,8 +1098,7 @@ final class LineNumberRuler: NSRulerView {
             let y = self.convert(NSPoint(x: 0, y: fragment.layoutFragmentFrame.minY + origin.y), from: tv).y
             let lineTop = fragment.textLineFragments.first?.typographicBounds.minY ?? 0
             self.drawFoldMark(at: start, y: y + lineTop, height: fragment.textLineFragments.first?.typographicBounds.height ?? 0)
-            self.drawGitMark(line: line, start: start, y: y, height: fragment.layoutFragmentFrame.height)
-            self.drawAIMark(from: start, to: tcs.offset(of: fragment.rangeInElement.endLocation), docY: fragment.layoutFragmentFrame.minY, y: y, height: fragment.layoutFragmentFrame.height)
+            self.drawGitMark(line: line, start: start, end: tcs.offset(of: fragment.rangeInElement.endLocation), y: y, height: fragment.layoutFragmentFrame.height)
             guard self.showsNumbers else { return y < self.bounds.maxY }
             let shown = self.relative == .off || (line == caretLine && self.relative == .hybrid) ? line : abs(line - caretLine)
             let label = "\(shown)" as NSString
@@ -1106,5 +1107,6 @@ final class LineNumberRuler: NSRulerView {
             label.draw(at: NSPoint(x: self.ruleThickness - size.width - 16, y: y + lineTop), withAttributes: style)   // 16: the fold ribbon
             return y < self.bounds.maxY
         }
+        layoutRainbow(tv, tcs, viewport: viewport)
     }
 }
