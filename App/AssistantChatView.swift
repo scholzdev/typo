@@ -351,12 +351,13 @@ struct AssistantPromptBox: View {
                         }
                         return .handled
                     }
-                    .onKeyPress(.upArrow) {
+                    // Held arrows repeat, so the whole list can be walked through.
+                    .onKeyPress(.upArrow, phases: [.down, .repeat]) { _ in
                         guard !commandMatches.isEmpty else { return .ignored }
                         commandIndex = max(commandIndex - 1, 0)
                         return .handled
                     }
-                    .onKeyPress(.downArrow) {
+                    .onKeyPress(.downArrow, phases: [.down, .repeat]) { _ in
                         guard !commandMatches.isEmpty else { return .ignored }
                         commandIndex = min(commandIndex + 1, commandMatches.count - 1)
                         return .handled
@@ -395,24 +396,36 @@ struct AssistantPromptBox: View {
     private var commandMatches: [ACPCommand] {
         guard model.draft.hasPrefix("/"), !model.draft.contains(" ") else { return [] }
         let typed = model.draft.dropFirst().lowercased()
-        return Array(model.agentCommands.filter { typed.isEmpty || $0.name.lowercased().hasPrefix(typed) }.prefix(8))
+        // Names starting with the typed text first, then names containing it.
+        let all = model.agentCommands.filter { typed.isEmpty || $0.name.lowercased().contains(typed) }
+        return all.filter { $0.name.lowercased().hasPrefix(typed) } + all.filter { !$0.name.lowercased().hasPrefix(typed) }
     }
 
     private var commandList: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ForEach(Array(commandMatches.enumerated()), id: \.element.id) { i, c in
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text("/" + c.name).font(.system(.callout, design: .monospaced))
-                    if let h = c.hint { Text("‹\(h)›").font(.caption).foregroundStyle(.tertiary) }
-                    Text(c.description).font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                    Spacer(minLength: 0)
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(Array(commandMatches.enumerated()), id: \.element.id) { i, c in
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            // No fixedSize: a row wider than the sidebar cut the whole column off on the left.
+                            Text("/" + c.name).font(.system(.callout, design: .monospaced)).lineLimit(1).truncationMode(.middle).layoutPriority(2)
+                            if let h = c.hint { Text("‹\(h)›").font(.caption).foregroundStyle(.tertiary).lineLimit(1).layoutPriority(1) }
+                            Text(c.description).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.tail)
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.horizontal, 8).padding(.vertical, 4)
+                        .background(i == commandIndex ? Color.accentColor.opacity(0.18) : .clear, in: RoundedRectangle(cornerRadius: 6))
+                        .contentShape(Rectangle())
+                        .onTapGesture { useCommand(c) }
+                        .accessibilityAddTraits(.isButton)
+                        .id(i)
+                    }
                 }
-                .padding(.horizontal, 8).padding(.vertical, 4)
-                .background(i == commandIndex ? Color.accentColor.opacity(0.18) : .clear, in: RoundedRectangle(cornerRadius: 6))
-                .contentShape(Rectangle())
-                .onTapGesture { useCommand(c) }
-                .accessibilityAddTraits(.isButton)
             }
+            .frame(maxHeight: 220)
+            .fixedSize(horizontal: false, vertical: true)
+            // No animation: held arrows would otherwise outrun the scrolling.
+            .onChange(of: commandIndex) { _, i in proxy.scrollTo(i) }
         }
     }
 
