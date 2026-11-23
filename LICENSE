@@ -1,0 +1,42 @@
+Typo Source-Available License 1.0
+
+Copyright (c) 2026 Florian Scholz. All rights reserved except as granted below.
+
+"The Software" means the source code, binaries, documentation and other files in
+this repository, and any work based on them.
+
+1. Use. You may download, build, run and study the Software for
+   noncommercial purposes only.
+
+2. Changes. You may change the Software and build your changed version, for
+   your own noncommercial use.
+
+3. Contributions. You may fork this repository on GitHub and send changes back
+   as pull requests to the original repository. By sending a pull request you
+   allow the copyright holder to use, change and distribute your contribution,
+   including under other license terms.
+
+4. No distribution. You may not distribute, publish, sell, sublicense or
+   otherwise make the Software, or any changed version of it, available to
+   others, in source or binary form, except as allowed in section 3. Builds
+   of the Software are distributed only by the copyright holder.
+
+5. No commercial use. You may not use the Software, or any changed version of
+   it, for a commercial purpose, including offering it or a service based on it
+   for a fee, unless the copyright holder has agreed to it in writing.
+
+6. Third-party parts. Parts of the Software that come from third parties keep
+   their own licenses (see App/Acknowledgements.txt and the license
+   files next to those parts). This license does not change them.
+
+7. Notices. Keep this license and the copyright notice in every copy you are
+   allowed to make.
+
+8. Permission. Anything not allowed above needs the written permission of
+   the copyright holder. Ask by opening an issue on the repository.
+
+9. No warranty. The Software is provided "as is", without warranty of any
+   kind. The copyright holder is not liable for any damage arising from its use,
+   to the extent the law allows.
+
+10. Ending. If you break these terms, your rights under this license end.

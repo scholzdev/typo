@@ -1,0 +1,207 @@
+/* Values from the app's default theme (EditorTheme.standard, EditorFolding, LineNumberRuler), with the system
+   colors resolved for Aqua and Dark Aqua. */
+.fold-demo {
+  --fd-ink: 0, 0, 0;                       /* textColor, as r,g,b for the translucent ribbon and bands */
+  --fd-bg: #ffffff;                         /* textBackgroundColor */
+  --fd-chrome: #f6f6f6;
+  --fd-text: #000000;
+  --fd-ruler: rgba(0, 0, 0, 0.5);           /* secondaryLabelColor */
+  --fd-accent: 0, 136, 255;                 /* controlAccentColor (blue) */
+  --fd-kw: #ff2d55;                         /* systemPink */
+  --fd-str: #ff383c;                        /* systemRed */
+  --fd-numc: #cb30e0;                       /* systemPurple */
+  --fd-unit: #767cd4;                       /* number blended 45% toward math */
+  --fd-fn: #0088ff;                         /* systemBlue */
+  --fd-lbl: #34c759;                        /* systemGreen */
+  --fd-math: #00c3d0;                       /* systemTeal */
+  --fd-ms: 400ms;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--fd-bg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  color: var(--fd-text);
+}
+@media (prefers-color-scheme: dark) {
+  .fold-demo {
+    --fd-ink: 255, 255, 255;
+    --fd-bg: #1e1e1e;
+    --fd-chrome: #2a2a2a;
+    --fd-text: #ffffff;
+    --fd-ruler: rgba(255, 255, 255, 0.55);
+    --fd-accent: 0, 145, 255;
+    --fd-kw: #ff375f;
+    --fd-str: #ff4245;
+    --fd-numc: #db34f2;
+    --fd-unit: #868cea;
+    --fd-fn: #0091ff;
+    --fd-lbl: #30d158;
+    --fd-math: #00d2e0;
+  }
+}
+
+.fd-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--fd-chrome);
+  border-bottom: 1px solid rgba(var(--fd-ink), 0.08);
+  font: 12px/1 var(--sans);
+  color: var(--fd-ruler);
+}
+.fd-dots { display: flex; gap: 7px; margin-right: 10px; }
+.fd-dots i { width: 11px; height: 11px; border-radius: 50%; background: #ff5f57; }
+.fd-dots i:nth-child(2) { background: #febc2e; }
+.fd-dots i:nth-child(3) { background: #28c840; }
+.fd-bar .fd-tab { font-weight: 600; color: var(--fd-text); }
+.fd-actions { margin-left: auto; display: flex; gap: 6px; }
+.fd-actions button {
+  font: 500 11.5px/1 var(--sans);
+  color: var(--fd-text);
+  background: var(--fd-bg);
+  border: 1px solid rgba(var(--fd-ink), 0.12);
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.fd-actions button:hover { background: rgba(var(--fd-ink), 0.06); }
+
+/* 13 pt SF Mono, natural line height; 50 pt ruler with the ribbon at 37 pt; 4 pt text inset. */
+.fd-code {
+  position: relative;
+  padding: 8px 0 12px;
+  font: 13px/16px ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+  overflow-x: auto;
+}
+.fd-code::before {                          /* the ribbon track, shown while the pointer is over the editor */
+  content: "";
+  position: absolute;
+  left: 37px; top: 0; bottom: 0;
+  width: 10px;
+  border-radius: 5px;
+  background: rgba(var(--fd-ink), 0.06);
+  opacity: 0;
+  transition: opacity 150ms ease;
+  pointer-events: none;
+}
+.fd-code:hover::before { opacity: 1; }
+.fd-line {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px 3px 10px 3px 1fr;
+  white-space: pre;
+}
+.fd-line.current { background: rgba(var(--fd-accent), 0.10); }
+.fd-num {
+  grid-column: 1;
+  text-align: right;
+  font: 11px/16px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--fd-ruler);
+  user-select: none;
+}
+.fd-line.current .fd-num { color: var(--fd-text); font-weight: 700; }
+.fd-rib { grid-column: 3; position: relative; z-index: 1; }
+.fd-rib[style] { background: rgba(var(--fd-ink), var(--a)); cursor: pointer; }
+.fd-rib.top { border-top-left-radius: 5px; border-top-right-radius: 5px; }
+.fd-rib.bottom { border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; }
+.fd-line.hot .fd-rib[style] { background: rgba(var(--fd-ink), 0.35); }
+.fd-line.hot { background-image: linear-gradient(rgba(var(--fd-ink), 0.05), rgba(var(--fd-ink), 0.05)); }
+.fd-text { grid-column: 5; padding-right: 16px; position: relative; }
+
+.fd-caret {
+  position: absolute;
+  left: 0; top: 1px;
+  width: 2px; height: 14px;
+  border-radius: 1px;
+  background: rgb(var(--fd-accent));
+  animation: fd-blink 1.06s steps(1) infinite;
+}
+@keyframes fd-blink { 50% { opacity: 0; } }
+
+/* Chevron over the ribbon: on hover for open regions, always for folded ones (SF Symbol chevron, 9 pt semibold). */
+.fd-toggle {
+  position: absolute;
+  left: 37px; top: 0;
+  width: 10px; height: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--fd-ruler);
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0;
+}
+.fd-toggle svg { width: 10px; height: 10px; margin-top: 3px; display: block; transform: rotate(90deg); transition: transform 200ms ease; }
+.fd-head:hover .fd-toggle, .fd-toggle:focus-visible, .fd-head.folded .fd-toggle { opacity: 1; }
+.fd-head.folded .fd-toggle svg { transform: none; }
+.fd-toggle:focus-visible { outline: 2px solid rgb(var(--fd-accent)); outline-offset: 1px; border-radius: 3px; }
+.fd-head:hover .fd-rib, .fd-head.folded .fd-rib { color: transparent; }
+/* A folded region's ribbon becomes the notch arrow. */
+.fd-head.folded .fd-rib[style] {
+  background: rgba(var(--fd-ink), 0.22);
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 50%, 0 100%, 0 calc(100% - 6px), 6px 50%, 0 6px);
+}
+.fd-head.folded .fd-toggle { opacity: 0; }
+.fd-head.folded:hover .fd-toggle, .fd-head.folded .fd-toggle:focus-visible { opacity: 1; }
+
+.t-kw { color: var(--fd-kw); }
+.t-fn { color: var(--fd-fn); }
+.t-str { color: var(--fd-str); }
+.t-num { color: var(--fd-numc); }
+.t-unit { color: var(--fd-unit); }
+.t-lbl { color: var(--fd-lbl); font-weight: 400; }
+.t-math { color: var(--fd-math); }
+.t-punct { color: var(--fd-ruler); }
+.t-head, .t-strong { font-weight: 700; }
+
+/* "⋯ N lines": 11 pt medium system font in the ruler color on a 15% pill, 8 pt after a heading, 5 pt after a bracket. */
+.fd-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fd-ruler) 15%, transparent);
+  color: var(--fd-ruler);
+  font: 500 11px/15px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  vertical-align: 0;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--fd-ms) ease;
+  pointer-events: none;
+}
+.fd-badge.block { margin-left: 5px; }
+.fd-head.folded .fd-badge { opacity: 1; pointer-events: auto; }
+
+/* Collapse: the rows shrink so the text below flows up every frame, while the body folds away like paper. */
+.fd-body {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--fd-ms) cubic-bezier(.32, .72, .2, 1);
+}
+.fd-body.folded { grid-template-rows: 0fr; }
+.fd-inner {
+  min-height: 0;
+  overflow: hidden;
+  transform-origin: 50% 0;
+  transition: transform var(--fd-ms) cubic-bezier(.32, .72, .2, 1), opacity var(--fd-ms) ease, filter var(--fd-ms) ease;
+}
+.fd-body.folded > .fd-inner {
+  transform: perspective(700px) rotateX(-58deg);
+  opacity: 0;
+  filter: brightness(0.85);
+}
+
+.fold-hint { margin: 10px 2px 0; font-size: 14px; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .fold-demo { --fd-ms: 1ms; }
+  .fd-caret { animation: none; }
+}
+@media (max-width: 560px) {
+  .fd-code { font-size: 11.5px; line-height: 15px; }
+  .fd-dots { margin-right: 2px; }
+  .fd-actions button { padding: 5px 8px; }
+}

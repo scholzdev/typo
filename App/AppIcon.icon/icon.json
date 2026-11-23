@@ -1,0 +1,40 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "srgb:0.40000,0.38000,0.96000,1.00000",
+      "srgb:0.16000,0.11000,0.46000,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "layers" : [
+        { "image-name" : "squiggle.png", "name" : "squiggle" }
+      ],
+      "name" : "Squiggle",
+      "shadow" : { "kind" : "layer-color", "opacity" : 0.5 },
+      "specular" : true,
+      "translucency" : { "enabled" : false, "value" : 0.5 }
+    },
+    {
+      "layers" : [
+        { "image-name" : "word.png", "name" : "word" }
+      ],
+      "name" : "Word",
+      "shadow" : { "kind" : "none", "opacity" : 0 },
+      "specular" : false,
+      "translucency" : { "enabled" : false, "value" : 0.5 }
+    },
+    {
+      "layers" : [
+        { "image-name" : "card.png", "name" : "card" }
+      ],
+      "name" : "Card",
+      "shadow" : { "kind" : "neutral", "opacity" : 0.5 },
+      "specular" : true,
+      "translucency" : { "enabled" : false, "value" : 0.5 }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : "shared"
+  }
+}

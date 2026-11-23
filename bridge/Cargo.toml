@@ -1,0 +1,26 @@
+[package]
+name = "typst-bridge"
+version = "0.2.0"
+edition = "2024"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+typst = "0.15.1"
+typst-layout = "0.15.1"
+typst-ide = "0.15.1"
+typst-render = "0.15.1"
+typst-pdf = "0.15.1"
+typst-svg = "0.15.1"
+hayagriva = "=0.10.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+unicode-segmentation = "1"
+stacker = "0.1"
+typstyle-core = "0.15.3"
+typst-kit = { version = "0.15.1", features = ["embedded-fonts", "system-files", "system-downloader", "datetime"] }
+
+[profile.release]
+panic = "abort"

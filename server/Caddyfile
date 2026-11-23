@@ -1,0 +1,6 @@
+license.florianscholz.me {
+	request_body {
+		max_size 4KB
+	}
+	reverse_proxy app:8080
+}
