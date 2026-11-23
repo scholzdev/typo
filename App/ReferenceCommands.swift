@@ -171,7 +171,6 @@ struct ReferenceCommands: Commands {
     }
 
     static func rename(_ project: Project) async {
-        guard !LicenseStore.shared.readOnly else { return }
         guard let file = project.selectedFile, let buffer = project.selectedBuffer, let window = NSApp.keyWindow else { return }
         let offset = buffer.selection.location
         let sheet = NSWindow(contentRect: .zero, styleMask: [.titled], backing: .buffered, defer: false)

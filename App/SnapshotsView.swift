@@ -159,7 +159,6 @@ struct SnapshotsView: View {
 
     /// Each restore is an undoable edit of that file (Cmd-Z in its editor takes it back).
     private func restore(_ targets: [SnapshotFile]) {
-        guard !LicenseStore.shared.readOnly else { return }
         Task {
             for f in targets {
                 do { try await project.restore(f) } catch { showAlert("Couldn\u{2019}t Restore \u{201C}\(f.path.name)\u{201D}", error.localizedDescription) }

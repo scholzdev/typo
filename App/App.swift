@@ -20,7 +20,6 @@ struct TypoApp: App {
         let folder = LocalPackagesFolder()
         _localPackages = State(initialValue: folder)
         Task { await folder.restore() }
-        _ = LicenseStore.shared   // after the migration, so the first-launch date doesn't hide a copied one
         GitAccountStore.shared.apply()   // the Source Control accounts sign git's HTTPS requests in
     }
 

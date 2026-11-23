@@ -225,14 +225,13 @@ struct EditorPane: View {
             QuickLookView(url: url).safeAreaInset(edge: .top, spacing: 0) { bar }
         } else if let buffer = shownBuffer {
             VStack(spacing: 0) {
-                LicenseBanner()
                 MissingFileBanner(project: project, buffer: buffer)
                 ChangedOnDiskBanner(project: project, buffer: buffer)
                 if showsBibForm {
                     BibEditorView(project: project, buffer: buffer, tables: tables, showsSource: Binding(get: { layout.bibSource }, set: { layout.bibSource = $0 }))
                 } else {
                     EditorView(project: project, buffer: buffer, tables: tables, actions: actions, marks: project.lintHints(in: buffer.path) + (inlineIssues ? project.diagnostics(in: buffer.path) : []), revealToken: project.selectionRequests,
-                               layout: layout, focusMode: layout.focus, readOnly: LicenseStore.shared.readOnly)
+                               layout: layout, focusMode: layout.focus)
                         .overlay(alignment: .topTrailing) {
                             if BibTeX.isFormEditable(buffer.path.raw) {
                                 Button("Show Form", systemImage: "list.bullet.rectangle") { layout.bibSource = false }

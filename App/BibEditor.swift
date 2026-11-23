@@ -122,7 +122,6 @@ struct BibEditorView: View {
 
     /// Deletes the entries at `indices` as one undo step, from the last so the earlier ranges stay valid.
     private func delete(_ indices: Set<Int>) {
-        guard !LicenseStore.shared.readOnly else { return }
         let count = BibTeX.entries(in: buffer.storage.string).count
         let doomed = indices.filter { $0 < count }.sorted(by: >)
         guard let first = doomed.last else { return }
@@ -459,7 +458,6 @@ private struct NewBibEntrySheet: View {
     }
 
     private func commit() {
-        guard !LicenseStore.shared.readOnly else { return }
         let names = BibTeX.suggestedFields(for: type)
         let fields = names.compactMap { name -> BibTeXEntry.Field? in
             let v = (values[name] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)

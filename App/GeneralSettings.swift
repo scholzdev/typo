@@ -51,7 +51,6 @@ enum RestoreProjects: String {
 /// other state), and the names below are state or secrets that happen to be plain values.
 enum SettingsTransfer {
     private static let excluded: Set<String> = [
-        SettingsKey.licenseKey, SettingsKey.firstLaunch, SettingsKey.activationToken,
         SettingsKey.tab, SettingsKey.editedSnippet,
     ]
     private static let excludedPrefixes = ["NS", "Apple", "com.apple", "TypstCore."]
@@ -67,7 +66,7 @@ enum SettingsTransfer {
         settings(UserDefaults.standard.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "") ?? [:])
     }
 
-    /// Writes only the allowed keys of `plist`, so an edited file cannot touch the license or the recents.
+    /// Writes only the allowed keys of `plist`, so an edited file cannot touch the recents.
     static func importSettings(_ plist: [String: Any]) {
         for (k, v) in settings(plist) { UserDefaults.standard.set(v, forKey: k) }
         RestoreProjects.apply()
@@ -143,7 +142,7 @@ struct GeneralSettings: View {
                     Button("Import\u{2026}", action: importFile)
                 }
                 if let transferError { Text(transferError).font(.caption).foregroundStyle(.red) }
-                Text("License, recent projects and window positions are not included.")
+                Text("Recent projects and window positions are not included.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Reset Typo") {
@@ -160,7 +159,7 @@ struct GeneralSettings: View {
             Button("Reset", role: .destructive) { SettingsTransfer.reset() }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Your license, recent projects and snippets are kept.")
+            Text("Your recent projects and snippets are kept.")
         }
     }
 

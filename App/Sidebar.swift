@@ -337,7 +337,6 @@ private struct SearchTab: View {
 
     /// Nil replaces every match, including any past the result list's limit.
     private func replace(_ hits: [SearchHit]?) {
-        guard !LicenseStore.shared.readOnly else { return }
         replacing = true
         Task {
             defer { replacing = false; selection = []; rerun += 1 }

@@ -16,7 +16,7 @@ enum SettingsKey {
 
 /// Raw values are the persisted SettingsKey.tab tags.
 enum SettingsTab: String, CaseIterable {
-    case general, appearance, intelligence, navigation, textEditing, shortcuts, snippets, packages, sourceControl, components, license
+    case general, appearance, intelligence, navigation, textEditing, shortcuts, snippets, packages, sourceControl, components
 
     var title: String {
         switch self {
@@ -30,7 +30,6 @@ enum SettingsTab: String, CaseIterable {
         case .packages: "Packages"
         case .sourceControl: "Source Control"
         case .components: "Components"
-        case .license: "License"
         }
     }
 
@@ -47,11 +46,8 @@ enum SettingsTab: String, CaseIterable {
         case .packages: "shippingbox"
         case .sourceControl: "arrow.triangle.branch"
         case .components: "square.3.layers.3d"
-        case .license: "key"
         }
     }
-
-    @MainActor var isVisible: Bool { self != .license || LicenseStore.enforced }
 }
 
 /// An open sub-page of a settings area. Equality ignores the title so a rename does not count as a new visit.
@@ -78,11 +74,8 @@ struct SettingsView: View {
     @State private var nav = SettingsNavigation()
     @State private var packageUpdates = PackageUpdateModel()
     @State private var history = VisitHistory(start: SettingsPlace(tab: .general, page: nil))
-    @State private var licenseKey = ""
-    @State private var licenseError: LicenseError?
-    @State private var licenseBusy = false
 
-    private var current: SettingsTab { SettingsTab(rawValue: tab).flatMap { $0.isVisible ? $0 : nil } ?? .general }   // also catches the removed "themes" tab
+    private var current: SettingsTab { SettingsTab(rawValue: tab) ?? .general }   // also catches the removed "themes" tab
 
     private var place: SettingsPlace { SettingsPlace(tab: current, page: nav.page?.tab == current ? nav.page : nil) }
 
@@ -104,7 +97,7 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: .constant(.all)) {
-            let tabs = SettingsTab.allCases.filter(\.isVisible)
+            let tabs = SettingsTab.allCases
             // Own rows: the sidebar List always paints the accent-colour selection.
             ScrollView {
                 VStack(spacing: 2) {
@@ -156,7 +149,6 @@ struct SettingsView: View {
                     case .packages: PackagesSettings(updates: packageUpdates)
                     case .sourceControl: SourceControlSettings()
                     case .components: ComponentsSettings()
-                    case .license: license
                     }
                 }
             }
@@ -203,59 +195,6 @@ struct SettingsView: View {
             .buttonStyle(.plain)
             .font(.system(size: 15, weight: .medium))
             .foregroundStyle(.primary)
-    }
-
-    private var license: some View {
-        let store = LicenseStore.shared
-        return Form {
-            switch store.state {
-            case .licensed(let license):
-                Text("Licensed to \(license.email)")
-                Text("Activated on this Mac.").font(.caption).foregroundStyle(.secondary)
-                Button("Deactivate This Mac") {
-                    licenseBusy = true
-                    Task {
-                        licenseError = await store.deactivate()
-                        licenseBusy = false
-                    }
-                }
-                .disabled(licenseBusy)
-                if let licenseError {
-                    Text(licenseError.message).font(.caption).foregroundStyle(.red)
-                }
-            case .trial(let days):
-                Text("Trial: \(days) \(days == 1 ? "day" : "days") left")
-                licenseEntry
-            case .expired:
-                Text("Your trial has ended. Documents are read-only; exporting still works.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                licenseEntry
-            }
-        }
-        .pane()
-    }
-
-    @ViewBuilder private var licenseEntry: some View {
-        if LicenseStore.shared.license != nil {
-            Text("This license isn\u{2019}t activated on this Mac.").font(.caption).foregroundStyle(.secondary)
-        }
-        TextField("License key", text: $licenseKey).disabled(licenseBusy)
-        HStack {
-            Button("Activate") {
-                licenseBusy = true
-                Task {
-                    licenseError = await LicenseStore.shared.activate(licenseKey)
-                    if licenseError == nil { licenseKey = "" }
-                    licenseBusy = false
-                }
-            }
-            .disabled(licenseKey.isEmpty || licenseBusy)
-            if licenseBusy { ProgressView().controlSize(.small) }
-        }
-        if let licenseError {
-            Text(licenseError.message).font(.caption).foregroundStyle(.red)
-        }
     }
 }
 

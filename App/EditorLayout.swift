@@ -136,7 +136,7 @@ struct SecondEditorPane: View {
         let content = Group {
             if let buffer = loaded ?? (file != nil ? held : nil) {
                 EditorView(project: project, buffer: buffer, tables: tables, actions: actions, marks: project.lintHints(in: buffer.path) + (inlineIssues ? project.diagnostics(in: buffer.path) : []),
-                           revealToken: 0, layout: layout, readOnly: LicenseStore.shared.readOnly, isPrimary: false)
+                           revealToken: 0, layout: layout, isPrimary: false)
                     .onDisappear { if project.focusedEditorFile == buffer.path { project.focusedEditorFile = nil; layout.secondFocused = false; layout.updateDimming() } }
             } else {
                 ContentUnavailableView("No Other Text File", systemImage: "doc.text")
