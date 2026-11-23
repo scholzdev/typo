@@ -46,16 +46,16 @@ struct AssistantChatView: View {
                     }
                     if let pending = model.pendingConsent { consent(pending) }
                     if let pending = model.pendingSearch { search(pending) }
-                    if let pending = model.pendingTool { tool(pending) }
-                    if let pending = model.pendingPermission { permission(pending) }
+                    if let pending = model.shownTool { tool(pending) }
+                    if let pending = model.shownPermission { permission(pending) }
                     Color.clear.frame(height: 1).id("end")
                 }
                 .padding(16)
             }
             .onChange(of: model.current?.messages.last?.text) { proxy.scrollTo("end", anchor: .bottom) }
             .onChange(of: model.current?.messages.count) { proxy.scrollTo("end", anchor: .bottom) }
-            .onChange(of: model.pendingTool?.call.id) { proxy.scrollTo("end", anchor: .bottom) }
-            .onChange(of: model.pendingPermission?.call.id) { proxy.scrollTo("end", anchor: .bottom) }
+            .onChange(of: model.shownTool?.call.id) { proxy.scrollTo("end", anchor: .bottom) }
+            .onChange(of: model.shownPermission?.call.id) { proxy.scrollTo("end", anchor: .bottom) }
             .onChange(of: model.current?.messages.last?.toolCalls?.count) { proxy.scrollTo("end", anchor: .bottom) }
             .overlay {
                 if model.current == nil && model.pendingConsent == nil && model.pendingSearch == nil && model.notice == nil {

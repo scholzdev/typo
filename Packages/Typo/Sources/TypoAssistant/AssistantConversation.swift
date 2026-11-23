@@ -30,6 +30,12 @@ public struct AssistantMessage: Codable, Identifiable, Hashable, Sendable {
     public var edits: [Int: EditState] = [:]
     /// Why an edit has the state `.failed`; nil in files saved before edits were applied automatically.
     public var editFailures: [Int: String]?
+    /// Seconds from the question to the end of this answer; set on a turn's last answer.
+    public var duration: TimeInterval?
+    /// The user's thumbs up (true) or down on the answer; kept on this Mac only.
+    public var feedback: Bool?
+    /// When the user sent it; nil in files saved before.
+    public var created: Date?
 
     public init(role: Role, text: String, context: String? = nil) {
         self.role = role; self.text = text; self.context = context
@@ -47,6 +53,8 @@ public struct AssistantConversation: Codable, Identifiable, Hashable, Sendable {
     public var archived = false
     /// What this conversation changes about the global permissions; nil in files saved before permissions existed.
     public var permissions: AssistantPermissions?
+    /// The agent mode picked in the prompt's mode menu; nil follows the "Change files" permission.
+    public var agentMode: String?
 
     public init(providerID: UUID?, model: String, now: Date = .now) {
         title = "New Conversation"
