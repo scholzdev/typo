@@ -34,7 +34,7 @@ struct ProjectView: View {
         NavigationSplitView(columnVisibility: $layout.columns) {
             // One container with one width: the two contents must not resize the column (and with it the editor) when they swap.
             ZStack {
-                if assistant.mode == .assistant { AssistantSidebar(model: assistant) } else { SidebarView(project: project, model: sidebar, files: files) }
+                if assistant.mode == .assistant { AssistantConversationList(model: assistant) } else { SidebarView(project: project, model: sidebar, files: files) }
             }
             // The navigator's system tab strip can't shrink below ~260 pt; a narrower column centred it and cut off every tab's left edge.
             .frame(minWidth: 280, maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -44,7 +44,11 @@ struct ProjectView: View {
         } detail: {
             // Two panes in one detail column, so the preview can leave the window (pop-out) without rebuilding the editor.
             SplitPanes(autosaveName: "Tympan.split.\(project.id.raw)", showsTrailing: !project.preview.isPoppedOut && !layout.focus && layout.showPreview,
-                       leading: EditorPane(project: project, sidebar: sidebar, tables: tables, actions: actions, layout: layout),
+                       leading: ZStack {
+                           // The editor stays alive under the conversation, so switching back keeps its state.
+                           EditorPane(project: project, sidebar: sidebar, tables: tables, actions: actions, layout: layout)
+                           if assistant.mode == .assistant { AssistantChatView(model: assistant) }
+                       },
                        trailing: PreviewPane(project: project, popOut: popOut))
             .inspector(isPresented: Binding(get: { layout.showInspector && layout.inspectorFits && !layout.focus },
                                             set: { if !layout.focus, layout.inspectorFits { layout.showInspector = $0 } })) {
@@ -62,6 +66,16 @@ struct ProjectView: View {
         .onAppear {
             files.startWatching()
             actions.explainSelection = { [assistant, actions] in assistant.explainSelection(editor: actions) }
+            #if DEBUG
+            // `-TypoDebugAssistantPrompt "text"` opens the assistant and sends the text (empty: just opens it), for checking the UI.
+            if let prompt = UserDefaults.standard.string(forKey: "TypoDebugAssistantPrompt") {
+                assistant.toggle(editor: actions)
+                if !prompt.isEmpty { assistant.send(prompt) }
+                // `-TypoDebugAssistantBack n`: back to the editor after n seconds.
+                let back = UserDefaults.standard.double(forKey: "TypoDebugAssistantBack")
+                if back > 0 { Task { try? await Task.sleep(for: .seconds(back)); assistant.mode = .navigator } }
+            }
+            #endif
             project.navigation = .current
             project.showInSecondPane = { [layout] f, permanent in
                 layout.secondFile = f

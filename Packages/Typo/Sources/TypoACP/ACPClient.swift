@@ -514,6 +514,15 @@ public enum ACPFiles {
         while start < limit, o.character(at: start) == n.character(at: start) { start += 1 }
         while end < limit - start, o.character(at: o.length - 1 - end) == n.character(at: n.length - 1 - end) { end += 1 }
         guard start + end < max(o.length, n.length) else { return nil }
+        // A change across lines covers whole lines, so its gutter bar starts and ends with the lines it changed rather than
+        // at a shared "#" of the next line.
+        let middle = { (s: NSString, from: Int, to: Int) in s.substring(with: NSRange(location: from, length: max(to - from, 0))).contains("\n") }
+        if middle(o, start, o.length - end) || middle(n, start, n.length - end) {
+            while start > 0, o.character(at: start - 1) != 10 { start -= 1 }
+            end = 0
+            while end < limit - start, o.character(at: o.length - 1 - end) == n.character(at: n.length - 1 - end) { end += 1 }
+            while end > 0, o.character(at: o.length - end - 1) != 10 { end -= 1 }
+        }
         // Never split a surrogate pair.
         if start > 0, UTF16.isLeadSurrogate(o.character(at: start - 1)) { start -= 1 }
         if end > 0, UTF16.isTrailSurrogate(o.character(at: o.length - end)) { end -= 1 }

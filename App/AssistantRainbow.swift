@@ -123,8 +123,14 @@ extension LineNumberRuler: NSViewToolTipOwner {
             hits.append(RainbowHit(rect: NSRect(x: 1 + (full - w) / 2, y: top + 1, width: w, height: bottom - top - 2), range: r, previous: previous))
         }
         rainbowHits = hits
-        if wantsLayer == false { wantsLayer = true }
-        guard let host = layer else { return }
+        let overlay = subviews.compactMap { $0 as? RainbowOverlay }.first ?? {
+            let v = RainbowOverlay(frame: bounds)
+            v.autoresizingMask = [.width, .height]
+            addSubview(v)
+            return v
+        }()
+        if overlay.frame != bounds { overlay.frame = bounds }
+        guard let host = overlay.layer else { return }
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         while rainbowLayers.count < hits.count {
@@ -163,6 +169,17 @@ extension LineNumberRuler: NSViewToolTipOwner {
         menu.popUp(positioning: nil, at: NSPoint(x: hit.rect.maxX + 2, y: p.y), in: self)
         return true
     }
+}
+
+/// The ruler's layer for the bars: its own flipped, layer-backed view, so the bars sit in ruler coordinates; clicks pass through.
+final class RainbowOverlay: NSView {
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+        wantsLayer = true
+    }
+    required init?(coder: NSCoder) { fatalError("not used") }
+    override var isFlipped: Bool { superview?.isFlipped ?? true }
+    override func hitTest(_ point: NSPoint) -> NSView? { nil }
 }
 
 struct RainbowHit {

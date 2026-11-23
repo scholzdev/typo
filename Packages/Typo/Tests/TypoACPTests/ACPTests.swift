@@ -302,6 +302,8 @@ private func update(_ u: JSONValue) -> JSONValue { ["sessionId": "s1", "update":
         let r = ACPFiles.replacement(old: "one\ntwo\nthree", new: "one\n2\nthree")
         #expect(r == Replacement(range: NSRange(location: 4, length: 3), text: "2"))
         #expect(ACPFiles.replacement(old: "same", new: "same") == nil)
+        // Lines inserted before a line sharing their first character: the change covers just the new lines.
+        #expect(ACPFiles.replacement(old: "#a\n#b\n", new: "#a\n#x\n#y\n#b\n") == Replacement(range: NSRange(location: 3, length: 0), text: "#x\n#y\n"))
         #expect(ACPFiles.replacement(old: "", new: "new") == Replacement(range: NSRange(location: 0, length: 0), text: "new"))
         #expect(ACPFiles.replacement(old: "aaa", new: "aa") == Replacement(range: NSRange(location: 2, length: 1), text: ""))
         // 😀 and 😃 share their lead surrogate: the pair is replaced whole.

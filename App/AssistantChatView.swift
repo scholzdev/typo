@@ -6,40 +6,72 @@ import TypoACP
 import TypoAssistant
 import TypstEngine
 
-/// The editor column in assistant mode: the transcript over Xcode-style prompt box.
+/// The editor area in assistant mode, like Xcode's conversations: a breadcrumb, the transcript in a centred column,
+/// and the prompt box (or the permission bar) at the bottom.
 struct AssistantChatView: View {
     @Bindable var model: AssistantModel
     private let providers = AssistantProviderStore.shared
     @Environment(\.openSettings) private var openSettings
+    @State private var showsPermissions = false
+    static let column: CGFloat = 760
 
     var body: some View {
-        if !providers.hasReadyProvider {
-            ContentUnavailableView {
-                Label("Set Up a Model Provider", systemImage: "sparkles")
-            } description: {
-                Text(providers.onDevice.isAvailable ? "" : "\(providers.onDevice.status). You can also add a model provider with your own API key.")
-            } actions: {
-                Button("Open Intelligence Settings") {
-                    UserDefaults.standard.set("intelligence", forKey: SettingsKey.tab)
-                    openSettings()
+        VStack(spacing: 0) {
+            header
+            Divider()
+            if !providers.hasReadyProvider {
+                ContentUnavailableView {
+                    Label("Set Up a Model Provider", systemImage: "sparkles")
+                } description: {
+                    Text(providers.onDevice.isAvailable ? "" : "\(providers.onDevice.status). You can also add a model provider with your own API key.")
+                } actions: {
+                    Button("Open Intelligence Settings") {
+                        UserDefaults.standard.set("intelligence", forKey: SettingsKey.tab)
+                        openSettings()
+                    }
                 }
-            }
-            .onAppear { providers.refreshAvailability() }
-        } else {
-            VStack(spacing: 0) {
+                .onAppear { providers.refreshAvailability() }
+            } else {
                 transcript
-                if let latest = model.latestChanges { changesBar(latest) }
-                AssistantPromptBox(model: model)
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        VStack(spacing: 8) {
+                            if let latest = model.latestChanges { changesBar(latest) }
+                            AssistantPromptBox(model: model)
+                        }
+                        .frame(maxWidth: Self.column)
+                        .padding(.horizontal, 20).padding(.bottom, 14)
+                        .frame(maxWidth: .infinity)
+                    }
             }
         }
+        .background(Color(nsColor: .textBackgroundColor))
+    }
+
+    /// "✦ › Title", with the conversation's permissions and New Conversation at the right.
+    private var header: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "sparkles").foregroundStyle(.secondary)
+            Image(systemName: "chevron.right").font(.system(size: 9, weight: .semibold)).foregroundStyle(.tertiary)
+            Text(model.current?.title ?? "New Conversation").font(.system(size: 12)).lineLimit(1)
+            Spacer()
+            Button("Permissions", systemImage: "checkmark.shield") { showsPermissions.toggle() }
+                .buttonStyle(.borderless).labelStyle(.iconOnly)
+                .help("What the assistant may do in this conversation")
+                .popover(isPresented: $showsPermissions, arrowEdge: .bottom) { AssistantPermissionsPopover(model: model) }
+            Button("New Conversation", systemImage: "square.and.pencil") { model.newConversation() }
+                .buttonStyle(.borderless).labelStyle(.iconOnly)
+                .help("Starts a new conversation with the assistant")
+        }
+        .padding(.horizontal, 12).frame(height: 30)
     }
 
     private var transcript: some View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 16) {
-                    ForEach(model.current?.messages ?? []) { m in
-                        AssistantMessageView(model: model, message: m).id(m.id)
+                    let turns = AssistantTurn.split(model.current?.messages ?? [])
+                    ForEach(Array(turns.enumerated()), id: \.element.id) { i, t in
+                        AssistantTurnView(model: model, turn: t, header: Self.header(t, after: i > 0 ? turns[i - 1] : nil)).id(t.id)
                     }
                     if let notice = model.notice {
                         Label(notice, systemImage: "exclamationmark.triangle").foregroundStyle(.orange).textSelection(.enabled)
@@ -50,20 +82,24 @@ struct AssistantChatView: View {
                     if let pending = model.shownPermission { permission(pending) }
                     Color.clear.frame(height: 1).id("end")
                 }
-                .padding(16)
+                .frame(maxWidth: Self.column)
+                .padding(.horizontal, 20).padding(.vertical, 16)
+                .frame(maxWidth: .infinity)
             }
             .onChange(of: model.current?.messages.last?.text) { proxy.scrollTo("end", anchor: .bottom) }
             .onChange(of: model.current?.messages.count) { proxy.scrollTo("end", anchor: .bottom) }
             .onChange(of: model.shownTool?.call.id) { proxy.scrollTo("end", anchor: .bottom) }
             .onChange(of: model.shownPermission?.call.id) { proxy.scrollTo("end", anchor: .bottom) }
             .onChange(of: model.current?.messages.last?.toolCalls?.count) { proxy.scrollTo("end", anchor: .bottom) }
-            .overlay {
-                if model.current == nil && model.pendingConsent == nil && model.pendingSearch == nil && model.notice == nil {
-                    ContentUnavailableView("Ask About Your Document", systemImage: "sparkles",
-                                           description: Text("The assistant reads the files you attach and changes them as you ask, and you can revert what it did."))
-                }
-            }
+            .onChange(of: model.currentID) { proxy.scrollTo("end", anchor: .bottom) }
         }
+    }
+
+    /// A turn starts a new section when it is the first, on a new day, or an hour after the one before.
+    static func header(_ t: AssistantTurn, after previous: AssistantTurn?) -> Date? {
+        guard let d = t.user?.created else { return nil }
+        guard let p = previous?.answers.last?.created ?? previous?.user?.created else { return d }
+        return !Calendar.current.isDate(d, inSameDayAs: p) || d.timeIntervalSince(p) > 3600 ? d : nil
     }
 
     /// "1 Change in 1 File" with the list and Revert, for the latest answer.
@@ -153,45 +189,36 @@ struct AssistantChatView: View {
     }
 }
 
+/// One answer: tool calls, the text with its code cards, edits still waiting for a decision, errors.
 struct AssistantMessageView: View {
     let model: AssistantModel
     let message: AssistantMessage
 
     var body: some View {
-        if message.role == .user {
-            HStack {
-                Spacer(minLength: 60)
-                Text(message.text)
-                    .textSelection(.enabled)
-                    .padding(.horizontal, 12).padding(.vertical, 8)
-                    .background(.quaternary.opacity(0.6), in: RoundedRectangle(cornerRadius: 12))
-            }
-        } else {
-            answer
-        }
-    }
-
-    private var answer: some View {
+        let streaming = model.streamingID == message.id
         VStack(alignment: .leading, spacing: 10) {
-            if let r = message.reasoning, !r.isEmpty {
-                DisclosureGroup("Reasoning") {
+            if !streaming || !message.text.isEmpty, let r = message.reasoning, !r.isEmpty {
+                DisclosureGroup {
                     Text(r).font(.callout).foregroundStyle(.secondary).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-            let permissions = model.permissions
-            let segments = AssistantEdits.segments(message.text)
-            ForEach(Array(segments.enumerated()), id: \.offset) { i, s in
-                switch s {
-                case .text(let t): AssistantMarkdown(text: t)
-                case .edit(let e):
-                    // The edit's index among the message's edits, which is what `edits` (accepted/rejected) is keyed by.
-                    let index = segments[..<i].count { if case .edit = $0 { true } else { false } }
-                    if permissions.shows(e) || message.edits[index] != nil { AssistantEditCard(model: model, message: message, index: index, edit: e) }
+                } label: {
+                    Label("Thought", systemImage: "bubble.left").foregroundStyle(.secondary)
                 }
             }
             ForEach(message.toolCalls ?? []) { AssistantToolRow(exchange: $0) }
-            if model.streamingID == message.id {
-                ProgressView().controlSize(.small)
+            let permissions = model.permissions
+            let segments = AssistantEdits.segments(message.text)
+            let files = Set(model.project.allFiles.map(\.raw))
+            ForEach(Array(segments.enumerated()), id: \.offset) { i, s in
+                switch s {
+                case .text(let t): AssistantMarkdown(text: t, files: files) { model.openFile($0) }
+                case .edit(let e):
+                    // The edit's index among the message's edits, which is what `edits` (accepted/rejected) is keyed by.
+                    let index = segments[..<i].count { if case .edit = $0 { true } else { false } }
+                    // Applied changes show as the turn's file capsules and in the diff panel.
+                    if message.edits[index] != .accepted, permissions.shows(e) || message.edits[index] != nil {
+                        AssistantEditCard(model: model, message: message, index: index, edit: e)
+                    }
+                }
             }
             if message.truncated {
                 Text("The answer reached the length limit and may be incomplete.").font(.caption).foregroundStyle(.secondary)
@@ -200,81 +227,16 @@ struct AssistantMessageView: View {
                 HStack(alignment: .firstTextBaseline) {
                     Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(.red).textSelection(.enabled)
                     Spacer()
-                    Button("Retry") { model.retry(message) }.disabled(model.isStreaming)
+                    Button("Retry") { model.retry(message) }.disabled(model.isBusy)
                 }
             }
-            if model.pendingEdits(message).count > 1, model.streamingID != message.id {
+            if model.pendingEdits(message).count > 1, !streaming {
                 Button("Accept All") { Task { await model.acceptAll(message) } }
                     .help("Applies every pending change of this answer, one after another")
             }
         }
+        .font(.system(size: 13))
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-/// One tool call as a compact row ("Read kapitel.typ"); it expands to what the tool returned.
-struct AssistantToolRow: View {
-    let exchange: ToolExchange
-
-    var body: some View {
-        DisclosureGroup {
-            ScrollView {
-                Text(exchange.result ?? "Waiting for the result…")
-                    .font(.system(size: 11, design: .monospaced))
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(6)
-            }
-            .frame(maxHeight: 160)
-            .background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 6))
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: exchange.isError ? "exclamationmark.triangle" : "wrench.and.screwdriver")
-                Text(exchange.title).lineLimit(1).truncationMode(.middle)
-                if exchange.result == nil { ProgressView().controlSize(.mini) }
-            }
-            .font(.callout)
-            .foregroundStyle(exchange.isError ? .orange : .secondary)
-        }
-    }
-}
-
-/// Markdown prose with fenced code blocks in the editor's font.
-struct AssistantMarkdown: View {
-    let text: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ForEach(Array(Self.blocks(text).enumerated()), id: \.offset) { _, b in
-                if b.code {
-                    Text(b.text)
-                        .font(Font(Highlighter.baseFont))
-                        .textSelection(.enabled)
-                        .padding(8)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 6))
-                } else {
-                    Text((try? AttributedString(markdown: b.text, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(b.text))
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-        }
-    }
-
-    /// Alternating prose and ``` code blocks; an unclosed fence (still streaming) is code to the end.
-    static func blocks(_ text: String) -> [(code: Bool, text: String)] {
-        var out: [(code: Bool, text: String)] = [], lines: [String] = [], code = false
-        func flush() {
-            let t = lines.joined(separator: "\n")
-            if !t.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { out.append((code, code ? t : t.trimmingCharacters(in: .newlines))) }
-            lines = []
-        }
-        for line in text.components(separatedBy: "\n") {
-            if line.trimmingCharacters(in: .whitespaces).hasPrefix("```") { flush(); code.toggle() } else { lines.append(line) }
-        }
-        flush()
-        return out
     }
 }
 
@@ -306,40 +268,25 @@ struct AssistantEditCard: View {
     }
 }
 
-/// The prompt at the bottom, like Xcode's: attachments, the field, the provider and model, and send.
+/// The prompt at the bottom, like Xcode's: the field, then attach, model and mode menus and send.
 struct AssistantPromptBox: View {
     @Bindable var model: AssistantModel
     private let providers = AssistantProviderStore.shared
     @FocusState private var focused: Bool
     @State private var commandIndex = 0
+    @State private var picksFiles = false
+    @State private var showsModes = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             if model.current == nil { suggestions }
-            VStack(alignment: .leading, spacing: 6) {
-                if !model.attachments.isEmpty && model.provider?.isOnDevice != true {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 6) {
-                            ForEach(model.attachments, id: \.self) { f in
-                                HStack(spacing: 4) {
-                                    Image(systemName: "doc.text")
-                                    Text((f.raw as NSString).lastPathComponent)
-                                    Button { model.attachments.removeAll { $0 == f } } label: { Image(systemName: "xmark.circle.fill") }
-                                        .buttonStyle(.plain).foregroundStyle(.secondary)
-                                        .accessibilityLabel("Detach \(f.raw)")
-                                }
-                                .font(.caption)
-                                .padding(.horizontal, 8).padding(.vertical, 3)
-                                .background(.quaternary, in: Capsule())
-                                .help(f.raw)
-                            }
-                        }
-                    }
-                }
+            VStack(alignment: .leading, spacing: 8) {
+                if !model.attachments.isEmpty || !model.externalAttachments.isEmpty, model.provider?.isOnDevice != true { attachmentChips }
                 if !commandMatches.isEmpty { commandList }
-                TextField("Ask about your document…", text: $model.draft, axis: .vertical)
+                TextField(placeholder, text: $model.draft, axis: .vertical)
                     .textFieldStyle(.plain)
-                    .lineLimit(1...8)
+                    .font(.system(size: 14))
+                    .lineLimit(1...10)
                     .focused($focused)
                     .onKeyPress(.return, phases: .down) { press in
                         if press.modifiers.contains(.shift) {
@@ -363,33 +310,81 @@ struct AssistantPromptBox: View {
                         return .handled
                     }
                     .onChange(of: model.draft) { commandIndex = 0 }
-                HStack(spacing: 10) {
+                    .frame(minHeight: 52, alignment: .topLeading)
+                HStack(spacing: 14) {
                     if model.provider?.isOnDevice != true { attachMenu }
-                    providerMenu
-                    // Dropped when the row is too narrow; wrapped it stood one letter per line and widened the sidebar's content.
-                    ViewThatFits(in: .horizontal) {
-                        Text({ switch model.permissions.policy(.changeFiles) { case .never: "Edits are off"; case .ask: model.provider?.isAgent == true ? "The agent asks before edits" : "Edits need approval"; case .allow: "Edits apply right away" } }())
-                            .font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                        Color.clear.frame(width: 0, height: 0)
-                    }
-                    Spacer()
-                    if model.isStreaming {
-                        Button { model.stop() } label: { Image(systemName: "stop.circle.fill").font(.title2) }
-                            .buttonStyle(.plain).accessibilityLabel("Stop").help("Stop the answer")
-                    } else {
-                        Button { model.send() } label: { Image(systemName: "arrow.up.circle.fill").font(.title2) }
-                            .buttonStyle(.plain).accessibilityLabel("Send").help("Send (Return)")
-                            .disabled(model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !(model.provider.map(providers.isReady) ?? false))
-                    }
+                    modelMenu
+                    modeMenu
+                    Spacer(minLength: 0)
+                    sendButton
                 }
             }
-            .padding(10)
-            .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.separator))
-            .overlay { if model.isStreaming { AssistantGlow() } }
+            .padding(.horizontal, 14).padding(.top, 12).padding(.bottom, 10)
+            .background(.background, in: RoundedRectangle(cornerRadius: 18))
+            .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(.separator))
+            .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+            .contentShape(Rectangle())
+            .onTapGesture { focused = true }
         }
-        .padding(12)
         .onAppear { focused = true }
+        .onChange(of: model.currentID) { focused = true }
+        .sheet(isPresented: $picksFiles) { AssistantFilePicker(model: model) }
+    }
+
+    /// The agent or provider by name, without the "(ACP)" of its preset.
+    private var providerName: String { (model.provider?.name ?? "the assistant").replacingOccurrences(of: " (ACP)", with: "") }
+
+    private var placeholder: String {
+        model.current?.messages.isEmpty == false ? "Follow up with \(providerName)" : "New conversation with \(providerName)"
+    }
+
+    private var attachmentChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 6) {
+                ForEach(model.attachments, id: \.self) { f in
+                    chip(name: (f.raw as NSString).lastPathComponent, help: f.raw) { model.attachments.removeAll { $0 == f } }
+                }
+                ForEach(model.externalAttachments, id: \.self) { u in
+                    chip(name: u.lastPathComponent, help: u.path) { model.externalAttachments.removeAll { $0 == u } }
+                }
+            }
+        }
+    }
+
+    private func chip(name: String, help: String, remove: @escaping () -> Void) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: "doc.text")
+            Text(name)
+            Button(action: remove) { Image(systemName: "xmark.circle.fill") }
+                .buttonStyle(.plain).foregroundStyle(.secondary)
+                .accessibilityLabel("Detach \(help)")
+        }
+        .font(.caption)
+        .padding(.horizontal, 8).padding(.vertical, 3)
+        .background(.quaternary, in: Capsule())
+        .help(help)
+    }
+
+    private var sendButton: some View {
+        Group {
+            if model.isStreaming {
+                Button { model.stop() } label: {
+                    Image(systemName: "stop.fill").font(.system(size: 10, weight: .bold)).frame(width: 26, height: 26)
+                        .background(.quaternary, in: Circle())
+                }
+                .accessibilityLabel("Stop").help("Stop the answer")
+            } else {
+                let empty = model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                Button { model.send() } label: {
+                    Image(systemName: "arrow.up").font(.system(size: 13, weight: .semibold)).frame(width: 26, height: 26)
+                        .foregroundStyle(empty ? AnyShapeStyle(.tertiary) : AnyShapeStyle(.white))
+                        .background(empty ? AnyShapeStyle(.quaternary) : AnyShapeStyle(Color.accentColor), in: Circle())
+                }
+                .accessibilityLabel("Send").help("Send (Return)")
+                .disabled(empty || !(model.provider.map(providers.isReady) ?? false))
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     /// The agent's commands matching what follows "/", until the first space.
@@ -407,7 +402,7 @@ struct AssistantPromptBox: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(Array(commandMatches.enumerated()), id: \.element.id) { i, c in
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
-                            // No fixedSize: a row wider than the sidebar cut the whole column off on the left.
+                            // No fixedSize: a row wider than the box cut the whole column off on the left.
                             Text("/" + c.name).font(.system(.callout, design: .monospaced)).lineLimit(1).truncationMode(.middle).layoutPriority(2)
                             if let h = c.hint { Text("‹\(h)›").font(.caption).foregroundStyle(.tertiary).lineLimit(1).layoutPriority(1) }
                             Text(c.description).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.tail)
@@ -431,50 +426,203 @@ struct AssistantPromptBox: View {
 
     private func useCommand(_ c: ACPCommand) { model.draft = "/\(c.name) " }
 
-    @ViewBuilder private var suggestions: some View {
-        HStack(spacing: 8) {
-            if model.hasSelection { chip("Explain the selected text") { model.send(.explain) } }
-            if model.hasErrors, model.permissions.policy(.diagnostics) != .never { chip("Fix the compile errors") { model.send(.fixErrors) } }
-            chip("Improve the wording of this section") { model.send(.improve) }
+    // MARK: Suggestions
+
+    /// Three prompts for an empty conversation, the ones that fit the project's state first.
+    private var suggestions: some View {
+        VStack(spacing: 8) {
+            ForEach(Array(picks.prefix(3).enumerated()), id: \.offset) { _, p in
+                Button { p.1() } label: {
+                    Text(p.0).font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(LinearGradient(colors: [AssistantPalette.amber, AssistantPalette.coral, AssistantPalette.raspberry], startPoint: .leading, endPoint: .trailing))
+                        .padding(.horizontal, 14).padding(.vertical, 7)
+                        .background(.background, in: Capsule())
+                        .overlay(Capsule().strokeBorder(.separator))
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .disabled(model.isBusy)
+            }
         }
+        .frame(maxWidth: .infinity)
     }
 
-    private func chip(_ title: String, _ action: @escaping () -> Void) -> some View {
-        Button(title, action: action).buttonStyle(.bordered).buttonBorderShape(.capsule).controlSize(.small).disabled(model.isStreaming)
+    private var picks: [(String, () -> Void)] {
+        var out: [(String, () -> Void)] = []
+        if model.hasErrors, model.permissions.policy(.diagnostics) != .never { out.append(("Help me fix the compile errors", { model.send(.fixErrors) })) }
+        if model.hasSelection { out.append(("Explain the selected text", { model.send(.explain) })) }
+        if model.project.isRepository {
+            out.append(("Review the changes I made on this branch", { model.send("Review the changes I made on this branch.") }))
+        }
+        for t in ["Explain this project's structure", "Improve the wording of this section", "Check my citations", "Make my tables consistent"] {
+            out.append((t, { model.send(t + ".") }))
+        }
+        return out
+    }
+
+    // MARK: Menus
+
+    private func menuLabel(_ title: String) -> some View {
+        // One Text: a menu label keeps only a text and an icon, and puts the icon first.
+        (Text(title + " ") + Text(Image(systemName: "chevron.up.chevron.down")).font(.system(size: 8, weight: .semibold)).foregroundStyle(.secondary))
+            .font(.system(size: 12)).lineLimit(1)
     }
 
     private var attachMenu: some View {
         Menu {
-            ForEach(model.project.allFiles.filter { FileKind.isText($0.raw) }, id: \.self) { f in
-                Toggle(f.raw, isOn: Binding(get: { model.attachments.contains(f) },
-                                            set: { on in if on { model.attachments.append(f) } else { model.attachments.removeAll { $0 == f } } }))
-            }
+            Button("Add Content from Project…") { picksFiles = true }
+            Button("Upload Files…") { upload() }
         } label: {
             Image(systemName: "paperclip")
         }
         .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
-        .accessibilityLabel("Attach Files").help("Attach or detach project files")
+        .accessibilityLabel("Attach Files").help("Attach files to the next message")
     }
 
-    private var providerMenu: some View {
+    private func upload() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = true
+        panel.canChooseDirectories = false
+        guard panel.runModal() == .OK else { return }
+        for url in panel.urls {
+            // A file inside the project is attached by its project path, like one picked from the project.
+            if let rel = ACPFiles.projectPath(url.path, root: model.project.rootURL) {
+                if !model.attachments.contains(rel) { model.attachments.append(rel) }
+            } else if !model.externalAttachments.contains(url) {
+                model.externalAttachments.append(url)
+            }
+        }
+    }
+
+    /// The model of the conversation's provider, and Other… to switch provider.
+    private var modelMenu: some View {
         Menu {
-            ForEach(providers.providers) { p in
-                let models = Array(Set([providers.defaultModel(for: p), p.model] + p.preset.models).filter { !$0.isEmpty }).sorted()
-                if p.isOnDevice || p.isAgent || models.count <= 1 {
-                    Button(p.isOnDevice || p.isAgent ? p.name : "\(p.name) – \(models.first ?? p.model)") { model.choose(p, model: models.first ?? p.model) }
-                        .disabled(!providers.isReady(p))
-                } else {
-                    Menu(p.name) {
-                        ForEach(models, id: \.self) { m in Button(m) { model.choose(p, model: m) } }
+            if let p = model.provider {
+                if p.isAgent, let models = model.shownAgentOptions?.models, !models.choices.isEmpty {
+                    let byDefault = models.choices.first { $0.id == models.current }?.name
+                    Toggle(byDefault.map { "Default (\($0))" } ?? "Default", isOn: Binding(get: { model.model.isEmpty }, set: { _ in model.choose(p, model: "") }))
+                    Divider()
+                    ForEach(models.choices) { c in
+                        Toggle(c.name, isOn: Binding(get: { model.model == c.id }, set: { _ in model.choose(p, model: c.id) }))
                     }
-                    .disabled(!providers.isReady(p))
+                    Divider()
+                } else if !p.isAgent, !p.isOnDevice, case let ms = models(of: p), ms.count > 1 {
+                    ForEach(ms, id: \.self) { m in Toggle(m, isOn: Binding(get: { model.model == m }, set: { _ in model.choose(p, model: m) })) }
+                    Divider()
+                }
+            }
+            Menu("Other…") {
+                ForEach(providers.providers) { p in
+                    Toggle(p.name, isOn: Binding(get: { model.provider?.id == p.id }, set: { _ in model.choose(p, model: models(of: p).first ?? p.model) }))
+                        .disabled(!providers.isReady(p))
                 }
             }
         } label: {
-            Text(model.provider.map { $0.isOnDevice || $0.isAgent ? $0.name : "\($0.name) · \(model.model)" } ?? "Choose a Model").font(.caption)
-                .lineLimit(1).truncationMode(.middle).frame(maxWidth: 150)
+            menuLabel(modelTitle)
         }
-        .menuStyle(.borderlessButton).fixedSize()
-        .accessibilityLabel("Model").help("The model provider and model of this conversation")
+        .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+        .accessibilityLabel("Model").help("The model of this conversation")
     }
+
+    private func models(of p: AssistantProvider) -> [String] {
+        Array(Set([providers.defaultModel(for: p), p.model] + p.preset.models).filter { !$0.isEmpty }).sorted()
+    }
+
+    private var modelTitle: String {
+        guard let p = model.provider else { return "Choose a Model" }
+        if p.isAgent {
+            let models = model.shownAgentOptions?.models
+            let id = model.model.isEmpty ? models?.current : model.model
+            return models?.choices.first { $0.id == id }?.name ?? providerName
+        }
+        return p.isOnDevice ? p.name : model.model
+    }
+
+    /// The agent's modes, when it offers any.
+    @ViewBuilder private var modeMenu: some View {
+        if model.provider?.isAgent == true, let modes = model.shownAgentOptions?.modes, !modes.choices.isEmpty {
+            let shown = currentMode(modes)
+            Menu {
+                ForEach(modes.choices) { c in
+                    Toggle(c.name, isOn: Binding(get: { shown == c.id }, set: { _ in model.setAgentMode(c.id) }))
+                }
+                Divider()
+                Button("About Modes…") { showsModes = true }
+            } label: {
+                let name = modes.choices.first { $0.id == shown }?.name ?? "Default"
+                menuLabel(name.localizedCaseInsensitiveContains("mode") ? name : name + " Mode")
+            }
+            .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+            .accessibilityLabel("Mode").help("How freely the agent works in this conversation")
+            .popover(isPresented: $showsModes, arrowEdge: .top) { AssistantModesAbout(modes: modes.choices) }
+        }
+    }
+
+    /// The conversation's pick, else the mode the "Change files" permission maps to, else the agent's own.
+    private func currentMode(_ modes: ACPSelector) -> String? {
+        if let m = model.agentMode { return m }
+        let mapped = ACPAgent.mode(for: model.permissions.policy(.changeFiles))
+        return modes.choices.contains { $0.id == mapped } ? mapped : modes.current
+    }
+}
+
+/// "About Modes…": what each of the agent's modes does.
+struct AssistantModesAbout: View {
+    let modes: [ACPChoice]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Modes").font(.headline)
+            ForEach(modes) { m in
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(m.name).fontWeight(.medium)
+                    Text(m.description ?? Self.fallback(m.id)).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .padding(14).frame(width: 300)
+    }
+
+    /// Our wording for the common mode ids when the agent gives no description.
+    static func fallback(_ id: String) -> String {
+        switch id {
+        case "default": "Edits files inside the project and asks before running commands or touching anything outside it."
+        case "acceptEdits": "Fewer prompts: the agent decides on edits itself."
+        case "plan": "Plans and answers without changing files."
+        case "bypassPermissions": "Never asks; the agent does what it decides."
+        default: "A mode of the agent."
+        }
+    }
+}
+
+/// "Add Content from Project…": the project's text files to attach.
+struct AssistantFilePicker: View {
+    @Bindable var model: AssistantModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var filter = ""
+
+    var body: some View {
+        VStack(spacing: 0) {
+            TextField("Filter", text: $filter).textFieldStyle(.roundedBorder).padding(10)
+            List {
+                ForEach(model.project.allFiles.filter { FileKind.isText($0.raw) && (filter.isEmpty || $0.raw.localizedCaseInsensitiveContains(filter)) }, id: \.self) { f in
+                    Toggle(f.raw, isOn: Binding(get: { model.attachments.contains(f) },
+                                                set: { on in if on { model.attachments.append(f) } else { model.attachments.removeAll { $0 == f } } }))
+                }
+            }
+            HStack {
+                Spacer()
+                Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
+            }
+            .padding(10)
+        }
+        .frame(width: 420, height: 440)
+    }
+}
+
+/// Xcode's intelligence colors (sRGB), for the suggestion chips.
+enum AssistantPalette {
+    static let amber = Color(.sRGB, red: 1.000, green: 0.718, blue: 0.200)
+    static let coral = Color(.sRGB, red: 0.976, green: 0.482, blue: 0.345)
+    static let raspberry = Color(.sRGB, red: 0.980, green: 0.263, blue: 0.408)
 }

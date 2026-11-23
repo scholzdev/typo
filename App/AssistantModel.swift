@@ -38,6 +38,8 @@ extension FocusedValues {
     var agentCommands: [ACPCommand] = []
     /// Files sent with the next message; by default the file shown in the editor.
     var attachments: [RelPath] = []
+    /// Files from outside the project sent with the next message.
+    var externalAttachments: [URL] = []
     /// The first editor's selection when the window switched to the assistant (the editor is not on screen then).
     private(set) var selection: (path: RelPath, range: NSRange)?
     /// Provider and model for a new conversation; a conversation keeps its own.
@@ -429,6 +431,7 @@ extension FocusedValues {
 
     private func attachedFiles() async throws -> [AssistantContext.File] {
         attachments.compactMap { p in project.assistantText(of: p).map { AssistantContext.File(path: p.raw, text: $0) } }
+            + externalAttachments.compactMap { u in (try? String(contentsOf: u, encoding: .utf8)).map { AssistantContext.File(path: u.lastPathComponent, text: $0) } }
     }
 
     /// Streams an answer to the conversation's last user message.
@@ -514,7 +517,7 @@ extension FocusedValues {
     private func client(for p: AssistantProvider) -> any AssistantClient {
         guard p.isAgent else { return providers.client(for: p) }
         let command = p.command ?? "", root = project.rootURL, mcp = Bundle.main.path(forAuxiliaryExecutable: "typo-mcp")
-        return ACPClient(provider: p, sessions: agents, attachments: attachments.map(project.url(for:)), changeFiles: permissions.policy(.changeFiles),
+        return ACPClient(provider: p, sessions: agents, attachments: attachments.map(project.url(for:)) + externalAttachments, changeFiles: permissions.policy(.changeFiles),
                          mode: current?.agentMode) { [weak self] in
             try await ACPAgent.launch(command: command, cwd: root, host: self, mcp: mcp).agent
         }
@@ -759,6 +762,32 @@ extension FocusedValues {
         for (i, _) in appliedChanges(m).reversed() {
             guard let fresh = current?.messages.first(where: { $0.id == m.id }) else { return }
             await revert(fresh, i)
+        }
+    }
+
+    // MARK: Transcript
+
+    func setFeedback(_ m: AssistantMessage, _ good: Bool?) {
+        guard let id = conversations.first(where: { $0.messages.contains { $0.id == m.id } })?.id else { return }
+        change(id) { c in if let i = c.messages.firstIndex(where: { $0.id == m.id }) { c.messages[i].feedback = good } }
+    }
+
+    /// The diff panel under the conversation, and the file it scrolls to.
+    var showsDiff = false
+    var diffFile: String?
+
+    func showDiff(_ path: String) {
+        diffFile = path
+        showsDiff = true
+    }
+
+    /// Opens a project file the transcript links to, at `line` when given.
+    func openFile(_ path: String, line: Int? = nil) {
+        guard let rel = RelPath(path) ?? ACPFiles.projectPath(path, root: project.rootURL) else { return }
+        Task {
+            do { _ = try await project.open(rel) } catch { notice = "The file could not be opened: \(error.localizedDescription)"; return }
+            mode = .navigator
+            if let line { project.showLine(rel, line: line, column: nil) } else { project.openPermanently(rel) }
         }
     }
 
