@@ -15,12 +15,30 @@ extension AssistantPermissions {
     }
 }
 
-/// Settings › Intelligence › Permissions: what the assistant may do by default.
+/// Settings › Intelligence › Permissions, as in Xcode: a card, then what the assistant may do by default.
+struct AgentPermissionsSettings: View {
+    var body: some View {
+        Form {
+            SettingsHeaderCard(symbol: "hand.raised.fill", title: "Permissions",
+                               text: "Choose what the assistant may do in every conversation and every project. The shield button above a conversation changes them for that conversation only.")
+            AssistantPermissionsSection()
+            Section {
+                Text("Agents such as Claude Code ask before they run a command or change a file outside the project. Which commands they may run without asking is set in each agent's own settings.")
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Commands")
+            }
+        }
+        .pane()
+    }
+}
+
+/// What the assistant may do by default.
 struct AssistantPermissionsSection: View {
     @State private var permissions = AssistantPermissions.stored
 
     var body: some View {
-        Section("Permissions") {
+        Section("Defaults") {
             ForEach(AssistantPermission.allCases) { p in
                 VStack(alignment: .leading, spacing: 2) {
                     if p.choices.count > 1 {
@@ -42,8 +60,6 @@ struct AssistantPermissionsSection: View {
                     }
                 }
             }
-            Text("The defaults of every conversation. The shield button above a conversation changes them for that conversation only.")
-                .font(.caption).foregroundStyle(.secondary)
         }
         .onChange(of: permissions) { AssistantPermissions.stored = permissions }
     }

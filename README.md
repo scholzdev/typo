@@ -17,6 +17,15 @@ Typo is a native macOS editor for [Typst](https://typst.app), written in Swift a
 
 The full list is in [FEATURES.md](FEATURES.md).
 
+## Privacy
+
+Typo collects no analytics or usage data, and it sends nothing anywhere until you set up a model provider or an agent in Settings › Intelligence.
+
+- Apple Intelligence runs on your Mac; nothing leaves it.
+- A model provider you add with an API key receives your messages, the conversation and the files you attach or let it read. The key is kept in your Keychain.
+- An agent (Claude Code, Codex, Gemini CLI and others) runs on your Mac in the project folder and sends what it reads to its own provider, under that provider's terms.
+- Conversations are stored on your Mac and can be deleted at any time.
+
 ## Requirements
 
 macOS 27 and Xcode 27 to build. The Typst engine is a Rust library in `bridge/`, so building also needs a Rust toolchain (`rustup`) and [XcodeGen](https://github.com/yonaskolb/XcodeGen).

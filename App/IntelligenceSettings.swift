@@ -5,40 +5,65 @@ import TypoAssistant
 import TypoMCP
 import TypstEngine
 
-/// Settings › Intelligence: the model providers and the defaults for new conversations.
+/// Settings › Intelligence, laid out like Xcode's: agents, model providers, the defaults for new conversations,
+/// what agents may do in Typo, and the MCP server. Sub-pages: a provider, Permissions, Skills and Plug-ins.
 struct IntelligenceSettings: View {
     @Environment(SettingsNavigation.self) private var nav
     @State private var addingCustom = false
+    @State private var addingAgent = false
+    @State private var showingPrivacy = false
     private let store = AssistantProviderStore.shared
     @AppStorage(SettingsKey.assistantDefaultProvider) private var defaultProvider = ""
     @AppStorage(SettingsKey.assistantDefaultModel) private var defaultModel = ""
 
+    /// The fixed sub-pages; any other page id is a provider's UUID.
+    enum Page: String { case permissions, skills, plugins }
+
     var body: some View {
-        if nav.page?.tab == .intelligence, let id = nav.page.flatMap({ UUID(uuidString: $0.id) }), let p = store.provider(id) {
-            ProviderSettings(provider: p) { nav.page = nil }
-        } else {
-            list
+        let page = nav.page?.tab == .intelligence ? nav.page : nil
+        switch page.flatMap({ Page(rawValue: $0.id) }) {
+        case .permissions: AgentPermissionsSettings()
+        case .skills: SkillsSettings()
+        case .plugins: PluginsSettings()
+        case nil:
+            if let id = page.flatMap({ UUID(uuidString: $0.id) }), let p = store.provider(id) {
+                ProviderSettings(provider: p) { nav.page = nil }
+            } else {
+                list
+            }
         }
     }
 
     private var list: some View {
         Form {
+            SettingsHeaderCard(symbol: "sparkles", fill: AnyShapeStyle(LinearGradient(colors: [.orange, .pink, .purple, .blue], startPoint: .bottomLeading, endPoint: .topTrailing)),
+                               title: "Intelligence",
+                               text: "Chat about your project and let agents work on it, with the model of your choice. Third-party models and agents get access to your project's files.",
+                               link: ("About Intelligence in Typo & Privacy…", { showingPrivacy = true }))
             Section {
-                HStack(alignment: .top, spacing: 12) {
-                    Image(systemName: "sparkles")
-                        .font(.title2).foregroundStyle(.white)
-                        .frame(width: 40, height: 40)
-                        .background(.purple.gradient, in: RoundedRectangle(cornerRadius: 9))
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Assistant").font(.headline)
-                        Text("Chat about your project and review the changes it proposes before they are applied.")
-                        Text("Model providers receive the files you attach to a conversation.").font(.caption).foregroundStyle(.secondary)
+                // Only Claude is offered for now; agents of other presets the user set up earlier stay listed.
+                ForEach(AssistantPreset.agents.filter { $0.id == "acp-claude" }) { preset in
+                    let set = store.configured.filter { $0.presetID == preset.id }
+                    if set.isEmpty {
+                        HStack(spacing: 10) {
+                            ProviderIcon(presetID: preset.id)
+                            titled(preset.shortName, preset.organization)
+                            Spacer()
+                            Button("Get") { add(AssistantProvider(preset: preset)) }
+                                .buttonBorderShape(.capsule)
+                                .accessibilityLabel("Get \(preset.shortName)")
+                        }
                     }
+                    ForEach(set) { p in agentRow(p) }
                 }
-                .padding(.vertical, 4)
+                ForEach(store.configured.filter { $0.isAgent && $0.presetID != "acp-claude" }) { p in agentRow(p) }
+            } header: {
+                Text("Agents")
+            } footer: {
+                HStack { Spacer(); Button("Add an Agent…") { addingAgent = true } }
             }
-            Section("Providers") {
-                ForEach(store.providers) { p in
+            Section {
+                ForEach(store.providers.filter { !$0.isAgent }) { p in
                     if p.isOnDevice {
                         row(p)
                     } else {
@@ -47,22 +72,20 @@ struct IntelligenceSettings: View {
                             .contextMenu { Button("Delete", role: .destructive) { store.remove(p.id) } }
                     }
                 }
+            } header: {
+                Text("Model Providers")
+            } footer: {
                 HStack {
+                    Spacer()
                     Menu("Add a Provider…") {
                         ForEach(AssistantPreset.all) { preset in
                             Button("\(preset.name) (\(preset.organization))") { add(AssistantProvider(preset: preset)) }
-                        }
-                        Section("Agents (ACP)") {
-                            ForEach(AssistantPreset.agents) { preset in
-                                Button(preset.command?.isEmpty == true ? "\(preset.name)…" : "\(preset.name) (\(preset.organization))") { add(AssistantProvider(preset: preset)) }
-                            }
                         }
                     }
                     .fixedSize()
                     Button("Add a Model Provider…") { addingCustom = true }
                 }
             }
-            AssistantPermissionsSection()
             Section("Chat") {
                 Picker("Default provider", selection: $defaultProvider) {
                     Text("Automatic").tag("")
@@ -76,11 +99,22 @@ struct IntelligenceSettings: View {
                 Text("Used for new conversations. Automatic picks the first ready provider, else the on-device model.")
                     .font(.caption).foregroundStyle(.secondary)
             }
+            Section("Agents in Typo") {
+                SettingsPageRow(title: "Permissions", subtitle: "Control what the assistant and agents may do in your projects.") { go(.permissions, "Permissions") }
+                SettingsPageRow(title: "Skills", subtitle: "Typo's skills and your own, written in plain words.") { go(.skills, "Skills") }
+                SettingsPageRow(title: "Plug-ins", subtitle: "Add and manage plug-ins that bring skills to agents.") { go(.plugins, "Plug-ins") }
+            }
             MCPServerSection()
         }
         .pane()
         .sheet(isPresented: $addingCustom) { AddModelProviderSheet { add($0) } }
+        .sheet(isPresented: $addingAgent) { AddAgentSheet { add($0) } }
+        .sheet(isPresented: $showingPrivacy) { IntelligencePrivacySheet() }
         .onAppear { store.refreshAvailability() }
+    }
+
+    private func go(_ page: Page, _ title: String) {
+        nav.page = SettingsSubpage(tab: .intelligence, id: page.rawValue, title: title)
     }
 
     private func add(_ p: AssistantProvider) {
@@ -89,22 +123,39 @@ struct IntelligenceSettings: View {
     }
 
     private func open(_ p: AssistantProvider) {
-        nav.page = SettingsSubpage(tab: .intelligence, id: p.id.uuidString, title: p.name)
+        nav.page = SettingsSubpage(tab: .intelligence, id: p.id.uuidString, title: p.shortName)
+    }
+
+    private func titled(_ title: String, _ subtitle: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+            Text(subtitle).foregroundStyle(.secondary)
+        }
+    }
+
+    private func agentRow(_ p: AssistantProvider) -> some View {
+        Button { open(p) } label: {
+            HStack(spacing: 10) {
+                ProviderIcon(presetID: p.presetID)
+                titled(p.shortName, p.organization)
+                Spacer()
+                if !store.isReady(p) { Text(store.status(p)).foregroundStyle(.orange) }
+                Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(.tertiary)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .contextMenu { Button("Remove", role: .destructive) { store.remove(p.id) } }
     }
 
     private func row(_ p: AssistantProvider) -> some View {
         let ready = store.isReady(p)
         return HStack(spacing: 10) {
-            Image(systemName: p.isOnDevice ? "apple.intelligence" : p.preset.symbol)
-                .foregroundStyle(.white)
-                .frame(width: 22, height: 22)
-                .background(p.isOnDevice ? Color.purple : p.preset.isLocal ? .green : .blue, in: RoundedRectangle(cornerRadius: 5))
-            VStack(alignment: .leading, spacing: 1) {
-                Text(p.name)
-                Text(p.organization).font(.caption).foregroundStyle(.secondary)
-            }
+            ProviderIcon(presetID: p.presetID)
+            titled(p.name, p.organization)
             Spacer()
-            Text(store.status(p)).font(.callout).foregroundStyle(ready ? Color.secondary : .orange)
+            Text(store.status(p)).foregroundStyle(ready ? Color.secondary : .orange)
+            if !p.isOnDevice { Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(.tertiary) }
         }
     }
 }
@@ -118,7 +169,7 @@ private struct MCPServerSection: View {
     @State private var result: (ok: Bool, text: String)?
 
     var body: some View {
-        Section("MCP Server") {
+        Section("Model Context Protocol") {
             Text("Gives AI agents Typo's Typst tools: compile errors, page previews, Typst docs, packages and fonts.")
             if let path {
                 LabeledContent("Command") {
@@ -174,50 +225,103 @@ private struct ProviderSettings: View {
     @State private var result: (ok: Bool, text: String)?
     @State private var confirmDelete = false
     @State private var found: (ok: Bool, text: String)?
+    @State private var showingPrivacy = false
+    @State private var showingLogin = false
 
     private var preset: AssistantPreset { provider.preset }
     private var baseURLEditable: Bool { preset.baseURL == nil }
 
     var body: some View {
         Form {
-            if provider.isAgent { agent } else { model }
-            Section {
-                Button("Delete Provider…", role: .destructive) { confirmDelete = true }
+            if provider.isAgent {
+                agent
+            } else {
+                model
+                Section {
+                    Button("Delete Provider…", role: .destructive) { confirmDelete = true }
+                }
             }
         }
         .pane()
         .onChange(of: provider) { store.update(provider) }
-        .onChange(of: provider.name) { nav.page?.title = provider.name }
-        .confirmationDialog("Delete \(provider.name)?", isPresented: $confirmDelete) {
-            Button("Delete", role: .destructive) { store.remove(provider.id); deleted() }
+        .onChange(of: provider.name) { nav.page?.title = provider.shortName }
+        .confirmationDialog("Remove \(provider.shortName)?", isPresented: $confirmDelete) {
+            Button("Remove", role: .destructive) { store.remove(provider.id); deleted() }
         } message: {
-            Text(provider.isAgent ? "Its command is removed." : "Its API key is removed from the Keychain.")
+            Text(provider.isAgent ? "Its command is removed. The agent itself stays installed." : "Its API key is removed from the Keychain.")
         }
+        .sheet(isPresented: $showingPrivacy) { IntelligencePrivacySheet() }
+        .alert("Sign In to \(provider.shortName)", isPresented: $showingLogin) {
+            Button("OK") {}
+        } message: {
+            Text(preset.loginHint ?? "")
+        }
+        // The Account text's last link opens the privacy sheet; the others go to the browser.
+        .environment(\.openURL, OpenURLAction { url in
+            if url.scheme == "typo-settings" { showingPrivacy = true; return .handled }
+            return .systemAction
+        })
     }
 
-    /// An agent: the command that starts it, whether that command is found, and a test that starts it once.
+    /// An agent, as in Xcode: its card, its model, its account, and the command that starts it.
     @ViewBuilder private var agent: some View {
         Section {
-            Text(preset.caption).font(.caption).foregroundStyle(.secondary)
-            if preset.command?.isEmpty == true { TextField("Description", text: $provider.name) }
+            HStack(spacing: 10) {
+                ProviderIcon(presetID: provider.presetID)
+                Text(provider.shortName)
+            }
+            .padding(.vertical, 2)
+        }
+        Section {
+            LabeledContent("Model") { Text("Chosen in each conversation").foregroundStyle(.secondary) }
+        }
+        Section {
+            LabeledContent("Account") {
+                HStack(spacing: 10) {
+                    Text(found?.ok == true ? "Configured" : "Not Configured").foregroundStyle(.secondary)
+                    Menu {
+                        if preset.loginHint != nil { Button("How to Sign In…") { showingLogin = true } }
+                        Button("Test Agent") { run(testAgent) }.disabled(busy)
+                        Divider()
+                        Button("Remove Agent…", role: .destructive) { confirmDelete = true }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                    }
+                    .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+                    .accessibilityLabel("Account Options")
+                }
+            }
+            Text(accountNote).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            if busy || result != nil {
+                HStack {
+                    if busy { ProgressView().controlSize(.small); Text("Testing…").foregroundStyle(.secondary) }
+                    if let result, !busy { Text(result.text).foregroundStyle(result.ok ? Color.secondary : .red).textSelection(.enabled) }
+                }
+            }
+        }
+        Section {
+            if preset.command?.isEmpty == true { TextField("Name", text: $provider.name) }
             TextField("Command", text: Binding(get: { provider.command ?? "" }, set: { provider.command = $0 }), prompt: Text("agent --acp"))
                 .font(.body.monospaced())
-            if let found { Text(found.text).font(.caption).foregroundStyle(found.ok ? Color.secondary : .orange) }
-            if let hint = preset.loginHint { Text(hint).font(.caption).foregroundStyle(.secondary) }
+            if let found { Text(found.text).font(.callout).foregroundStyle(found.ok ? Color.secondary : .orange) }
+        } header: {
+            Text("Command")
+        } footer: {
+            Text(preset.caption + " Test Agent starts the agent once and stops it again.").font(.callout).foregroundStyle(.secondary)
         }
         .task(id: provider.command) { found = await Self.lookup(provider.command ?? "") }
-        Section {
-            HStack {
-                Button("Test Agent") { run(testAgent) }
-                if busy { ProgressView().controlSize(.small) }
-            }
-            .disabled(busy)
-            if let result {
-                Text(result.text).font(.caption).foregroundStyle(result.ok ? Color.secondary : .red).textSelection(.enabled)
-            }
-            Text("Test Agent starts the agent and stops it again. The agent works in the project folder and sends what it reads to its own provider.")
-                .font(.caption).foregroundStyle(.secondary)
+    }
+
+    /// Where the agent's requests go, with its vendor's policies where Typo knows them.
+    private var accountNote: AttributedString {
+        var text = "Sign in with the agent's own command line tool; Typo never sees your login."
+        if let links = VendorPolicy.links(provider.organization) {
+            text += " Your requests go to \(provider.organization) and are subject to its [Privacy Policy](\(links.privacy)) and [Terms of Use](\(links.terms))."
+        } else {
+            text += " Your requests go to the agent's own provider, under its terms."
         }
+        text += " Typo sends no usage data. [About Intelligence in Typo & Privacy…](typo-settings:privacy)"
+        return (try? AttributedString(markdown: text)) ?? AttributedString(text)
     }
 
     /// Whether the command's program is on the user's PATH.
