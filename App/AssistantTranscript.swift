@@ -316,12 +316,17 @@ struct AssistantMarkdown: View {
     var open: (String) -> Void = { _ in }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ForEach(Array(Self.blocks(text).enumerated()), id: \.offset) { _, b in
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(Self.blocks(text).enumerated()), id: \.offset) { i, b in
                 if b.code {
-                    AssistantCodeCard(code: b.text, language: b.language)
+                    AssistantCodeCard(code: b.text, language: b.language).padding(.top, i > 0 ? 10 : 0)
                 } else {
-                    ForEach(Array(Self.lines(b.text).enumerated()), id: \.offset) { _, l in line(l) }
+                    let lines = Self.lines(b.text)
+                    ForEach(Array(lines.enumerated()), id: \.offset) { j, l in
+                        // About a line between paragraphs; list items closer together.
+                        let listed = j > 0 && l.kind.isBullet && lines[j - 1].kind.isBullet
+                        line(l).padding(.top, i == 0 && j == 0 ? 0 : listed ? 4 : 10)
+                    }
                 }
             }
         }
@@ -336,25 +341,55 @@ struct AssistantMarkdown: View {
         switch l.kind {
         case .heading(let level):
             inline(l.text).font(level == 1 ? .title3.bold() : .headline).padding(.top, 4)
-        case .bullet(let marker):
+        case .bullet(let marker, let level):
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text(marker).foregroundStyle(.secondary)
                 inline(l.text)
             }
-            .padding(.leading, 6)
+            .padding(.leading, 6 + 20 * CGFloat(level))
         case .paragraph:
             inline(l.text)
         }
     }
 
     private func inline(_ s: String) -> some View {
-        Text((try? AttributedString(markdown: Self.linkingFiles(s, files), options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(s))
+        let (text, linksFiles) = Self.styled(s, files: files)
+        return text
             .textSelection(.enabled)
-            .lineSpacing(2)
+            .lineSpacing(4)
+            // File links read as bold text; the system tint would color them like web links.
+            .tint(linksFiles ? .primary : nil)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    enum LineKind { case heading(Int), bullet(String), paragraph }
+    /// Inline Markdown like Xcode: code in body-size monospace (bold inside bold), project files bold with a grey
+    /// arrow after them. The file name is the link: an image in a Text cannot be one.
+    static func styled(_ s: String, files: Set<String>) -> (Text, linksFiles: Bool) {
+        var a = (try? AttributedString(markdown: linkingFiles(s, files), options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(s)
+        var fileLinks: [Range<AttributedString.Index>] = []
+        for run in a.runs {
+            let intent = run.inlinePresentationIntent ?? []
+            let bold = intent.contains(.stronglyEmphasized)
+            if intent.contains(.code) {
+                a[run.range].font = .system(size: 13, weight: bold || run.link?.scheme == "typo-file" ? .bold : .regular, design: .monospaced)
+            } else if run.link?.scheme == "typo-file" {
+                a[run.range].font = .system(size: 13, weight: .bold)
+            }
+        }
+        for (link, range) in a.runs[\.link] where link?.scheme == "typo-file" { fileLinks.append(range) }
+        var text = Text("")
+        var from = a.startIndex
+        for r in fileLinks {
+            text = text + Text(AttributedString(a[from..<r.upperBound])) + Text(" ") + Text(Image(systemName: "arrow.right.circle.fill")).foregroundStyle(.secondary)
+            from = r.upperBound
+        }
+        return (text + Text(AttributedString(a[from..<a.endIndex])), !fileLinks.isEmpty)
+    }
+
+    enum LineKind {
+        case heading(Int), bullet(String, level: Int), paragraph
+        var isBullet: Bool { if case .bullet = self { true } else { false } }
+    }
 
     /// A prose block as headings, list items and paragraphs (lines of a paragraph joined).
     static func lines(_ block: String) -> [(kind: LineKind, text: String)] {
@@ -363,13 +398,16 @@ struct AssistantMarkdown: View {
         func flush() { if !para.isEmpty { out.append((.paragraph, para.joined(separator: "\n"))); para = [] } }
         for raw in block.components(separatedBy: "\n") {
             let t = raw.trimmingCharacters(in: .whitespaces)
+            // Two to four spaces (or a tab) of indentation nest a list item one level.
+            let indent = raw.prefix { $0 == " " || $0 == "\t" }.reduce(0) { $0 + ($1 == "\t" ? 4 : 1) }
+            let level = (indent + 1) / 3
             if t.isEmpty { flush(); continue }
             if let hashes = t.firstIndex(where: { $0 != "#" }), t.hasPrefix("#"), t[hashes] == " " {
                 flush(); out.append((.heading(t.distance(from: t.startIndex, to: hashes)), String(t[hashes...]).trimmingCharacters(in: .whitespaces)))
             } else if t.hasPrefix("- ") || t.hasPrefix("* ") {
-                flush(); out.append((.bullet("•"), String(t.dropFirst(2))))
+                flush(); out.append((.bullet("•", level: level), String(t.dropFirst(2))))
             } else if let dot = t.firstIndex(of: "."), t[..<dot].allSatisfy(\.isNumber), !t[..<dot].isEmpty, t[t.index(after: dot)...].hasPrefix(" ") {
-                flush(); out.append((.bullet(String(t[...dot])), String(t[t.index(dot, offsetBy: 2)...])))
+                flush(); out.append((.bullet(String(t[...dot]), level: level), String(t[t.index(dot, offsetBy: 2)...])))
             } else {
                 para.append(t)
             }
@@ -385,7 +423,7 @@ struct AssistantMarkdown: View {
         func flushWord() {
             let core = word.trimmingCharacters(in: CharacterSet(charactersIn: "*_.,:;()!?"))
             if !inCode, !core.isEmpty, files.contains(core), let r = word.range(of: core) {
-                word.replaceSubrange(r, with: "[\(core) ↗](typo-file:\(core.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? core))")
+                word.replaceSubrange(r, with: "[\(core)](typo-file:\(core.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? core))")
             }
             out += word; word = ""
         }
