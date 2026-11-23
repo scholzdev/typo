@@ -142,7 +142,8 @@ public final class ACPAgent: Sendable {
 
     /// Starts the agent of `command` in `cwd` and opens a session; returns it with the agent's name and version.
     /// `mcp`: the path of the bundled typo-mcp, which the session gets as an MCP server for `cwd`.
-    public static func launch(command: String, cwd: URL, host: (any ACPHost)?, mcp: String? = nil) async throws -> (agent: ACPAgent, info: String) {
+    /// `meta`: the `_meta` of `session/new`, such as `claudeCodeMeta(plugins:)`.
+    public static func launch(command: String, cwd: URL, host: (any ACPHost)?, mcp: String? = nil, meta: JSONValue? = nil) async throws -> (agent: ACPAgent, info: String) {
         let words = ACPProcess.words(command)
         guard let name = words.first else { throw ACPError(ACPError.closed, "The agent has no command. Enter it in Settings › Intelligence.") }
         let env = ACPProcess.environment()
@@ -156,7 +157,7 @@ public final class ACPAgent: Sendable {
         }
         let agent = ACPAgent(connection: connection, process: process, host: host)
         do {
-            return (agent, try await agent.connect(cwd: cwd, mcp: mcp))
+            return (agent, try await agent.connect(cwd: cwd, mcp: mcp, meta: meta))
         } catch {
             agent.close()
             throw error
@@ -164,7 +165,7 @@ public final class ACPAgent: Sendable {
     }
 
     /// `initialize` and `session/new`; returns the agent's name and version.
-    func connect(cwd: URL, mcp: String? = nil) async throws -> String {
+    func connect(cwd: URL, mcp: String? = nil, meta: JSONValue? = nil) async throws -> String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
         let info = try await connection.request("initialize", [
             "protocolVersion": .int(ACPProtocolInfo.protocolVersion),
@@ -174,13 +175,21 @@ public final class ACPAgent: Sendable {
         if let v = info["protocolVersion"]?.int, v != ACPProtocolInfo.protocolVersion {
             throw ACPError(ACPError.internalError, "The agent speaks protocol version \(v); Typo speaks version \(ACPProtocolInfo.protocolVersion).")
         }
-        let session = try await connection.request("session/new", ["cwd": .string(cwd.path), "mcpServers": .array(mcp.map { [["name": "typo", "command": .string($0), "args": ["--project", .string(cwd.path)], "env": []]] } ?? [])])
+        var params: JSONValue = ["cwd": .string(cwd.path), "mcpServers": .array(mcp.map { [["name": "typo", "command": .string($0), "args": ["--project", .string(cwd.path)], "env": []]] } ?? [])]
+        if let meta, case .object(var o) = params { o["_meta"] = meta; params = .object(o) }
+        let session = try await connection.request("session/new", params)
         guard let id = session["sessionId"]?.string else { throw ACPError(ACPError.internalError, "The agent opened no session.") }
         let options = ACPSessionOptions.parse(session)
         state.withLock { $0.sessionID = id; $0.options = options }
         Task { @MainActor [host] in host.value?.optionsChanged(options) }
         let a = info["agentInfo"]
         return [a?["title"]?.string ?? a?["name"]?.string ?? "The agent", a?["version"]?.string].compactMap { $0 }.joined(separator: " ")
+    }
+
+    /// The `session/new` `_meta` with which the Claude Code ACP adapter loads the plugin folders `plugins`
+    /// (its `claudeCode.options` go into the Claude Agent SDK's options); nil without plugins.
+    public static func claudeCodeMeta(plugins: [URL]) -> JSONValue? {
+        plugins.isEmpty ? nil : ["claudeCode": ["options": ["plugins": .array(plugins.map { ["type": "local", "path": .string($0.path)] })]]]
     }
 
     /// The agent's mode for the "Change files" permission: it asks before edits, accepts them, or only plans.

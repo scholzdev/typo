@@ -33,6 +33,8 @@ private final class FakeAgent: @unchecked Sendable {
     let notes = Collected<String>()
     /// The `mcpServers` of each session/new, as JSON.
     let mcpServers = Collected<String>()
+    /// The `_meta` of each session/new, as JSON ("null" without one).
+    let metas = Collected<String>()
     let promptHandler: @Sendable (ACPConnection, JSONValue) async -> JSONValue
 
     /// A prompt result with "errorCode" answers with that error instead.
@@ -46,6 +48,7 @@ private final class FakeAgent: @unchecked Sendable {
             case "initialize": return .success(["protocolVersion": 1, "agentInfo": ["name": "fake", "version": "1.0"]])
             case "session/new":
                 mcpServers.add(String(decoding: (params["mcpServers"] ?? nil).json, as: UTF8.self))
+                metas.add(String(decoding: (params["_meta"] ?? nil).json, as: UTF8.self))
                 return .success(["sessionId": "s1", "modes": ["currentModeId": "default", "availableModes": .array(modes.map { ["id": .string($0), "name": .string($0)] })]])
             case "session/set_mode":
                 notes.add("set_mode:" + (params["modeId"]?.string ?? ""))
@@ -112,6 +115,18 @@ private func update(_ u: JSONValue) -> JSONValue { ["sessionId": "s1", "update":
         let bare = FakeAgent()
         _ = try await bare.agent(host: nil)
         #expect(bare.mcpServers.all == ["[]"])
+    }
+
+    @Test func sessionCarriesClaudeCodePluginsOnlyWhenGiven() async throws {
+        let fake = FakeAgent()
+        let a = ACPAgent(connection: fake.clientConnection, process: nil, host: nil)
+        let meta = ACPAgent.claudeCodeMeta(plugins: [URL(fileURLWithPath: "/c/typo"), URL(fileURLWithPath: "/c/typo-user")])
+        _ = try await a.connect(cwd: URL(fileURLWithPath: "/p"), meta: meta)
+        #expect(fake.metas.all == [#"{"claudeCode":{"options":{"plugins":[{"path":"/c/typo","type":"local"},{"path":"/c/typo-user","type":"local"}]}}}"#])
+        #expect(ACPAgent.claudeCodeMeta(plugins: []) == nil)
+        let bare = FakeAgent()
+        _ = try await bare.agent(host: nil)
+        #expect(bare.metas.all == ["null"])
     }
 
     @MainActor @Test func aTurnStreamsTextToolsAndFileAccess() async throws {
