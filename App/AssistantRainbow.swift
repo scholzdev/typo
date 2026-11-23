@@ -93,6 +93,8 @@ struct RainbowBar: NSViewRepresentable {
             layer?.addSublayer(bar)
         }
         required init?(coder: NSCoder) { fatalError("not used") }
+        /// Flipped like the gutter's `RainbowOverlay`, so the gradient runs blue at the top here too.
+        override var isFlipped: Bool { true }
         override func layout() {
             super.layout()
             CATransaction.begin(); CATransaction.setDisableActions(true)
