@@ -95,6 +95,7 @@ struct ComponentsSettings: View {
             ForEach(sections) { section in
                 Section(section.title) { ForEach(section.items) { row($0) } }
             }
+            ZoteroSettingsSection()
         }
         .pane()
         .task { await reload() }

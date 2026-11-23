@@ -20,6 +20,8 @@ extension FocusedValues {
     var quickOpen: QuickOpenMode?
     /// The library (⇧⌘L) or command palette (⇧⌘P) is showing on this tab; nil while closed.
     var library: LibraryKind?
+    /// File › Connect Zotero… sheet.
+    var connectingZotero = false
     var secondFile: RelPath? { didSet { if let f = secondFile { tabs.show(f, permanent: false, pinning: NavigationSettings.current.pinTabs) } } }
     /// The second pane's tabs (design/14h), derived from `secondFile` like the first pane's.
     var tabs = TabList()
@@ -136,7 +138,7 @@ struct SecondEditorPane: View {
         let content = Group {
             if let buffer = loaded ?? (file != nil ? held : nil) {
                 EditorView(project: project, buffer: buffer, tables: tables, actions: actions, marks: project.lintHints(in: buffer.path) + (inlineIssues ? project.diagnostics(in: buffer.path) : []),
-                           revealToken: 0, layout: layout, isPrimary: false)
+                           revealToken: 0, layout: layout, readOnly: buffer.isZoteroManaged, isPrimary: false)
                     .onDisappear { if project.focusedEditorFile == buffer.path { project.focusedEditorFile = nil; layout.secondFocused = false; layout.updateDimming() } }
             } else {
                 ContentUnavailableView("No Other Text File", systemImage: "doc.text")

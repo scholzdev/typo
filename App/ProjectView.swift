@@ -57,6 +57,8 @@ struct ProjectView: View {
         .onChange(of: AccessibilityChecks.enabled(accessibilityChecks, target: exportTarget), initial: true) { project.accessibilityChecks = $1 }
         .onChange(of: compileWhileTyping, initial: true) { project.compilesWhileTyping = compileWhileTyping }
         .onChange(of: project.fileRevision) { sidebar.searchOutcome = nil }      // hits may name files that moved; the search tab reruns
+        .task(id: project.zoteroLink?.target) { await project.runZoteroSync() }
+        .sheet(isPresented: $layout.connectingZotero) { ZoteroConnectSheet(project: project, suggested: project.selectedFile.flatMap { $0.raw.lowercased().hasSuffix(".bib") ? $0 : nil }) }
         .onAppear {
             files.startWatching()
             actions.explainSelection = { [assistant, actions] in assistant.explainSelection(editor: actions) }
@@ -228,11 +230,12 @@ struct EditorPane: View {
             VStack(spacing: 0) {
                 MissingFileBanner(project: project, buffer: buffer)
                 ChangedOnDiskBanner(project: project, buffer: buffer)
+                ZoteroBanner(project: project, buffer: buffer)
                 if showsBibForm {
                     BibEditorView(project: project, buffer: buffer, tables: tables, showsSource: Binding(get: { layout.bibSource }, set: { layout.bibSource = $0 }))
                 } else {
                     EditorView(project: project, buffer: buffer, tables: tables, actions: actions, marks: project.lintHints(in: buffer.path) + (inlineIssues ? project.diagnostics(in: buffer.path) : []), revealToken: project.selectionRequests,
-                               layout: layout, focusMode: layout.focus)
+                               layout: layout, focusMode: layout.focus, readOnly: buffer.isZoteroManaged)
                         .overlay(alignment: .topTrailing) {
                             if BibTeX.isFormEditable(buffer.path.raw) {
                                 Button("Show Form", systemImage: "list.bullet.rectangle") { layout.bibSource = false }

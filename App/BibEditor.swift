@@ -13,6 +13,10 @@ struct BibEditorView: View {
     @State private var selection: Int?
     @State private var adding = false
     @State private var creating = false
+    @State private var connectingZotero = false
+
+    /// Zotero fills the file: every sync would overwrite an edit made here.
+    private var readOnly: Bool { buffer.isZoteroManaged }
 
     var body: some View {
         let _ = project.bibliographyRevision        // reparse after every edit to the file, ours or the text view's
@@ -31,9 +35,9 @@ struct BibEditorView: View {
                 .listStyle(.sidebar)
                 // On a row and on the empty space below the rows alike.
                 .contextMenu(forSelectionType: Int.self) { items in
-                    Button("New Entry…", systemImage: "plus") { creating = true }
-                    Button("New Entry from DOI, arXiv or ISBN…", systemImage: "network") { adding = true }
-                    if !items.isEmpty {
+                    Button("New Entry…", systemImage: "plus") { creating = true }.disabled(readOnly)
+                    Button("New Entry from DOI, arXiv or ISBN…", systemImage: "network") { adding = true }.disabled(readOnly)
+                    if !items.isEmpty, !readOnly {
                         Divider()
                         Button(items.count == 1 ? "Delete Entry" : "Delete \(items.count) Entries", systemImage: "trash", role: .destructive) {
                             delete(items)
@@ -48,7 +52,7 @@ struct BibEditorView: View {
                         } description: {
                             Text("Add a reference to cite it from your document.")
                         } actions: {
-                            Button("New Entry…") { creating = true }
+                            Button("New Entry…") { creating = true }.disabled(readOnly)
                         }
                     } else if shown.isEmpty {
                         ContentUnavailableView.search(text: query)
@@ -66,6 +70,7 @@ struct BibEditorView: View {
                         BibEntryForm(entry: entries[selection], usedKeys: Set(entries.map(\.key)),
                                      change: { change in update(selection, change) }, delete: { delete([selection]) })
                             .id(selection)
+                            .disabled(readOnly)
                     } else {
                         ContentUnavailableView("No Entry Selected", systemImage: "text.book.closed",
                                                description: Text("Choose an entry to edit its fields."))
@@ -77,6 +82,7 @@ struct BibEditorView: View {
         .background(.background)
         .sheet(isPresented: $adding) { AddReferenceSheet(project: project, tables: tables) }
         .sheet(isPresented: $creating) { NewBibEntrySheet(usedKeys: Set(entries.map(\.key)), add: add) }
+        .sheet(isPresented: $connectingZotero) { ZoteroConnectSheet(project: project, suggested: buffer.path) }
         .onAppear { if selection == nil, !entries.isEmpty { selection = 0 } }
         .onChange(of: buffer.path) { selection = BibTeX.entries(in: buffer.storage.string).isEmpty ? nil : 0 }
     }
@@ -95,6 +101,11 @@ struct BibEditorView: View {
             }
             .menuStyle(.button)
             .help("New Entry")
+            .disabled(readOnly)
+            if project.zoteroLink == nil {
+                Button("Connect Zotero…", systemImage: "books.vertical") { connectingZotero = true }
+                    .help("Fill a .bib file from your Zotero library")
+            }
             Picker("View", selection: $showsSource) {
                 Label("Form", systemImage: "list.bullet.rectangle").tag(false)
                 Label("Source", systemImage: "chevron.left.forwardslash.chevron.right").tag(true)
@@ -114,6 +125,7 @@ struct BibEditorView: View {
 
     /// Edits entry `index` of the file as it is now, not as it was when the view was drawn.
     private func update(_ index: Int, _ change: (inout BibTeXEntry) -> Void) {
+        guard !readOnly else { return }
         var entries = BibTeX.entries(in: buffer.storage.string)
         guard entries.indices.contains(index) else { return }
         change(&entries[index])
@@ -122,6 +134,7 @@ struct BibEditorView: View {
 
     /// Deletes the entries at `indices` as one undo step, from the last so the earlier ranges stay valid.
     private func delete(_ indices: Set<Int>) {
+        guard !readOnly else { return }
         let count = BibTeX.entries(in: buffer.storage.string).count
         let doomed = indices.filter { $0 < count }.sorted(by: >)
         guard let first = doomed.last else { return }
@@ -138,6 +151,7 @@ struct BibEditorView: View {
     }
 
     private func add(_ entry: BibTeXEntry) {
+        guard !readOnly else { return }
         let text = buffer.storage.string
         let index = BibTeX.entries(in: text).count
         buffer.apply([BibTeX.append(entry, to: text)], actionName: "New Reference")
