@@ -17,6 +17,10 @@ targets:
     sources:
       - path: App
         excludes: ["Support"]
+      # Typo's own skills, a Claude plugin folder: Contents/Resources/Skills.
+      - path: Skills
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: Typo
         products: [TypoKit, TypoAssistant, TypoACP, TypoMCP, ACPProtocol, MCPProtocol]

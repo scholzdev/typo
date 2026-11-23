@@ -88,3 +88,23 @@ private func tempDir() -> URL {
     #expect(manifest.contains("\"typo\""))
     #expect(SkillPlugin(url: root.appending(path: "out"), name: "typo").list() == [Skill(name: "one", description: "", body: "Prose only")])
 }
+
+@Test func findsAndImportsSkillFolders() throws {
+    let root = tempDir()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let fm = FileManager.default
+    for dir in ["skills/a", "plugins/p/skills/b", "plugins/p/node_modules/x/skills/c", "empty"] {
+        try fm.createDirectory(at: root.appending(path: dir), withIntermediateDirectories: true)
+    }
+    for dir in ["skills/a", "plugins/p/skills/b", "plugins/p/node_modules/x/skills/c"] {
+        try Data("---\nname: n\ndescription: d\n---\nBody".utf8).write(to: root.appending(path: dir + "/SKILL.md"))
+    }
+    try Data("extra".utf8).write(to: root.appending(path: "skills/a/notes.md"))
+    let found = SkillPlugin.skillFolders(in: root)
+    #expect(found.map(\.lastPathComponent) == ["b", "a"])
+    #expect(SkillPlugin.skillFolders(in: root.appending(path: "skills/a")).map(\.lastPathComponent) == ["a"])
+    let mine = SkillPlugin(url: root.appending(path: "mine"), name: "typo-user")
+    try mine.importSkill(from: root.appending(path: "skills/a"), as: "alpha")
+    #expect(mine.list().map(\.name) == ["alpha"])
+    #expect(fm.fileExists(atPath: mine.folder("alpha").appending(path: "notes.md").path))
+}

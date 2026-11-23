@@ -118,6 +118,25 @@ public struct SkillPlugin: Sendable {
         try Data(skill.markdown.utf8).write(to: folder(skill.name).appending(path: "SKILL.md"), options: .atomic)
     }
 
+    /// Copies the skill folder `from` (a SKILL.md and anything beside it) into this plugin as `name`.
+    public func importSkill(from folder: URL, as name: String) throws {
+        try prepare()
+        try FileManager.default.copyItem(at: folder, to: self.folder(name))
+    }
+
+    /// The skill folders (those with a SKILL.md) in and under `root`, sorted by path; dependency and VCS folders are skipped.
+    public static func skillFolders(in root: URL) -> [URL] {
+        let fm = FileManager.default
+        if fm.fileExists(atPath: root.appending(path: "SKILL.md").path) { return [root] }
+        guard let walk = fm.enumerator(at: root, includingPropertiesForKeys: [.isDirectoryKey]) else { return [] }
+        var found: [URL] = []
+        for case let url as URL in walk {
+            if ["node_modules", ".git"].contains(url.lastPathComponent) || walk.level > 8 { walk.skipDescendants(); continue }
+            if url.lastPathComponent == "SKILL.md" { found.append(url.deletingLastPathComponent()); walk.skipDescendants() }
+        }
+        return found.sorted { $0.path < $1.path }
+    }
+
     /// Builds `into` as a copy of this plugin with only the skills whose key is not in `disabled`, and returns it;
     /// nil when no skill is enabled. Copies, not symlinks: a loader that lists directories may skip linked ones.
     public func assemble(into dest: URL, disabled: Set<String>) throws -> URL? {

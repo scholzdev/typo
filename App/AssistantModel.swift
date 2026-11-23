@@ -518,9 +518,12 @@ extension FocusedValues {
     private func client(for p: AssistantProvider) -> any AssistantClient {
         guard p.isAgent else { return providers.client(for: p) }
         let command = p.command ?? "", root = project.rootURL, mcp = Bundle.main.path(forAuxiliaryExecutable: "typo-mcp")
+        let claude = p.presetID == "acp-claude"
         return ACPClient(provider: p, sessions: agents, attachments: attachments.map(project.url(for:)) + externalAttachments, changeFiles: permissions.policy(.changeFiles),
                          mode: current?.agentMode) { [weak self] in
-            try await ACPAgent.launch(command: command, cwd: root, host: self, mcp: mcp).agent
+            // Only the Claude Code adapter reads plugin folders from session/new; the skills are assembled when the agent starts.
+            let meta = claude ? ACPAgent.claudeCodeMeta(plugins: SkillStore.agentPlugins()) : nil
+            return try await ACPAgent.launch(command: command, cwd: root, host: self, mcp: mcp, meta: meta).agent
         }
     }
 
