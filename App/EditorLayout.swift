@@ -20,6 +20,8 @@ extension FocusedValues {
     var quickOpen: QuickOpenMode?
     /// The library (⇧⌘L) or command palette (⇧⌘P) is showing on this tab; nil while closed.
     var library: LibraryKind?
+    /// File › Connect Zotero… sheet.
+    var connectingZotero = false
     var secondFile: RelPath? { didSet { if let f = secondFile { tabs.show(f, permanent: false, pinning: NavigationSettings.current.pinTabs) } } }
     /// The second pane's tabs (design/14h), derived from `secondFile` like the first pane's.
     var tabs = TabList()

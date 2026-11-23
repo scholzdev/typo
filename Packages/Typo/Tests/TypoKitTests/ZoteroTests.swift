@@ -135,6 +135,11 @@ private let bibB = "\n@book{jones2021,\n\ttitle = {Beta},\n\tauthor = {Jones, Bo
         await p.syncZotero(key: "k", transport: stub.transport)
         #expect(stub.requests.count == 2 && p.zoteroError == nil && p.zoteroLink?.version == 3)
         #expect(try text(root, "refs.bib") == ZoteroLink.fileText(bibA))
+        // A target changed outside Typo is fetched in full again and rewritten.
+        try "@misc{stray, title = {Stray}}\n".write(to: root.appending(path: "refs.bib"), atomically: true, encoding: .utf8)
+        await p.syncZotero(key: "k", transport: stub.transport)
+        #expect(stub.requests.count == 3 && stub.requests.last?.value(forHTTPHeaderField: "If-Modified-Since-Version") == nil)
+        #expect(try text(root, "refs.bib") == ZoteroLink.fileText(bibA))
         // A deleted target is fetched in full again, not answered by the 304.
         try FileManager.default.removeItem(at: root.appending(path: "refs.bib"))
         await p.refreshFiles()

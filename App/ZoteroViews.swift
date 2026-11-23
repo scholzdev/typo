@@ -161,7 +161,7 @@ struct ZoteroConnectSheet: View {
             UserDefaults.standard.set(userID, forKey: ZoteroKeychain.userIDKey)
         }
         if project.allFiles.contains(targetPath), project.zoteroLink?.target != targetPath,
-           !confirm("Replace \u{201C}\(targetPath.name)\u{201D} with your Zotero library?", "Its current entries are overwritten by every sync. Undo the first sync with Edit \u{203A} Undo.", ok: "Replace") {
+           !confirm("Replace \u{201C}\(targetPath.name)\u{201D} with your Zotero library?", "Its current entries are overwritten by every sync. To get them back, disconnect Zotero, then use Edit \u{203A} Undo.", ok: "Replace") {
             return
         }
         busy = true

@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import TypstEngine
 
@@ -14,6 +15,8 @@ public struct ZoteroLink: Codable, Equatable, Sendable {
     public var version: Int?
     public var lastSynced: Date?
     public var entryCount: Int?
+    /// SHA-256 of the text the last sync wrote: `version` is trusted only while the file still has that text.
+    var digest: String?
 
     public init(source: ZoteroSource, userID: String, collection: ZoteroCollection?, target: RelPath) {
         self.source = source; self.userID = source == .local ? "0" : userID; self.collection = collection; self.target = target
@@ -28,6 +31,8 @@ public struct ZoteroLink: Codable, Equatable, Sendable {
         let body = bibtex.replacingOccurrences(of: "\r\n", with: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
         return header + "\n\n" + body + "\n"
     }
+
+    static func digest(_ text: String) -> String { SHA256.hash(data: Data(text.utf8)).map { String(format: "%02x", $0) }.joined() }
 }
 
 struct ZoteroLinkStore {
@@ -77,13 +82,17 @@ extension Project {
         defer { zoteroSyncing = false }
         let client = ZoteroClient(source: link.source, userID: link.userID, key: key, transport: transport)
         do {
-            // A missing file must be rewritten even when the library did not change.
-            let export = try await client.bibtex(collection: link.collection?.key, since: exists(link.target) ? link.version : nil)
+            // A missing or changed file must be rewritten even when the library did not change.
+            let current = exists(link.target) ? buffers[link.target]?.storage.string ?? (try? String(contentsOf: url(for: link.target), encoding: .utf8)) : nil
+            let intact = current.map(ZoteroLink.digest) == link.digest && link.digest != nil
+            let export = try await client.bibtex(collection: link.collection?.key, since: intact ? link.version : nil)
             if let s = export?.backoff { zoteroNotBefore = now.addingTimeInterval(TimeInterval(s)) }
             guard var next = zoteroLink, next.target == link.target else { return }     // disconnected or relinked meanwhile
             if let export {
-                try await writeZotero(ZoteroLink.fileText(export.text), to: link.target)
+                let text = ZoteroLink.fileText(export.text)
+                try await writeZotero(text, to: link.target)
                 next.version = export.version
+                next.digest = ZoteroLink.digest(text)
                 next.entryCount = BibTeX.entries(in: export.text).count
             }
             next.lastSynced = now

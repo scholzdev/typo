@@ -57,6 +57,7 @@ struct ProjectView: View {
         .onChange(of: compileWhileTyping, initial: true) { project.compilesWhileTyping = compileWhileTyping }
         .onChange(of: project.fileRevision) { sidebar.searchOutcome = nil }      // hits may name files that moved; the search tab reruns
         .task(id: project.zoteroLink?.target) { await project.runZoteroSync() }
+        .sheet(isPresented: $layout.connectingZotero) { ZoteroConnectSheet(project: project, suggested: project.selectedFile.flatMap { $0.raw.lowercased().hasSuffix(".bib") ? $0 : nil }) }
         .onAppear {
             files.startWatching()
             actions.explainSelection = { [assistant, actions] in assistant.explainSelection(editor: actions) }

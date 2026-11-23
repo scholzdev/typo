@@ -956,7 +956,9 @@ struct EditorView: NSViewRepresentable {
             return out
         }
 
-        func undoManager(for view: NSTextView) -> UndoManager? { buffer?.undoManager }
+        /// Read-only gets an empty one: the buffer's undo would still change the text (e.g. take back a Zotero sync).
+        func undoManager(for view: NSTextView) -> UndoManager? { readOnly ? noUndo : buffer?.undoManager }
+        private let noUndo = UndoManager()
 
         /// Re-applies the diagnostic underlines that overlap `range` (the ⌘-hover underline removed them there).
         func restoreMarks(in range: NSRange, of tv: NSTextView) {

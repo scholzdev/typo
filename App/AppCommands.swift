@@ -80,6 +80,7 @@ struct AppCommand: Identifiable {
              // Enabled only with the file list focused; otherwise the key reaches the editor (delete to line start).
              AppCommand(menu: "File", title: "Move to Trash", systemImage: "trash", shortcut: KeyboardShortcut(.delete, modifiers: .command),
                         isEnabled: !(files?.selection == nil || ctx.fileListFocused != true)) { files?.moveToTrash() }],
+            [AppCommand(menu: "File", title: "Connect Zotero…", systemImage: "books.vertical", isEnabled: ctx.layout != nil) { ctx.layout?.connectingZotero = true }],
         ]
     }
 
@@ -281,6 +282,7 @@ struct AppCommand: Identifiable {
         "File/New Project from Template…": "Opens the template gallery to start a project from a template.",
         "File/Open…": "Chooses an existing project folder and opens it in a window.",
         "File/New File…": "Creates a new file in the project and starts naming it in the sidebar.",
+        "File/Connect Zotero…": "Fills a .bib file of the project from your Zotero library and keeps it in sync.",
         "File/New Folder…": "Creates a new folder in the project and starts naming it in the sidebar.",
         "File/Rename": "Renames the file or folder selected in the sidebar.",
         "File/Duplicate": "Makes a copy of the selected file or folder next to the original.",
