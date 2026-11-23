@@ -94,6 +94,21 @@ struct AssistantTurnsTests {
     }
 }
 
+struct AssistantDiffRowsTests {
+    @Test func placesTheEditInTheCurrentFileWithContext() {
+        let edit = ProposedEdit(path: "a.typ", search: "b\nc", replace: "b\nx\ny")
+        let rows = AssistantDiffRows.rows(edit, current: "a\nb\nx\ny\nd\ne\nf", context: 1)
+        #expect(rows.map(\.kind) == [.context, .context, .removed, .added, .added, .context])
+        #expect(rows.map(\.text) == ["a", "b", "c", "x", "y", "d"])
+        #expect(rows.map(\.line) == [1, 2, nil, 3, 4, 5])
+    }
+
+    @Test func aNewFileIsAllAddedAndAMissingTextHasNoNumbers() {
+        #expect(AssistantDiffRows.rows(ProposedEdit(path: "n.typ", search: "", replace: "p\nq"), current: "p\nq").map(\.kind) == [.added, .added])
+        #expect(AssistantDiffRows.rows(ProposedEdit(path: "n.typ", search: "o", replace: "p"), current: "zzz").map(\.line) == [nil, nil])
+    }
+}
+
 /// Edit blocks in the answer format, as ACPFiles.block writes them.
 enum ACPLikeBlock {
     static func block(_ path: String, _ search: String, _ replace: String) -> String {

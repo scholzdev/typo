@@ -98,3 +98,45 @@ public enum AssistantToolStatus: Equatable, Sendable {
         }
     }
 }
+
+/// The lines of one applied edit as the diff panel shows them: a little context, removed lines, added lines.
+public enum AssistantDiffRows {
+    public struct Row: Equatable, Sendable {
+        public enum Kind: Equatable, Sendable { case context, added, removed }
+        public var kind: Kind
+        public var text: String
+        /// 1-based line in the current file; nil for removed lines and when the edit's text is no longer found.
+        public var line: Int?
+    }
+
+    /// `current` is the file as it is now; the edit is placed where its new text first appears.
+    public static func rows(_ edit: ProposedEdit, current: String?, context: Int = 2) -> [Row] {
+        func lines(_ s: String) -> [String] { s.isEmpty ? [] : s.components(separatedBy: "\n") }
+        let new = lines(edit.replace)
+        var base: Int?
+        var before: [String] = [], after: [String] = []
+        if let current, !edit.replace.isEmpty, let r = current.range(of: edit.replace) {
+            let all = current.components(separatedBy: "\n")
+            let first = current[..<r.lowerBound].count { $0 == "\n" }
+            base = first + 1
+            before = Array(all[max(first - context, 0)..<first])
+            let end = first + new.count
+            after = end < all.count ? Array(all[end..<min(end + context, all.count)]) : []
+        }
+        let marks = GitGutterMarks.compute(base: edit.search, current: edit.replace)
+        var out: [Row] = before.enumerated().map { i, t in Row(kind: .context, text: t, line: base.map { $0 - before.count + i }) }
+        for h in marks.hunks where h.isDeletion && h.start == 0 { out += h.oldLines.map { Row(kind: .removed, text: $0) } }
+        for (i, text) in new.enumerated() {
+            let n = i + 1
+            for h in marks.hunks where !h.isDeletion && h.start == n { out += h.oldLines.map { Row(kind: .removed, text: $0) } }
+            out.append(Row(kind: marks.lines[n] == nil ? .context : .added, text: text, line: base.map { $0 + i }))
+            for h in marks.hunks where h.isDeletion && h.start == n { out += h.oldLines.map { Row(kind: .removed, text: $0) } }
+        }
+        out += after.enumerated().map { i, t in Row(kind: .context, text: t, line: base.map { $0 + new.count + i }) }
+        return out
+    }
+}
+
+extension AssistantDiffRows.Row {
+    public init(kind: Kind, text: String) { self.init(kind: kind, text: text, line: nil) }
+}

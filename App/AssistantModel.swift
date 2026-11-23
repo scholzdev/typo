@@ -573,6 +573,11 @@ extension FocusedValues {
         if streamingID == message {
             streamingID = nil; streamingConversation = nil; task = nil; turnStart = nil; liveTools = []
             if id != currentID || mode != .assistant { layout.unread.insert(id) }
+            // Like Xcode, a turn that changed files opens the diff panel under it.
+            if id == currentID, let c = current, let t = AssistantTurn.split(c.messages).last, !t.changes.isEmpty {
+                diffFile = t.changes.first?.path
+                showsDiff = true
+            }
         }
     }
 

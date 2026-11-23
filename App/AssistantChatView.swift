@@ -31,7 +31,19 @@ struct AssistantChatView: View {
                     }
                 }
                 .onAppear { providers.refreshAvailability() }
+            } else if model.showsDiff {
+                VSplitView {
+                    conversation.frame(minHeight: 260)
+                    AssistantDiffPanel(model: model).frame(minHeight: 120, idealHeight: 280)
+                }
             } else {
+                conversation
+            }
+        }
+        .background(Color(nsColor: .textBackgroundColor))
+    }
+
+    private var conversation: some View {
                 transcript
                     .safeAreaInset(edge: .bottom, spacing: 0) {
                         VStack(spacing: 8) {
@@ -43,12 +55,11 @@ struct AssistantChatView: View {
                             }
                         }
                         .frame(maxWidth: Self.column)
-                        .padding(.horizontal, 20).padding(.bottom, 14)
+                        .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 14)
                         .frame(maxWidth: .infinity)
+                        // The transcript scrolls under the prompt; it must not show through.
+                        .background(Color(nsColor: .textBackgroundColor))
                     }
-            }
-        }
-        .background(Color(nsColor: .textBackgroundColor))
     }
 
     /// "✦ › Title", with the conversation's permissions and New Conversation at the right.
@@ -58,6 +69,11 @@ struct AssistantChatView: View {
             Image(systemName: "chevron.right").font(.system(size: 9, weight: .semibold)).foregroundStyle(.tertiary)
             Text(model.current?.title ?? "New Conversation").font(.system(size: 12)).lineLimit(1)
             Spacer()
+            if model.current?.messages.contains(where: { !$0.edits.isEmpty }) == true || model.showsDiff {
+                Toggle("Changes", systemImage: "plusminus", isOn: Binding(get: { model.showsDiff }, set: { model.showsDiff = $0 }))
+                    .toggleStyle(.button).buttonStyle(.borderless).labelStyle(.iconOnly)
+                    .help("Show the changes of this conversation")
+            }
             Button("Permissions", systemImage: "checkmark.shield") { showsPermissions.toggle() }
                 .buttonStyle(.borderless).labelStyle(.iconOnly)
                 .help("What the assistant may do in this conversation")
