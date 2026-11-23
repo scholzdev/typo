@@ -16,6 +16,10 @@ final class RainbowBarLayer: CALayer {
     private let wash = CALayer()
     private static let ring: CGFloat = 1.25
     private static let stops: [Double] = [0, 0.33, 0.66, 1]
+    /// Xcode's bar as it renders: blue, a magenta-purple, a coral red and orange, measured from its gutter.
+    private static let colors: [CGColor] = [0x5B97E2, 0xD56ADA, 0xF56D69, 0xF59A5F].map {
+        CGColor(srgbRed: CGFloat($0 >> 16 & 0xFF) / 255, green: CGFloat($0 >> 8 & 0xFF) / 255, blue: CGFloat($0 & 0xFF) / 255, alpha: 1)
+    }
     /// A change from an earlier turn.
     var previous = false
 
@@ -41,7 +45,7 @@ final class RainbowBarLayer: CALayer {
     /// Colors are resolved for `appearance`: CGColors don't follow light and dark by themselves.
     func style(for appearance: NSAppearance) {
         appearance.performAsCurrentDrawingAppearance {
-            gradient.colors = [NSColor.systemBlue, .systemPurple, .systemRed, .systemOrange].map(\.cgColor)
+            gradient.colors = Self.colors
             wash.backgroundColor = NSColor.textBackgroundColor.withAlphaComponent(0.6).cgColor
             borderColor = NSColor.systemGray.withAlphaComponent(0.5).cgColor
         }
