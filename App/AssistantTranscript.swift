@@ -41,9 +41,11 @@ struct AssistantTurnView: View {
                 .assistantEntrance()
         }
         let current = turn.answers.last
-        if let current, current.text.isEmpty, let r = current.reasoning, !r.isEmpty {
+        // Once tool calls follow the thought it is stale, and while a permission waits the bar is what the turn shows.
+        let blocked = model.shownPermission != nil || model.pendingTool != nil
+        if let current, current.text.isEmpty, pending.isEmpty, current.toolCalls?.isEmpty != false, !blocked, let r = current.reasoning, !r.isEmpty {
             AssistantThinkingRow(text: r).assistantEntrance()
-        } else if current?.text.isEmpty != false, !pending.contains(where: { AssistantToolStatus(acp: $0.status).isRunning }) {
+        } else if current?.text.isEmpty != false, !blocked, !pending.contains(where: { AssistantToolStatus(acp: $0.status).isRunning }) {
             AssistantWorkingRow().assistantEntrance()
         }
     }
