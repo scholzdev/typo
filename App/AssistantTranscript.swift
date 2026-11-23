@@ -21,12 +21,13 @@ struct AssistantTurnView: View {
                     .font(.caption).foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
             }
-            if let u = turn.user { AssistantUserBubble(text: u.text) }
-            ForEach(turn.changes) { c in AssistantFileCapsule(change: c) { model.openChange(c) } }
+            if let u = turn.user { AssistantUserBubble(text: u.text, mentions: u.mentions ?? []).assistantEntrance() }
+            ForEach(turn.changes) { c in AssistantFileCapsule(change: c) { model.openChange(c) }.assistantEntrance() }
             ForEach(turn.answers) { m in AssistantMessageView(model: model, message: m) }
             if running { live }
             if !running, !turn.answers.isEmpty, let last = turn.answers.last {
                 AssistantTurnFooter(duration: turn.duration, files: turn.changes.count, feedback: last.feedback) { model.setFeedback(last, $0) }
+                    .assistantEntrance()
             }
         }
     }
@@ -37,16 +38,17 @@ struct AssistantTurnView: View {
         let pending = model.liveTools.filter { !shown.contains($0.id) }
         ForEach(pending, id: \.id) { c in
             AssistantToolRow(kind: c.kind, title: c.title.isEmpty ? "Tool" : c.title, status: AssistantToolStatus(acp: c.status), detail: Self.detail(c))
+                .assistantEntrance()
         }
         let current = turn.answers.last
         if let current, current.text.isEmpty, let r = current.reasoning, !r.isEmpty {
-            AssistantThinkingRow(text: r)
+            AssistantThinkingRow(text: r).assistantEntrance()
         } else if current?.text.isEmpty != false, !pending.contains(where: { AssistantToolStatus(acp: $0.status).isRunning }) {
-            AssistantWorkingRow()
+            AssistantWorkingRow().assistantEntrance()
         }
     }
 
-    /// What a running call shows when expanded: its command, else its text.
+    /// What a running call shows under its title: its command, else its text.
     static func detail(_ c: ACPToolCall) -> String? {
         if let cmd = c.rawInput?["command"]?.string { return "Running \(cmd)" }
         return c.content.compactMap { $0["content"]?["text"]?.string }.first
@@ -56,15 +58,27 @@ struct AssistantTurnView: View {
 /// The user's message: a wide pill with a light blue gradient.
 struct AssistantUserBubble: View {
     let text: String
+    /// The "@"-mentioned paths, whose file names show in grey monospace.
+    var mentions: [String] = []
 
     var body: some View {
-        Text(text)
+        Text(styled)
             .font(.system(size: 13, weight: .medium))
             .textSelection(.enabled)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16).padding(.vertical, 10)
             .background(LinearGradient(colors: [Color.blue.opacity(0.16), Color.blue.opacity(0.26)], startPoint: .top, endPoint: .bottom),
                         in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+    }
+
+    private var styled: AttributedString {
+        var out = AttributedString(text)
+        for r in AssistantMentions.ranges(of: mentions, in: text) {
+            guard let lo = AttributedString.Index(r.lowerBound, within: out), let hi = AttributedString.Index(r.upperBound, within: out) else { continue }
+            out[lo..<hi].font = .system(size: 13, design: .monospaced)
+            out[lo..<hi].foregroundColor = .secondary
+        }
+        return out
     }
 }
 
@@ -191,13 +205,13 @@ struct AssistantToolRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Button { if detail?.isEmpty == false { expanded.toggle() } } label: {
+            Button { if detail?.isEmpty == false, !status.isRunning { expanded.toggle() } } label: {
                 HStack(spacing: 8) {
                     Image(systemName: AssistantToolStatus.symbol(kind: kind)).frame(width: 16)
                     Text(title).lineLimit(1).truncationMode(.middle)
                     Spacer(minLength: 8)
                     switch status {
-                    case .pending, .inProgress: ProgressView().controlSize(.small)
+                    case .pending, .inProgress: AssistantSpinner()
                     case .completed: Image(systemName: "checkmark").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                     case .failed: Image(systemName: "xmark.octagon.fill").foregroundStyle(.red)
                     }
@@ -206,20 +220,61 @@ struct AssistantToolRow: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            if expanded, let detail {
+            // A running call shows what it does on one line; a finished one only when expanded, in full.
+            if status.isRunning, let line = detail?.split(whereSeparator: \.isNewline).first {
+                Text(line).foregroundStyle(.secondary).lineLimit(1).truncationMode(.tail)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 10).padding(.vertical, 6)
+                    .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .transition(.opacity)
+            } else if expanded, let detail {
                 ScrollView {
                     Text(detail).font(.system(size: 11, design: .monospaced)).textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading).padding(8)
                 }
                 .frame(maxHeight: 160)
                 .fixedSize(horizontal: false, vertical: true)
-                .background(.background, in: RoundedRectangle(cornerRadius: 10))
+                .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 10))
             }
         }
         .font(.system(size: 12))
         .padding(.horizontal, 12).padding(.vertical, 8)
         .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .animation(.easeOut(duration: 0.25), value: status)
+        .animation(.easeOut(duration: 0.2), value: expanded)
     }
+}
+
+/// A small ring with a turning blue arc, like Xcode's tool-call progress.
+struct AssistantSpinner: View {
+    @State private var turning = false
+
+    var body: some View {
+        ZStack {
+            Circle().stroke(.quaternary, lineWidth: 2)
+            Circle().trim(from: 0, to: 0.3).stroke(Color.accentColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .rotationEffect(.degrees(turning ? 360 : 0))
+                .animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: turning)
+        }
+        .frame(width: 13, height: 13)
+        .onAppear { turning = true }
+        .accessibilityLabel("In progress")
+    }
+}
+
+/// New transcript items fade in and rise a little (a plain fade with Reduce Motion); removed ones fade out.
+/// They animate only inside the model's animated changes, so opening a conversation shows it at once.
+struct AssistantEntrance: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func body(content: Content) -> some View {
+        content.transition(reduceMotion ? .opacity : .asymmetric(insertion: .opacity.combined(with: .offset(y: 8)).combined(with: .scale(scale: 0.98, anchor: .top)), removal: .opacity))
+    }
+}
+
+extension View {
+    func assistantEntrance() -> some View { modifier(AssistantEntrance()) }
 }
 
 /// "11s · 1 file edited · feedback" under a finished turn.

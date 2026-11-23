@@ -90,7 +90,7 @@ struct AssistantChatView: View {
                 LazyVStack(alignment: .leading, spacing: 16) {
                     let turns = AssistantTurn.split(model.current?.messages ?? [])
                     ForEach(Array(turns.enumerated()), id: \.element.id) { i, t in
-                        AssistantTurnView(model: model, turn: t, header: Self.header(t, after: i > 0 ? turns[i - 1] : nil)).id(t.id)
+                        AssistantTurnView(model: model, turn: t, header: Self.header(t, after: i > 0 ? turns[i - 1] : nil)).id(t.id).assistantEntrance()
                     }
                     if let notice = model.notice {
                         Label(notice, systemImage: "exclamationmark.triangle").foregroundStyle(.orange).textSelection(.enabled)
@@ -196,20 +196,21 @@ struct AssistantMessageView: View {
                 } label: {
                     Label("Thought", systemImage: "bubble.left").foregroundStyle(.secondary)
                 }
+                .assistantEntrance()
             }
-            ForEach(message.toolCalls ?? []) { AssistantToolRow(exchange: $0) }
+            ForEach(message.toolCalls ?? []) { AssistantToolRow(exchange: $0).assistantEntrance() }
             let permissions = model.permissions
             let segments = AssistantEdits.segments(message.text)
             let files = Set(model.project.allFiles.map(\.raw))
             ForEach(Array(segments.enumerated()), id: \.offset) { i, s in
                 switch s {
-                case .text(let t): AssistantMarkdown(text: t, files: files) { model.openFile($0) }
+                case .text(let t): AssistantMarkdown(text: t, files: files) { model.openFile($0) }.assistantEntrance()
                 case .edit(let e):
                     // The edit's index among the message's edits, which is what `edits` (accepted/rejected) is keyed by.
                     let index = segments[..<i].count { if case .edit = $0 { true } else { false } }
                     // Applied changes show as the turn's file capsules and in the diff panel.
                     if message.edits[index] != .accepted, permissions.shows(e) || message.edits[index] != nil {
-                        AssistantEditCard(model: model, message: message, index: index, edit: e)
+                        AssistantEditCard(model: model, message: message, index: index, edit: e).assistantEntrance()
                     }
                 }
             }
