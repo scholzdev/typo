@@ -43,7 +43,7 @@ struct ProjectView: View {
                 .toolbar { if !layout.focus, layout.columns != .detailOnly { NavigatorToggles(layout: layout, assistant: assistant, actions: actions, placement: .automatic) } }
         } detail: {
             // Two panes in one detail column, so the preview can leave the window (pop-out) without rebuilding the editor.
-            SplitPanes(autosaveName: "Tympan.split.\(project.id.raw)", showsTrailing: !project.preview.isPoppedOut && !layout.focus && layout.showPreview,
+            SplitPanes(autosaveName: "Tympan.split.\(project.id.raw)", showsTrailing: !project.preview.isPoppedOut && !layout.focus && layout.showPreview && assistant.mode != .assistant,
                        leading: ZStack {
                            // The editor stays alive under the conversation, so switching back keeps its state.
                            EditorPane(project: project, sidebar: sidebar, tables: tables, actions: actions, layout: layout)
