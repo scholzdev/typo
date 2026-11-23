@@ -55,6 +55,20 @@ struct PairEditTests {
         #expect(decide("(", "", caret(0), .text) == pair("(", ")", at: 0))
     }
 
+    @Test func dollarRules() {
+        #expect(decide("$", "a b", caret(2), .markup) == .none)                                   // before a word: a single `$`
+        #expect(decide("$", "x\n", caret(1), .markup) == pair("$", "$", at: 1))
+        #expect(decide("$", "\\", caret(1), .markup) == .none)                                    // `\$`
+        #expect(decide("$", "$$", caret(1), .math, auto: [1]) == .stepOver)
+        #expect(decide("$", "ab", caret(0), .text) == .none)                                      // raw, strings, comments
+        #expect(decide(" ", "$$", caret(1), .math, auto: [1]) ==
+                .edit(range: caret(1), replacement: "  ", selection: caret(2), autoCloser: 3))   // display math
+        #expect(decide(" ", "$$", caret(1), .math, auto: []) == .none)                            // typed by hand
+        #expect(decide(" ", "$x$", caret(2), .math, auto: [2]) == .none)
+        #expect(PairEdit.decideBackspace(text: "$$", selection: caret(1), autoInserted: [1]) ==
+                .edit(range: NSRange(location: 0, length: 2), replacement: "", selection: caret(0), autoCloser: nil))
+    }
+
     @Test func multiCharacterInsertsAreIgnored() {
         #expect(decide("()", "", caret(0)) == .none)
         #expect(decide("a", "", caret(0)) == .none)

@@ -26,7 +26,15 @@ public enum PairEdit {
            closers.contains(c) || c == "$" || c == "\"" {
             return .stepOver
         }
+        // A space inside a fresh `$|$` opens display math: `$ | $`.
+        if c == " ", mode == .math, selection.length == 0, autoInserted.contains(selection.location),
+           selection.location > 0, selection.location < ns.length,
+           ns.substring(with: NSRange(location: selection.location - 1, length: 2)) == "$$" {
+            return .edit(range: selection, replacement: "  ", selection: NSRange(location: selection.location + 1, length: 0),
+                         autoCloser: selection.location + 2)
+        }
         guard let closer = pairs[c] else { return .none }
+        if c == "$", selection.location > 0, ns.substring(with: NSRange(location: selection.location - 1, length: 1)) == "\\" { return .none }   // `\$`
         switch c {
         case "$" where mode != .markup, "\"" where mode != .code && mode != .math: return .none
         default: break
