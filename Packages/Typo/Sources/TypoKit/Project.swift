@@ -139,6 +139,13 @@ public struct FileNode: Identifiable, Sendable, Equatable {
     public internal(set) var bookmarks: [CodeBookmark] = [] { didSet { bookmarksDidChange(from: oldValue) } }
     /// Each open file's bookmarked line ranges, moved by every edit; not observed, as they change with typing.
     @ObservationIgnored var bookmarkAnchors: [UUID: NSRange] = [:]
+    /// The Zotero library synced into a `.bib` file, saved per project (ZoteroSync.swift).
+    public internal(set) var zoteroLink: ZoteroLink? { didSet { if zoteroLink != oldValue { ZoteroLinkStore(id).save(zoteroLink) } } }
+    /// Why the last Zotero sync failed, nil after a successful one.
+    public internal(set) var zoteroError: String?
+    public internal(set) var zoteroSyncing = false
+    /// No sync before this: Zotero asked to back off (Retry-After, Backoff).
+    @ObservationIgnored var zoteroNotBefore: Date?
     private var result: CompileResult?                       // latest delivered, never older than the previous one
     private var lastGood: CompileResult?                     // latest result with a document: what the preview and the outline show
     private var lint: (seq: Seq, hints: [Diagnostic])?       // lint hints of the texts as of `seq`; see runLint()
@@ -206,6 +213,7 @@ public struct FileNode: Identifiable, Sendable, Equatable {
         // A project whose main was trashed (no other .typ left) must still open, with nothing selected.
         tabs = restoredTabs()
         bookmarks = BookmarkStore(id).load().filter { exists($0.path) }
+        zoteroLink = ZoteroLinkStore(id).load()
         if FileManager.default.fileExists(atPath: root.appending(path: main.raw).path) {
             try await open(main)
             selectedFile = main

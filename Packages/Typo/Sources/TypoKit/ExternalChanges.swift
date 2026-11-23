@@ -99,16 +99,21 @@ extension Project {
     /// One edit over the differing middle only, so the caret and the folds stay where they were.
     private func load(_ disk: String, _ format: FileFormat, into b: Buffer) {
         b.fileFormat = format
-        let old = b.storage.string as NSString, new = disk as NSString
-        var head = 0
-        while head < min(old.length, new.length), old.character(at: head) == new.character(at: head) { head += 1 }
-        var tail = 0
-        while tail < min(old.length, new.length) - head, old.character(at: old.length - 1 - tail) == new.character(at: new.length - 1 - tail) { tail += 1 }
-        let range = NSRange(location: head, length: old.length - head - tail)
-        b.apply([Replacement(range: range, text: new.substring(with: NSRange(location: head, length: new.length - head - tail)))], actionName: "Reload from Disk")
+        b.apply([Self.middleEdit(b.storage.string, disk)], actionName: "Reload from Disk")
         b.savedSeq = b.lastSeq
         diskHashes[b.path] = disk.hashValue
         dirtyRevision += 1
         hasUnsavedChanges = buffers.values.contains(where: \.isDirty)
+    }
+
+    /// The edit turning `old` into `new` that replaces only the differing middle.
+    static func middleEdit(_ old: String, _ new: String) -> Replacement {
+        let old = old as NSString, new = new as NSString
+        var head = 0
+        while head < min(old.length, new.length), old.character(at: head) == new.character(at: head) { head += 1 }
+        var tail = 0
+        while tail < min(old.length, new.length) - head, old.character(at: old.length - 1 - tail) == new.character(at: new.length - 1 - tail) { tail += 1 }
+        return Replacement(range: NSRange(location: head, length: old.length - head - tail),
+                           text: new.substring(with: NSRange(location: head, length: new.length - head - tail)))
     }
 }
