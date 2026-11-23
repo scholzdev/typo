@@ -72,6 +72,11 @@ extension Project {
         GitBranch.parse(try await git.run(["for-each-ref", "--format=%(HEAD)%00%(refname:short)", "refs/heads"], in: rootURL))
     }
 
+    /// The short commit HEAD points at (shown when no branch is checked out); nil without commits.
+    public func shortHead(git: GitRunner = GitRunner()) async -> String? {
+        try? await git.run(["rev-parse", "--short", "HEAD"], in: rootURL).trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     /// Checks out `name`; git refuses when uncommitted changes would be lost, and that message is the error.
     public func switchBranch(_ name: String, git: GitRunner = GitRunner()) async throws {
         try await rewritingWorkingTree { _ = try await git.run(["switch", "--", name], in: self.rootURL) }
