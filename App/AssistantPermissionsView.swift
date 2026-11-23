@@ -141,7 +141,7 @@ struct AgentPermissionsSettings: View {
             Text(title)
             Text(text).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true).padding(.bottom, 8)
             ForEach(Array(items.sorted().enumerated()), id: \.element) { i, item in
-                Text(item).font(.system(.body, design: .monospaced)).lineLimit(1).truncationMode(.middle)
+                Text(item).lineLimit(1).truncationMode(.middle)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 8).padding(.vertical, 5)
                     .background(selection.wrappedValue == item ? AnyShapeStyle(Color.accentColor.opacity(0.25)) : AnyShapeStyle(i.isMultiple(of: 2) ? Color.clear : Color.primary.opacity(0.04)))
