@@ -59,6 +59,16 @@ struct ProviderIcon: View {
     var body: some View {
         if ["acp-claude", "anthropic"].contains(presetID), let icon = Self.claudeIcon {
             Image(nsImage: icon).resizable().frame(width: size, height: size).accessibilityHidden(true)
+        } else if presetID == "on-device" {
+            // The colored Apple Intelligence glyph on a white tile; `.multicolor` draws this symbol black, so the
+            // gradient is our own.
+            Image(systemName: "apple.intelligence")
+                .font(.system(size: size * 0.6, weight: .medium))
+                .foregroundStyle(LinearGradient(colors: IntelligenceIcon.colors, startPoint: .topLeading, endPoint: .bottomTrailing))
+                .frame(width: size, height: size)
+                .background(.white, in: RoundedRectangle(cornerRadius: size * 0.24, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: size * 0.24, style: .continuous).strokeBorder(.separator, lineWidth: 0.5))
+                .accessibilityHidden(true)
         } else {
             symbolIcon
         }
@@ -88,11 +98,17 @@ struct ProviderIcon: View {
         case "acp-goose": ("bird.fill", AnyShapeStyle(Color.black.gradient), .white)
         case "acp-opencode", "opencode-zen", "opencode-go": ("chevron.left.forwardslash.chevron.right", AnyShapeStyle(Color(white: 0.2).gradient), .white)
         case "acp-custom": ("puzzlepiece.extension.fill", AnyShapeStyle(Color.blue.gradient), .white)
-        case "on-device": ("apple.intelligence", AnyShapeStyle(Color.purple.gradient), .white)
         case "ollama", "lmstudio", "custom-local": ("desktopcomputer", AnyShapeStyle(Color.green.gradient), .white)
         default: ("cloud.fill", AnyShapeStyle(Color.blue.gradient), .white)
         }
     }
+}
+
+/// The colors of Apple's intelligence look: orange, coral, purple and blue.
+enum IntelligenceIcon {
+    static let orange = Color(red: 1, green: 0.48, blue: 0.18), coral = Color(red: 0.96, green: 0.21, blue: 0.36)
+    static let purple = Color(red: 0.65, green: 0.29, blue: 0.94), blue = Color(red: 0.29, green: 0.55, blue: 1)
+    static let colors = [orange, coral, purple, blue]
 }
 
 extension AssistantPreset {
