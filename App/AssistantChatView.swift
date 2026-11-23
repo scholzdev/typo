@@ -286,7 +286,10 @@ struct AssistantPromptBox: View {
                             Text(placeholder).font(.system(size: 14)).foregroundStyle(.placeholder).allowsHitTesting(false)
                         }
                     }
-                    .onChange(of: model.draft) { commandIndex = 0 }
+                    .onChange(of: model.draft) { old, new in
+                        commandIndex = 0
+                        if dismissed != nil, new != dismissed { dismissed = nil }
+                    }
                     .onChange(of: mentionQuery) { commandIndex = 0 }
                     .frame(minHeight: 52, alignment: .topLeading)
                 HStack(spacing: 14) {
@@ -380,7 +383,8 @@ struct AssistantPromptBox: View {
     /// The completion list's entries: project files after "@", else the agent's commands after "/".
     private var completions: [AssistantPromptField.Completion] {
         guard dismissed != model.draft else { return [] }
-        if let q = mentionQuery {
+        // On-device answers take no files.
+        if let q = mentionQuery, model.provider?.isOnDevice != true {
             let paths = model.project.allFiles.map(\.raw).filter(FileKind.isText)
             return AssistantMentions.matches(q.query, in: paths).map { .init(id: $0, kind: .file, name: ($0 as NSString).lastPathComponent, detail: nil, help: $0) }
         }
@@ -767,9 +771,9 @@ struct AssistantPromptField: NSViewRepresentable {
                 guard !items.isEmpty else { return false }
                 parent.selection = min(parent.selection + 1, items.count - 1)
                 return true
-            case #selector(NSResponder.cancelOperation(_:)):
-                guard !items.isEmpty else { return false }
-                parent.dismissed = parent.text
+            // Escape; with no list it does nothing rather than open the system's word completion.
+            case #selector(NSResponder.cancelOperation(_:)), #selector(NSTextView.complete(_:)):
+                if !items.isEmpty { parent.dismissed = parent.text }
                 return true
             default:
                 return false
