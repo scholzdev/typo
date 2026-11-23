@@ -36,7 +36,7 @@ struct IntelligenceSettings: View {
 
     private var list: some View {
         Form {
-            SettingsHeaderCard(symbol: "sparkles", fill: AnyShapeStyle(LinearGradient(colors: [.orange, .pink, .purple, .blue], startPoint: .bottomLeading, endPoint: .topTrailing)),
+            SettingsHeaderCard(symbol: "apple.intelligence", fill: AnyShapeStyle(IntelligenceIcon.mesh),
                                title: "Intelligence",
                                text: "Chat about your project and let agents work on it, with the model of your choice. Third-party models and agents get access to your project's files.",
                                link: ("About Intelligence in Typo & Privacy…", { showingPrivacy = true }))

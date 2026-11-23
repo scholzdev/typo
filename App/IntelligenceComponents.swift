@@ -15,7 +15,7 @@ struct SettingsHeaderCard: View {
                 Image(systemName: symbol)
                     .font(.system(size: 17, weight: .medium)).foregroundStyle(.white)
                     .frame(width: 32, height: 32)
-                    .background(fill, in: RoundedRectangle(cornerRadius: 8))
+                    .background(fill, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title).font(.system(size: 13, weight: .regular))
                     Text(text).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
@@ -109,6 +109,11 @@ enum IntelligenceIcon {
     static let orange = Color(red: 1, green: 0.48, blue: 0.18), coral = Color(red: 0.96, green: 0.21, blue: 0.36)
     static let purple = Color(red: 0.65, green: 0.29, blue: 0.94), blue = Color(red: 0.29, green: 0.55, blue: 1)
     static let colors = [orange, coral, purple, blue]
+    /// Orange at the top left, coral at the top right, purple toward the bottom right and a blue glow at the bottom.
+    static let mesh = MeshGradient(width: 3, height: 3, points: [[0, 0], [0.5, 0], [1, 0], [0, 0.5], [0.55, 0.45], [1, 0.5], [0, 1], [0.5, 1], [1, 1]],
+                                   colors: [orange, Color(red: 0.98, green: 0.33, blue: 0.3), coral,
+                                            Color(red: 0.99, green: 0.42, blue: 0.3), Color(red: 0.9, green: 0.3, blue: 0.5), Color(red: 0.75, green: 0.3, blue: 0.85),
+                                            Color(red: 0.85, green: 0.45, blue: 0.6), blue, purple])
 }
 
 extension AssistantPreset {
