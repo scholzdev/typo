@@ -194,19 +194,17 @@ extension LineNumberRuler {
             NSGraphicsContext.restoreGraphicsState()
             return
         }
-        guard let img = NSImage(systemSymbolName: folded ? "chevron.right" : "chevron.down", accessibilityDescription: nil)?.withSymbolConfiguration(config) else { return }
+        // Folded, the chevron sits white on the solid bar, as in Xcode.
+        let tint = folded ? NSImage.SymbolConfiguration(pointSize: 9, weight: .bold).applying(.init(paletteColors: [.white])) : config
+        guard let img = NSImage(systemSymbolName: folded ? "chevron.right" : "chevron.down", accessibilityDescription: nil)?.withSymbolConfiguration(tint) else { return }
         img.draw(in: NSRect(x: ruleThickness - 12, y: y + max(height, img.size.height) / 2 - img.size.height / 2, width: img.size.width, height: img.size.height))
     }
 
-    /// Xcode's fold notch: a right-pointing arrow in the ribbon column across the fold line's row, under the chevron.
+    /// Xcode's folded line: a solid grey bar in the ribbon column across the fold line's row, under the white chevron.
     private func drawFoldNotch(y: CGFloat, height: CGFloat) {
-        let w: CGFloat = 10, h = max(height, 1), x = ruleThickness - 13
-        let p = NSBezierPath()
-        p.move(to: NSPoint(x: x, y: y)); p.line(to: NSPoint(x: x + w, y: y + h / 2)); p.line(to: NSPoint(x: x, y: y + h))
-        p.line(to: NSPoint(x: x, y: y + h - 6)); p.line(to: NSPoint(x: x + w - 4, y: y + h / 2)); p.line(to: NSPoint(x: x, y: y + 6))
-        p.close()
-        Highlighter.style.colors.text.withAlphaComponent(0.22).setFill()
-        p.fill()
+        let w: CGFloat = 12, h = max(height, 1), x = ruleThickness - 14
+        Highlighter.style.colors.text.withAlphaComponent(0.45).setFill()
+        NSBezierPath(roundedRect: NSRect(x: x, y: y, width: w, height: h), xRadius: 2, yRadius: 2).fill()
     }
 
     /// Xcode's ribbon: while the pointer is over the gutter, a rounded track with every fold region as a capsule, nested
@@ -282,7 +280,7 @@ extension DecorationView {
                                                     .foregroundColor: colors.ruler.withAlphaComponent(fade)]
         // A block reads `{ ··· }` like Xcode: a dots pill, then the closing line in its own colours; a section gives its line count.
         let tail = foldTail?(start)
-        let label = (tail != nil ? "···" : "⋯ \(n) \(n == 1 ? "line" : "lines")") as NSString
+        let label = (tail != nil ? "•••" : "⋯ \(n) \(n == 1 ? "line" : "lines")") as NSString
         let size = label.size(withAttributes: attrs)
         let b = last.typographicBounds
         let rect = NSRect(x: frame.minX + b.maxX + (tail != nil ? 5 : 8), y: frame.minY + b.minY + (b.height - size.height - 2) / 2,
