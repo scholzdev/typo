@@ -10,10 +10,11 @@ struct TypoApp: App {
     @State private var recents: RecentProjects
     @State private var localPackages: LocalPackagesFolder
     init() {
-        // Before any reader of UserDefaults or Application Support: the copy fills what the sandboxed build left behind.
-        if let pw = getpwuid(getuid()), let bundle = Bundle.main.bundleIdentifier {
+        // Before any reader of UserDefaults or Application Support: the copies fill what the old bundle id and the sandboxed build left behind.
+        DefaultsMigration.run()
+        if let pw = getpwuid(getuid()) {
             let home = URL(fileURLWithPath: String(cString: pw.pointee.pw_dir), isDirectory: true)
-            SandboxMigration.run(container: home.appending(path: "Library/Containers/\(bundle)/Data"), home: home)
+            SandboxMigration.run(container: home.appending(path: "Library/Containers/\(DefaultsMigration.legacyBundleID)/Data"), home: home)
         }
         _recents = State(initialValue: RecentProjects())
         TypstRuntime.warmUp()

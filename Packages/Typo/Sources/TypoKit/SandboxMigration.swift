@@ -8,9 +8,9 @@ public enum SandboxMigration {
     // persisted folder name, kept from the app's old name so saved data survives
     static let folders = ["Tympan", "typst/packages"]
 
-    /// `container` is ~/Library/Containers/<bundle id>/Data; `home` the real home directory.
+    /// `container` is ~/Library/Containers/<old bundle id>/Data; `home` the real home directory.
     public static func run(container: URL, home: URL, defaults: UserDefaults = .standard, fileManager fm: FileManager = .default) {
-        let prefs = container.appending(path: "Library/Preferences/\(Bundle.main.bundleIdentifier ?? "").plist")
+        let prefs = container.appending(path: "Library/Preferences/\(DefaultsMigration.legacyBundleID).plist")
         run(container: container, home: home, prefs: prefs, defaults: defaults, fileManager: fm)
     }
 

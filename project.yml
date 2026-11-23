@@ -53,7 +53,7 @@ targets:
               public.filename-extension: [typ]
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.Tympan
+        PRODUCT_BUNDLE_IDENTIFIER: me.florianscholz.typo
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_IDENTITY: "-"
         ENABLE_APP_SANDBOX: NO
