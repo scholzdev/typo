@@ -102,6 +102,9 @@ private final class FakeAgent: @unchecked Sendable {
 
     var commands: [ACPCommand] = []
     func commandsChanged(_ commands: [ACPCommand]) { self.commands = commands }
+
+    var plans: [ACPPlan] = []
+    func planChanged(_ plan: ACPPlan) { plans.append(plan) }
 }
 
 private func update(_ u: JSONValue) -> JSONValue { ["sessionId": "s1", "update": u] }
@@ -190,6 +193,26 @@ private func update(_ u: JSONValue) -> JSONValue { ["sessionId": "s1", "update":
         #expect(try await turn.value == .other("cancelled"))
         #expect(outcomes.all == ["cancelled"])
         #expect(await eventually { fake.notes.all.contains("session/cancel") })
+    }
+
+    @MainActor @Test func aTurnsPlansGoToTheHostAndNotAsEvents() async throws {
+        let host = FakeHost()
+        let fake = FakeAgent { peer, _ in
+            peer.notify("session/update", update(["sessionUpdate": "plan", "entries": [["content": "Read", "priority": "high", "status": "in_progress"]]]))
+            peer.notify("session/update", update(["sessionUpdate": "plan", "entries": [["content": "Read", "priority": "high", "status": "completed"]]]))
+            return ["stopReason": "end_turn"]
+        }
+        let agent = try await fake.agent(host: host)
+        let events = Collected<AssistantEvent>()
+        _ = try await agent.prompt([["type": "text", "text": "go"]]) { $0.forEach(events.add) }
+        #expect(await eventually { host.plans.count == 2 })
+        #expect(host.plans.map { $0.entries.map(\.status) } == [[.inProgress], [.completed]])
+        #expect(host.plans[1].assistantEntries == [AssistantPlan.Entry(content: "Read", priority: .high, status: .completed)])
+        #expect(events.all.isEmpty)
+        // Outside a turn a plan has no answer to join.
+        fake.peer.notify("session/update", update(["sessionUpdate": "plan", "entries": []]))
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(host.plans.count == 2)
     }
 
     @Test func turnMergesToolCallUpdates() {
