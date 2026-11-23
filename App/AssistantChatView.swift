@@ -198,7 +198,7 @@ struct AssistantMessageView: View {
                 }
                 .assistantEntrance()
             }
-            ForEach(message.toolCalls ?? []) { AssistantToolRow(exchange: $0).assistantEntrance() }
+            ForEach(message.toolCalls ?? []) { AssistantToolRow(exchange: $0, note: model.accessNotes[$0.call.id]).assistantEntrance() }
             let permissions = model.permissions
             let segments = AssistantEdits.segments(message.text)
             let files = Set(model.project.allFiles.map(\.raw))

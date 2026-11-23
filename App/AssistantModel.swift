@@ -1,4 +1,5 @@
 import AppKit
+import OSLog
 import SwiftUI
 import TypoKit
 import ACPProtocol
@@ -69,6 +70,8 @@ extension FocusedValues {
     /// Agents may ask for several tool calls at once; the cards are answered one after another.
     private var permissionQueue: [(pending: PendingPermission, answer: CheckedContinuation<String?, Never>)] = []
     var pendingPermission: PendingPermission? { permissionQueue.first?.pending }
+    /// Why Settings › Permissions answered a tool call without asking, by tool call, for its row in the transcript.
+    private(set) var accessNotes: [String: String] = [:]
     /// The agents running for this window's conversations.
     private let agents = ACPSessions()
     /// The files each running edit tool of an agent names, by tool call, with the answer its changes join.
@@ -653,7 +656,28 @@ extension FocusedValues {
     /// The user's pick on an agent's permission card; nil when the turn stopped.
     func answerPermission(_ option: String?) {
         guard !permissionQueue.isEmpty else { return }
-        permissionQueue.removeFirst().answer.resume(returning: option)
+        let (pending, answer) = permissionQueue.removeFirst()
+        answer.resume(returning: option)
+        // "Always Allow" on a command or a file outside the project becomes a rule in Settings › Permissions; requests
+        // waiting behind it that the rule now covers are answered too.
+        guard let option, pending.options.first(where: { $0.id == option })?.kind == "allow_always" else { return }
+        var access = AgentAccess.stored
+        access.remember(pending.call.accessRequest, root: project.rootURL.path)
+        guard access != AgentAccess.stored else { return }
+        AgentAccess.stored = access
+        Self.log.info("Always Allow added rules for \(pending.call.title, privacy: .public)")
+        permissionQueue.removeAll { p in
+            guard let id = automaticAnswer(p.pending) else { return false }
+            p.answer.resume(returning: id)
+            return true
+        }
+    }
+
+    /// What "Always Allow" will add to Settings › Permissions, for its confirmation.
+    func alwaysAllowNote(_ p: PendingPermission) -> String? {
+        let a = AgentAccess.stored.additions(for: p.call.accessRequest, root: project.rootURL.path)
+        let lines = a.commands.map { "“\($0)” will be added to Allowed Commands." } + a.folders.map { "“\($0)” will be added to Allowed Folders." }
+        return lines.isEmpty ? nil : lines.joined(separator: "\n")
     }
 
     /// Sends the last question again after a failed answer.
@@ -873,34 +897,83 @@ extension FocusedValues {
 // MARK: - Agent host
 
 extension AssistantModel: ACPHost {
-    /// Edits follow the "Change files" permission where it decides alone; everything else asks with the agent's options.
+    /// Settings › Permissions and the "Change files" permission answer what they decide alone; everything else asks
+    /// with the agent's options.
     func permission(for call: ACPToolCall, options: [ACPOption]) async -> String? {
-        func option(_ kind: String) -> String? { options.first { $0.kind == kind }?.id }
-        let permissions = runningPermissions
-        // Typo's own MCP tools only read the project; a page preview still asks, since its image goes to the provider.
-        if call.title.hasPrefix("typo: "), !call.title.hasSuffix("view_preview"), let id = option("allow_once") { return id }
-        if call.changesFiles {
-            switch permissions.policy(.changeFiles) {
-            case .allow: if let id = option("allow_once") { return id }
-            case .never: if let id = option("reject_once") { return id }
-            case .ask: break
-            }
+        let pending = PendingPermission(call: call, options: options)
+        if let id = automaticAnswer(pending) { return id }
+        return await withCheckedContinuation { c in permissionQueue.append((pending, c)) }
+    }
+
+    /// The option to answer without asking, or nil to ask. Only "once" options: the agent shouldn't remember a rule
+    /// the user may still change.
+    private func automaticAnswer(_ p: PendingPermission) -> String? {
+        let access = AgentAccess.stored, root = project.rootURL.path
+        let decision = isFileRequest(p.call) ? access.fileAccess(p.call.locations.first ?? "", root: root)
+            : access.decide(p.call.accessRequest, root: root, changeFiles: runningPermissions.policy(.changeFiles))
+        switch decision {
+        case .allow(let rule):
+            guard let id = p.options.first(where: { $0.kind == "allow_once" })?.id else { return nil }
+            note(p.call, "Allowed by your settings: \(rule)", builtIn: rule == "Typo's own tools")
+            return id
+        case .reject(let rule):
+            guard let id = p.options.first(where: { $0.kind == "reject_once" })?.id else { return nil }
+            note(p.call, "Refused by your settings: \(rule)")
+            return id
+        case .ask:
+            return nil
         }
-        return await withCheckedContinuation { c in permissionQueue.append((PendingPermission(call: call, options: options), c)) }
+    }
+
+    private func note(_ call: ACPToolCall, _ text: String, builtIn: Bool = false) {
+        Self.log.info("\(call.kind ?? "tool", privacy: .public) \(call.title, privacy: .public): \(text, privacy: .public)")
+        if !builtIn { accessNotes[call.id] = text }
+    }
+
+    static let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Typo", category: "Permissions")
+
+    /// Typo's own request to read or write a file outside the project, which the agent didn't ask about itself.
+    func isFileRequest(_ call: ACPToolCall) -> Bool { call.id.hasPrefix("typo-file-") }
+
+    /// The real path of a file outside the project once the settings or the user allow it; an error otherwise.
+    private func outsideFile(_ path: String, write: Bool) async throws -> String {
+        var call = ACPToolCall(id: "typo-file-\(UUID().uuidString)")
+        call.kind = write ? "edit" : "read"
+        call.title = (write ? "Write " : "Read ") + path
+        call.locations = [path]
+        let p = PendingPermission(call: call, options: [ACPOption(id: "once", name: "Allow Once", kind: "allow_once"),
+                                                        ACPOption(id: "always", name: "Always Allow for This Folder", kind: "allow_always"),
+                                                        ACPOption(id: "reject", name: "Don't Allow", kind: "reject_once")])
+        var answer = automaticAnswer(p)
+        if answer == nil, streamingID != nil { answer = await withCheckedContinuation { c in permissionQueue.append((p, c)) } }
+        switch answer {
+        case "once", "always": return AgentAccess.resolve(path)
+        case "reject" where !AgentAccess.stored.controlsFiles: throw ACPError(ACPError.invalidParams, "\(path) is outside the project folder.")
+        default: throw ACPError(ACPError.invalidParams, "\(path) is outside the project folder, and the user did not allow access to it.")
+        }
     }
 
     func readTextFile(_ path: String) async throws -> String {
-        let rel = try projectPath(path)
+        guard let rel = ACPFiles.projectPath(path, root: project.rootURL) else {
+            let full = try await outsideFile(path, write: false)
+            guard let text = try? String(contentsOfFile: full, encoding: .utf8) else { throw ACPError(ACPError.notFound, "\(path) does not exist or is not a text file.") }
+            return text
+        }
         if let b = project.buffer(for: rel) { return b.storage.string }
         guard let text = try? String(contentsOf: project.url(for: rel), encoding: .utf8) else { throw ACPError(ACPError.notFound, "\(rel.raw) does not exist or is not a text file.") }
         return text
     }
 
     /// Lands in the editor as one undoable step with AI marks, and in the answer as an applied change that Revert takes back.
+    /// A file outside the project, once allowed, is written as it is: no editor holds it, and Revert doesn't cover it.
     func writeTextFile(_ path: String, content: String) async throws {
-        let rel = try projectPath(path)
         let permissions = runningPermissions
         guard permissions.policy(.changeFiles) != .never else { throw ACPError(ACPError.internalError, "The user does not allow changes to files.") }
+        guard let rel = ACPFiles.projectPath(path, root: project.rootURL) else {
+            let full = try await outsideFile(path, write: true)
+            try Data(content.utf8).write(to: URL(fileURLWithPath: full), options: .atomic)
+            return
+        }
         guard let id = streamingConversation, let message = streamingID else { throw ACPError(ACPError.internalError, "No answer is in progress.") }
         let url = project.url(for: rel)
         guard FileKind.isText(rel.raw) else {
@@ -968,11 +1041,6 @@ extension AssistantModel: ACPHost {
 
     /// The permissions of the running turn's conversation; the shown one may be another.
     private var runningPermissions: AssistantPermissions { streamingConversation.map(permissions(of:)) ?? permissions }
-
-    private func projectPath(_ path: String) throws -> RelPath {
-        guard let rel = ACPFiles.projectPath(path, root: project.rootURL) else { throw ACPError(ACPError.invalidParams, "\(path) is outside the project folder.") }
-        return rel
-    }
 
     /// The change joins the streaming answer as an applied edit block, which the card, the changes bar and Revert read.
     private func record(_ edit: ProposedEdit, _ change: AppliedChange, in id: UUID, _ message: UUID) {

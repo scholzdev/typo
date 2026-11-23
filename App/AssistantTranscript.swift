@@ -193,20 +193,22 @@ struct AssistantToolRow: View {
     let title: String
     let status: AssistantToolStatus
     var detail: String?
+    /// Why Settings › Permissions answered the call without asking, shown when expanded.
+    var note: String?
     @State private var expanded = false
 
-    init(kind: String?, title: String, status: AssistantToolStatus, detail: String? = nil) {
-        self.kind = kind; self.title = title; self.status = status; self.detail = detail
+    init(kind: String?, title: String, status: AssistantToolStatus, detail: String? = nil, note: String? = nil) {
+        self.kind = kind; self.title = title; self.status = status; self.detail = detail; self.note = note
     }
 
     /// A finished call from the transcript; its name is the ACP kind for an agent's call.
-    init(exchange e: ToolExchange) {
-        self.init(kind: e.call.name, title: e.title, status: e.result == nil ? .inProgress : e.isError ? .failed : .completed, detail: e.result)
+    init(exchange e: ToolExchange, note: String? = nil) {
+        self.init(kind: e.call.name, title: e.title, status: e.result == nil ? .inProgress : e.isError ? .failed : .completed, detail: e.result, note: note)
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Button { if detail?.isEmpty == false, !status.isRunning { expanded.toggle() } } label: {
+            Button { if detail?.isEmpty == false || note != nil, !status.isRunning { expanded.toggle() } } label: {
                 HStack(spacing: 8) {
                     Image(systemName: AssistantToolStatus.symbol(kind: kind)).frame(width: 16)
                     Text(title).lineLimit(1).truncationMode(.middle)
@@ -228,7 +230,11 @@ struct AssistantToolRow: View {
                     .padding(.horizontal, 10).padding(.vertical, 6)
                     .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .transition(.opacity)
-            } else if expanded, let detail {
+            }
+            if expanded, !status.isRunning, let note {
+                Label(note, systemImage: "checkmark.shield").font(.caption).foregroundStyle(.secondary)
+            }
+            if expanded, !status.isRunning, let detail, !detail.isEmpty {
                 ScrollView {
                     Text(detail).font(.system(size: 11, design: .monospaced)).textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading).padding(8)

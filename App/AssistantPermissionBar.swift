@@ -39,7 +39,7 @@ struct AssistantPermissionBar: View {
             Button("Always Allow") { if let o = option("allow_always") { model.answerPermission(o.id) } }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("\(agent) won't ask again before doing this in this session.")
+            Text(model.isFileRequest(pending.call) ? model.alwaysAllowNote(pending) ?? "" : [model.alwaysAllowNote(pending), "\(agent) won't ask again before doing this in this session."].compactMap { $0 }.joined(separator: "\n\n"))
         }
     }
 
@@ -47,11 +47,12 @@ struct AssistantPermissionBar: View {
 
     private func option(_ kind: String) -> ACPOption? { pending.options.first { $0.kind == kind } }
 
-    /// File access names the file; anything else names the tool call.
+    /// File access names the file, project files by their project path; anything else names the tool call.
     private var question: AttributedString {
         let paths = pending.call.paths.map { ACPFiles.projectPath($0, root: model.project.rootURL)?.raw ?? $0 }
-        let text = pending.call.changesFiles && !paths.isEmpty
-            ? "Do you want to allow the agent **Read and Write** access to **\(paths.joined(separator: ", "))**?"
+        let access = pending.call.kind == "read" ? "Read" : "Read and Write"
+        let text = (pending.call.changesFiles || pending.call.kind == "read") && !paths.isEmpty
+            ? "Do you want to allow \(agent) **\(access)** access to **\(paths.joined(separator: ", "))**?"
             : "Do you want to allow \(agent) to **\(pending.call.title.isEmpty ? "continue" : pending.call.title)**?"
         return (try? AttributedString(markdown: text)) ?? AttributedString(text)
     }
@@ -68,7 +69,7 @@ struct AssistantPermissionBar: View {
             Divider().frame(height: 16).overlay(.white.opacity(0.5))
             Menu {
                 if let o = option("allow_once") { Button("Allow Once") { model.answerPermission(o.id) } }
-                if option("allow_always") != nil { Button("Always Allow…") { confirmsAlways = true } }
+                if option("allow_always") != nil { Button(model.isFileRequest(pending.call) ? "Always Allow for This Folder…" : "Always Allow…") { confirmsAlways = true } }
                 Divider()
                 Button("Permissions Settings…") {
                     UserDefaults.standard.set("intelligence", forKey: SettingsKey.tab)
