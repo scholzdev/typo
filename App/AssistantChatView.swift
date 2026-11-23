@@ -36,7 +36,11 @@ struct AssistantChatView: View {
                     .safeAreaInset(edge: .bottom, spacing: 0) {
                         VStack(spacing: 8) {
                             if let latest = model.latestChanges { changesBar(latest) }
-                            AssistantPromptBox(model: model)
+                            if let pending = model.shownPermission {
+                                AssistantPermissionBar(model: model, pending: pending)
+                            } else {
+                                AssistantPromptBox(model: model)
+                            }
                         }
                         .frame(maxWidth: Self.column)
                         .padding(.horizontal, 20).padding(.bottom, 14)
@@ -79,7 +83,7 @@ struct AssistantChatView: View {
                     if let pending = model.pendingConsent { consent(pending) }
                     if let pending = model.pendingSearch { search(pending) }
                     if let pending = model.shownTool { tool(pending) }
-                    if let pending = model.shownPermission { permission(pending) }
+                    if let pending = model.shownPermission { permissionDiffs(pending) }
                     Color.clear.frame(height: 1).id("end")
                 }
                 .frame(maxWidth: Self.column)
@@ -145,27 +149,12 @@ struct AssistantChatView: View {
         .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
     }
 
-    /// Asked when an agent wants to run a tool; the buttons are the agent's own options.
-    private func permission(_ p: AssistantModel.PendingPermission) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label(p.call.title.isEmpty ? "May the agent continue?" : p.call.title, systemImage: "terminal").font(.headline)
-            ForEach(Array(p.call.diffs.enumerated()), id: \.offset) { _, d in
-                let path = ACPFiles.projectPath(d.path, root: model.project.rootURL)?.raw ?? d.path
-                AssistantChangeCard(edit: ProposedEdit(path: path, search: d.search, replace: d.replace), status: .pending, showsButtons: false)
-            }
-            HStack {
-                Spacer()
-                ForEach(p.options) { o in
-                    if o.kind == "allow_once" {
-                        Button(o.name) { model.answerPermission(o.id) }.keyboardShortcut(.defaultAction)
-                    } else {
-                        Button(o.name) { model.answerPermission(o.id) }
-                    }
-                }
-            }
+    /// The changes an agent asks to make, above the permission bar.
+    @ViewBuilder private func permissionDiffs(_ p: AssistantModel.PendingPermission) -> some View {
+        ForEach(Array(p.call.diffs.enumerated()), id: \.offset) { _, d in
+            let path = ACPFiles.projectPath(d.path, root: model.project.rootURL)?.raw ?? d.path
+            AssistantChangeCard(edit: ProposedEdit(path: path, search: d.search, replace: d.replace), status: .pending, showsButtons: false)
         }
-        .padding(12)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
     }
 
     /// The one-time notice before a provider first receives files.
