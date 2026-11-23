@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
-import UniformTypeIdentifiers
 import TypoKit
+import TypstEngine
 import ACPProtocol
 import TypoAssistant
 
@@ -107,8 +107,7 @@ struct AssistantFileCapsule: View {
 struct AssistantFileIcon: View {
     let path: String
     var body: some View {
-        Image(nsImage: NSWorkspace.shared.icon(for: UTType(filenameExtension: (path as NSString).pathExtension) ?? .plainText))
-            .resizable().frame(width: 16, height: 16)
+        FileIcon(kind: FileKind(path: path))
     }
 }
 
