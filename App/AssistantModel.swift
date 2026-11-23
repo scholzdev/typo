@@ -38,6 +38,8 @@ extension FocusedValues {
     var agentCommands: [ACPCommand] = []
     /// Files sent with the next message; by default the file shown in the editor.
     var attachments: [RelPath] = []
+    /// The files "@"-mentioned in the draft; attached when it is sent.
+    var mentions: [RelPath] = []
     /// Files from outside the project sent with the next message.
     var externalAttachments: [URL] = []
     /// The first editor's selection when the window switched to the assistant (the editor is not on screen then).
@@ -239,6 +241,7 @@ extension FocusedValues {
         currentID = nil
         draftAgentMode = nil
         draft = ""
+        mentions = []
         notice = nil
         pendingConsent = nil
         pendingSearch = nil
@@ -323,6 +326,9 @@ extension FocusedValues {
         guard !question.isEmpty, !isStreaming, let provider, providers.isReady(provider) else { return }
         guard !isBusy else { notice = "Another conversation is still working. Wait for it or stop it first."; return }
         notice = nil
+        // Mentioned files are attached like picked ones, so the provider or agent gets them.
+        let mentioned = text == nil ? mentions : []
+        for m in mentioned where !attachments.contains(m) { attachments.append(m) }
         if providers.needsConsent(provider) {
             pendingConsent = PendingConsent(provider: provider, files: attachments.map(\.raw)) { [weak self] in
                 self?.providers.consent(provider)
@@ -349,10 +355,11 @@ extension FocusedValues {
             do {
                 let context = try await context(for: question, provider: provider, diagnostics: diagnostics)
                 guard currentID == conversation else { return }    // the user moved to another conversation meanwhile
-                if text == nil { draft = "" }
+                if text == nil { draft = ""; mentions = [] }
                 let id = conversation ?? start(provider: provider, model: model, title: question)
                 var message = AssistantMessage(role: .user, text: question, context: context)
                 message.created = .now
+                if !mentioned.isEmpty { message.mentions = mentioned.map(\.raw) }
                 Self.entrance { change(id) { [message] in $0.messages.append(message); $0.updated = .now } }
                 preparing = false
                 respond(in: id, search: searching)

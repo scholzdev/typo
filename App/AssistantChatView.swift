@@ -266,8 +266,11 @@ struct AssistantEditCard: View {
 struct AssistantPromptBox: View {
     @Bindable var model: AssistantModel
     private let providers = AssistantProviderStore.shared
-    @FocusState private var focused: Bool
+    @State private var focusRequest = 0
     @State private var commandIndex = 0
+    @State private var mentionQuery: AssistantPromptField.Query?
+    /// The draft the completion list was closed for with Escape; it opens again once the draft changes.
+    @State private var dismissed: String?
     @State private var picksFiles = false
     @State private var showsModes = false
 
@@ -275,35 +278,16 @@ struct AssistantPromptBox: View {
         VStack(alignment: .leading, spacing: 10) {
             if model.current == nil { suggestions }
             VStack(alignment: .leading, spacing: 8) {
-                if !model.attachments.isEmpty || !model.externalAttachments.isEmpty, model.provider?.isOnDevice != true { attachmentChips }
-                if !commandMatches.isEmpty { commandList }
-                TextField(placeholder, text: $model.draft, axis: .vertical)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 14))
-                    .lineLimit(1...10)
-                    .focused($focused)
-                    .onKeyPress(.return, phases: .down) { press in
-                        if press.modifiers.contains(.shift) {
-                            NSApp.sendAction(#selector(NSResponder.insertNewlineIgnoringFieldEditor(_:)), to: nil, from: nil)
-                        } else if commandMatches.indices.contains(commandIndex) {
-                            useCommand(commandMatches[commandIndex])
-                        } else {
-                            model.send()
+                if !chipFiles.isEmpty || !model.externalAttachments.isEmpty, model.provider?.isOnDevice != true { attachmentChips }
+                AssistantPromptField(text: $model.draft, mentions: $model.mentions, query: $mentionQuery, selection: $commandIndex,
+                                     dismissed: $dismissed, items: completions, focusRequest: focusRequest) { model.send() }
+                    .overlay(alignment: .topLeading) {
+                        if model.draft.isEmpty {
+                            Text(placeholder).font(.system(size: 14)).foregroundStyle(.placeholder).allowsHitTesting(false)
                         }
-                        return .handled
-                    }
-                    // Held arrows repeat, so the whole list can be walked through.
-                    .onKeyPress(.upArrow, phases: [.down, .repeat]) { _ in
-                        guard !commandMatches.isEmpty else { return .ignored }
-                        commandIndex = max(commandIndex - 1, 0)
-                        return .handled
-                    }
-                    .onKeyPress(.downArrow, phases: [.down, .repeat]) { _ in
-                        guard !commandMatches.isEmpty else { return .ignored }
-                        commandIndex = min(commandIndex + 1, commandMatches.count - 1)
-                        return .handled
                     }
                     .onChange(of: model.draft) { commandIndex = 0 }
+                    .onChange(of: mentionQuery) { commandIndex = 0 }
                     .frame(minHeight: 52, alignment: .topLeading)
                 HStack(spacing: 14) {
                     if model.provider?.isOnDevice != true { attachMenu }
@@ -318,10 +302,10 @@ struct AssistantPromptBox: View {
             .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(.separator))
             .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
             .contentShape(Rectangle())
-            .onTapGesture { focused = true }
+            .onTapGesture { focusRequest += 1 }
         }
-        .onAppear { focused = true }
-        .onChange(of: model.currentID) { focused = true }
+        .onAppear { focusRequest += 1 }
+        .onChange(of: model.currentID) { focusRequest += 1 }
         .sheet(isPresented: $picksFiles) { AssistantFilePicker(model: model) }
     }
 
@@ -335,7 +319,7 @@ struct AssistantPromptBox: View {
     private var attachmentChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) {
-                ForEach(model.attachments, id: \.self) { f in
+                ForEach(chipFiles, id: \.self) { f in
                     chip(name: (f.raw as NSString).lastPathComponent, help: f.raw) { model.attachments.removeAll { $0 == f } }
                 }
                 ForEach(model.externalAttachments, id: \.self) { u in
@@ -344,6 +328,9 @@ struct AssistantPromptBox: View {
             }
         }
     }
+
+    /// Attached files without the ones the draft mentions, which show in the text.
+    private var chipFiles: [RelPath] { model.attachments.filter { !model.mentions.contains($0) } }
 
     private func chip(name: String, help: String, remove: @escaping () -> Void) -> some View {
         HStack(spacing: 4) {
@@ -390,35 +377,18 @@ struct AssistantPromptBox: View {
         return all.filter { $0.name.lowercased().hasPrefix(typed) } + all.filter { !$0.name.lowercased().hasPrefix(typed) }
     }
 
-    private var commandList: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(Array(commandMatches.enumerated()), id: \.element.id) { i, c in
-                        HStack(alignment: .firstTextBaseline, spacing: 6) {
-                            // No fixedSize: a row wider than the box cut the whole column off on the left.
-                            Text("/" + c.name).font(.system(.callout, design: .monospaced)).lineLimit(1).truncationMode(.middle).layoutPriority(2)
-                            if let h = c.hint { Text("‹\(h)›").font(.caption).foregroundStyle(.tertiary).lineLimit(1).layoutPriority(1) }
-                            Text(c.description).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.tail)
-                            Spacer(minLength: 0)
-                        }
-                        .padding(.horizontal, 8).padding(.vertical, 4)
-                        .background(i == commandIndex ? Color.accentColor.opacity(0.18) : .clear, in: RoundedRectangle(cornerRadius: 6))
-                        .contentShape(Rectangle())
-                        .onTapGesture { useCommand(c) }
-                        .accessibilityAddTraits(.isButton)
-                        .id(i)
-                    }
-                }
-            }
-            .frame(maxHeight: 220)
-            .fixedSize(horizontal: false, vertical: true)
-            // No animation: held arrows would otherwise outrun the scrolling.
-            .onChange(of: commandIndex) { _, i in proxy.scrollTo(i) }
+    /// The completion list's entries: project files after "@", else the agent's commands after "/".
+    private var completions: [AssistantPromptField.Completion] {
+        guard dismissed != model.draft else { return [] }
+        if let q = mentionQuery {
+            let paths = model.project.allFiles.map(\.raw).filter(FileKind.isText)
+            return AssistantMentions.matches(q.query, in: paths).map { .init(id: $0, kind: .file, name: ($0 as NSString).lastPathComponent, detail: nil, help: $0) }
+        }
+        return commandMatches.map { c in
+            let k = AssistantCommandKind.classify(c.description)
+            return .init(id: c.name, kind: k.kind == .skill ? .skill : .command, name: c.name, detail: k.description.isEmpty ? nil : k.description, help: k.description)
         }
     }
-
-    private func useCommand(_ c: ACPCommand) { model.draft = "/\(c.name) " }
 
     // MARK: Suggestions
 
@@ -619,4 +589,357 @@ enum AssistantPalette {
     static let amber = Color(.sRGB, red: 1.000, green: 0.718, blue: 0.200)
     static let coral = Color(.sRGB, red: 0.976, green: 0.482, blue: 0.345)
     static let raspberry = Color(.sRGB, red: 0.980, green: 0.263, blue: 0.408)
+}
+
+extension NSAttributedString.Key {
+    /// The `RelPath` an "@" mention token in the prompt stands for.
+    static let typoMention = NSAttributedString.Key("TypoMention")
+}
+
+/// The prompt's text: Return sends, Shift-Return breaks the line, and "@file" mentions are grey monospaced tokens
+/// that delete as one. Shows the "/" and "@" completions in a panel under the caret.
+struct AssistantPromptField: NSViewRepresentable {
+    struct Query: Equatable { var range: NSRange; var query: String }
+
+    struct Completion: Identifiable {
+        enum Kind { case command, skill, file }
+        var id: String
+        var kind: Kind
+        var name: String
+        var detail: String?
+        var help: String
+    }
+
+    @Binding var text: String
+    @Binding var mentions: [RelPath]
+    @Binding var query: Query?
+    @Binding var selection: Int
+    @Binding var dismissed: String?
+    var items: [Completion]
+    var focusRequest: Int
+    var send: () -> Void
+
+    static let font = NSFont.systemFont(ofSize: 14)
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    func makeNSView(context: Context) -> NSScrollView {
+        let tv = context.coordinator.textView
+        tv.delegate = context.coordinator
+        tv.drawsBackground = false
+        tv.isRichText = true
+        tv.importsGraphics = false
+        tv.allowsUndo = true
+        tv.font = Self.font
+        tv.textColor = .labelColor
+        tv.typingAttributes = Coordinator.base
+        tv.textContainerInset = .zero
+        tv.textContainer?.lineFragmentPadding = 0
+        tv.textContainer?.widthTracksTextView = true
+        tv.isAutomaticQuoteSubstitutionEnabled = false
+        tv.isAutomaticDashSubstitutionEnabled = false
+        tv.minSize = .zero
+        tv.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: .greatestFiniteMagnitude)
+        tv.isVerticallyResizable = true
+        tv.isHorizontallyResizable = false
+        tv.autoresizingMask = [.width]
+        tv.setAccessibilityLabel("Prompt")
+        tv.resigned = { [weak coordinator = context.coordinator] in coordinator?.hidePopup() }
+        let scroll = NSScrollView()
+        scroll.drawsBackground = false
+        scroll.borderType = .noBorder
+        scroll.hasVerticalScroller = true
+        scroll.autohidesScrollers = true
+        scroll.documentView = tv
+        return scroll
+    }
+
+    func updateNSView(_ scroll: NSScrollView, context: Context) {
+        let c = context.coordinator
+        c.parent = self
+        let tv = c.textView
+        if tv.string != text, !tv.hasMarkedText() {
+            // Set from outside (sent, a command picked, a suggestion): plain text, so no mentions.
+            c.updating = true
+            tv.textStorage?.setAttributedString(NSAttributedString(string: text, attributes: Coordinator.base))
+            tv.setSelectedRange(NSRange(location: (text as NSString).length, length: 0))
+            c.updating = false
+            DispatchQueue.main.async { c.sync() }
+        }
+        if c.focusRequest != focusRequest {
+            c.focusRequest = focusRequest
+            DispatchQueue.main.async { tv.window?.makeFirstResponder(tv) }
+        }
+        c.updatePopup()
+    }
+
+    static func dismantleNSView(_ nsView: NSScrollView, coordinator: Coordinator) { coordinator.hidePopup() }
+
+    /// As tall as the text, from one line up to ten; then it scrolls.
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSScrollView, context: Context) -> CGSize? {
+        let tv = context.coordinator.textView
+        guard let width = proposal.width, width > 0, let lm = tv.layoutManager, let tc = tv.textContainer else { return nil }
+        tc.containerSize = NSSize(width: width, height: .greatestFiniteMagnitude)
+        lm.ensureLayout(for: tc)
+        let line = lm.defaultLineHeight(for: Self.font)
+        return CGSize(width: width, height: min(max(lm.usedRect(for: tc).height, line), line * 10))
+    }
+
+    @MainActor final class Coordinator: NSObject, NSTextViewDelegate {
+        var parent: AssistantPromptField
+        let textView = PromptTextView(usingTextLayoutManager: false)
+        var focusRequest = -1
+        var updating = false
+        private var panel: NSPanel?
+        private var host: CompletionHost?
+
+        static let base: [NSAttributedString.Key: Any] = [.font: AssistantPromptField.font, .foregroundColor: NSColor.labelColor]
+
+        init(_ parent: AssistantPromptField) { self.parent = parent }
+
+        // MARK: Text
+
+        func textDidChange(_ notification: Notification) { sync() }
+
+        func textViewDidChangeSelection(_ notification: Notification) {
+            guard !updating else { return }
+            updateQuery()
+        }
+
+        func textView(_ textView: NSTextView, shouldChangeTypingAttributes oldTypingAttributes: [String: Any] = [:],
+                      toAttributes newTypingAttributes: [NSAttributedString.Key: Any] = [:]) -> [NSAttributedString.Key: Any] {
+            // Typing next to a token never continues it.
+            Self.base
+        }
+
+        /// The draft and its mentions from the text; a token edited inside turns back into plain text.
+        func sync() {
+            guard let storage = textView.textStorage else { return }
+            var paths: [RelPath] = [], broken: [NSRange] = []
+            storage.enumerateAttribute(.typoMention, in: NSRange(location: 0, length: storage.length)) { value, range, _ in
+                guard let path = value as? RelPath else { return }
+                if storage.attributedSubstring(from: range).string == (path.raw as NSString).lastPathComponent {
+                    if !paths.contains(path) { paths.append(path) }
+                } else {
+                    broken.append(range)
+                }
+            }
+            if !broken.isEmpty {
+                storage.beginEditing()
+                for r in broken { storage.setAttributes(Self.base, range: r) }
+                storage.endEditing()
+            }
+            if parent.text != textView.string { parent.text = textView.string }
+            if parent.mentions != paths { parent.mentions = paths }
+            updateQuery()
+        }
+
+        private func updateQuery() {
+            let sel = textView.selectedRange()
+            let q = sel.length == 0 && !textView.hasMarkedText() ? AssistantMentions.query(in: textView.string, caret: sel.location) : nil
+            let new = q.map { Query(range: $0.range, query: $0.query) }
+            if parent.query != new { parent.query = new }
+        }
+
+        // MARK: Keys
+
+        func textView(_ textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+            let items = parent.items
+            switch selector {
+            case #selector(NSResponder.insertNewline(_:)):
+                if NSApp.currentEvent?.modifierFlags.contains(.shift) == true {
+                    textView.insertNewlineIgnoringFieldEditor(nil)
+                } else if items.indices.contains(parent.selection) {
+                    choose(parent.selection)
+                } else {
+                    parent.send()
+                }
+                return true
+            case #selector(NSResponder.insertTab(_:)):
+                if items.indices.contains(parent.selection) { choose(parent.selection) } else { textView.window?.selectNextKeyView(nil) }
+                return true
+            // Held arrows repeat, so the whole list can be walked through.
+            case #selector(NSResponder.moveUp(_:)):
+                guard !items.isEmpty else { return false }
+                parent.selection = max(parent.selection - 1, 0)
+                return true
+            case #selector(NSResponder.moveDown(_:)):
+                guard !items.isEmpty else { return false }
+                parent.selection = min(parent.selection + 1, items.count - 1)
+                return true
+            case #selector(NSResponder.cancelOperation(_:)):
+                guard !items.isEmpty else { return false }
+                parent.dismissed = parent.text
+                return true
+            default:
+                return false
+            }
+        }
+
+        func choose(_ i: Int) {
+            guard parent.items.indices.contains(i) else { return }
+            let c = parent.items[i]
+            switch c.kind {
+            case .command, .skill:
+                parent.text = "/\(c.name) "
+            case .file:
+                guard let q = parent.query, let path = RelPath(c.id) else { return }
+                let token = NSMutableAttributedString(string: c.name, attributes: [
+                    .font: NSFont.monospacedSystemFont(ofSize: 13, weight: .regular),
+                    .foregroundColor: NSColor.secondaryLabelColor,
+                    .typoMention: path,
+                ])
+                token.append(NSAttributedString(string: " ", attributes: Self.base))
+                guard textView.shouldChangeText(in: q.range, replacementString: token.string) else { return }
+                textView.textStorage?.replaceCharacters(in: q.range, with: token)
+                textView.didChangeText()
+                textView.setSelectedRange(NSRange(location: q.range.location + token.length, length: 0))
+                textView.typingAttributes = Self.base
+            }
+        }
+
+        // MARK: Completion panel
+
+        /// Shows the completions under the start of what they complete (above it when the screen ends below).
+        func updatePopup() {
+            let items = parent.items
+            guard !items.isEmpty, let window = textView.window, window.firstResponder === textView else { return hidePopup() }
+            let list = AssistantCompletionList(items: items, selected: min(parent.selection, items.count - 1)) { [weak self] in self?.choose($0) }
+            let panel = self.panel ?? makePanel()
+            host?.rootView = list
+            let anchor = parent.query?.range.location ?? 0
+            let caret = textView.firstRect(forCharacterRange: NSRange(location: anchor, length: 0), actualRange: nil)
+            let size = NSSize(width: 240, height: CGFloat(min(items.count, 9)) * 22 + 10)
+            var origin = NSPoint(x: caret.minX - 10, y: caret.minY - 4 - size.height)
+            if let screen = window.screen, origin.y < screen.visibleFrame.minY { origin.y = caret.maxY + 4 }
+            panel.setFrame(NSRect(origin: origin, size: size), display: true)
+            if panel.parent == nil { window.addChildWindow(panel, ordered: .above) }
+            panel.invalidateShadow()
+        }
+
+        func hidePopup() {
+            guard let panel, panel.isVisible || panel.parent != nil else { return }
+            panel.parent?.removeChildWindow(panel)
+            panel.orderOut(nil)
+            // A hidden panel kept showing its old rows when it came back; a new one starts fresh.
+            self.panel = nil
+            host = nil
+        }
+
+        private func makePanel() -> NSPanel {
+            let panel = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
+            panel.isOpaque = false
+            panel.backgroundColor = .clear
+            panel.hasShadow = true
+            panel.becomesKeyOnlyIfNeeded = true
+            let blur = NSVisualEffectView()
+            blur.material = .menu
+            blur.blendingMode = .behindWindow
+            blur.state = .active
+            blur.maskImage = Self.roundedMask(12)
+            let host = CompletionHost(rootView: AssistantCompletionList(items: [], selected: 0) { _ in })
+            host.translatesAutoresizingMaskIntoConstraints = false
+            blur.addSubview(host)
+            NSLayoutConstraint.activate([host.leadingAnchor.constraint(equalTo: blur.leadingAnchor), host.trailingAnchor.constraint(equalTo: blur.trailingAnchor),
+                                         host.topAnchor.constraint(equalTo: blur.topAnchor), host.bottomAnchor.constraint(equalTo: blur.bottomAnchor)])
+            panel.contentView = blur
+            self.panel = panel
+            self.host = host
+            return panel
+        }
+
+        private static func roundedMask(_ r: CGFloat) -> NSImage {
+            let image = NSImage(size: NSSize(width: 2 * r + 1, height: 2 * r + 1), flipped: false) { rect in
+                NSColor.black.setFill()
+                NSBezierPath(roundedRect: rect, xRadius: r, yRadius: r).fill()
+                return true
+            }
+            image.capInsets = NSEdgeInsets(top: r, left: r, bottom: r, right: r)
+            image.resizingMode = .stretch
+            return image
+        }
+    }
+}
+
+/// The prompt's text view: a mention token deletes as a whole, and pasted text arrives plain.
+final class PromptTextView: NSTextView {
+    var resigned: () -> Void = {}
+
+    override var readablePasteboardTypes: [NSPasteboard.PasteboardType] { [.string] }
+
+    override func deleteBackward(_ sender: Any?) {
+        selectToken(at: selectedRange().location - 1)
+        super.deleteBackward(sender)
+    }
+
+    override func deleteForward(_ sender: Any?) {
+        selectToken(at: selectedRange().location)
+        super.deleteForward(sender)
+    }
+
+    /// Selects the mention token holding character `i`, when the caret is an insertion point next to it.
+    private func selectToken(at i: Int) {
+        guard selectedRange().length == 0, !hasMarkedText(), let storage = textStorage, i >= 0, i < storage.length else { return }
+        var r = NSRange()
+        if storage.attribute(.typoMention, at: i, longestEffectiveRange: &r, in: NSRange(location: 0, length: storage.length)) != nil {
+            setSelectedRange(r)
+        }
+    }
+
+    override func resignFirstResponder() -> Bool {
+        let done = super.resignFirstResponder()
+        if done { resigned() }
+        return done
+    }
+}
+
+/// Clicks reach the completion list although its panel never becomes key.
+final class CompletionHost: NSHostingView<AssistantCompletionList> {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+}
+
+/// Xcode's completion popup: an icon and the name per row, the selected row on a white rounded highlight.
+struct AssistantCompletionList: View {
+    let items: [AssistantPromptField.Completion]
+    let selected: Int
+    let choose: (Int) -> Void
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 0) {
+                    ForEach(Array(items.enumerated()), id: \.element.id) { i, c in
+                        HStack(spacing: 6) {
+                            icon(c).frame(width: 16)
+                            Text(c.name).foregroundStyle(i == selected ? .primary : .secondary).lineLimit(1).truncationMode(.middle).layoutPriority(1)
+                            if let d = c.detail { Text(d).font(.system(size: 11)).foregroundStyle(.tertiary).lineLimit(1) }
+                            Spacer(minLength: 0)
+                        }
+                        .font(.system(size: 13))
+                        .padding(.horizontal, 6)
+                        .frame(height: 22)
+                        .background(i == selected ? Color(nsColor: .textBackgroundColor) : .clear, in: RoundedRectangle(cornerRadius: 6))
+                        .contentShape(Rectangle())
+                        .onTapGesture { choose(i) }
+                        .help(c.help)
+                        .accessibilityAddTraits(.isButton)
+                    }
+                }
+                .padding(5)
+            }
+            .scrollIndicators(.visible)
+            // No animation: held arrows would otherwise outrun the scrolling.
+            // Scrolls by the rows' own ids: a second `.id(index)` on the rows froze the list when it was filtered.
+            .onChange(of: selected) { _, i in if items.indices.contains(i) { proxy.scrollTo(items[i].id) } }
+        }
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.separator, lineWidth: 0.5))
+    }
+
+    @ViewBuilder private func icon(_ c: AssistantPromptField.Completion) -> some View {
+        switch c.kind {
+        case .command: Image(systemName: "gearshape").foregroundStyle(.secondary)
+        case .skill: Image(systemName: "rosette").foregroundStyle(.secondary)
+        case .file: AssistantFileIcon(path: c.id)
+        }
+    }
 }
