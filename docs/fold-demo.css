@@ -1,19 +1,20 @@
 /* Values from the app's default theme (EditorTheme.standard, EditorFolding, LineNumberRuler), with the system
    colors resolved for Aqua and Dark Aqua. */
+/* Light and dark values are mixed by the page's --dark (see style.css). */
 .fold-demo {
-  --fd-ink: 0, 0, 0;                       /* textColor, as r,g,b for the translucent ribbon and bands */
-  --fd-bg: #ffffff;                         /* textBackgroundColor */
-  --fd-chrome: #f6f6f6;
-  --fd-text: #000000;
-  --fd-ruler: rgba(0, 0, 0, 0.5);           /* secondaryLabelColor */
-  --fd-accent: 0, 136, 255;                 /* controlAccentColor (blue) */
-  --fd-kw: #ff2d55;                         /* systemPink */
-  --fd-str: #ff383c;                        /* systemRed */
-  --fd-numc: #cb30e0;                       /* systemPurple */
-  --fd-unit: #767cd4;                       /* number blended 45% toward math */
-  --fd-fn: #0088ff;                         /* systemBlue */
-  --fd-lbl: #34c759;                        /* systemGreen */
-  --fd-math: #00c3d0;                       /* systemTeal */
+  --fd-ink: calc(255 * var(--dark)), calc(255 * var(--dark)), calc(255 * var(--dark)); /* textColor as r,g,b */
+  --fd-bg: color-mix(in srgb, #ffffff, #1e1e1e var(--m));      /* textBackgroundColor */
+  --fd-chrome: color-mix(in srgb, #f6f6f6, #2a2a2a var(--m));
+  --fd-text: color-mix(in srgb, #000000, #ffffff var(--m));
+  --fd-ruler: rgba(var(--fd-ink), calc(0.5 + 0.05 * var(--dark)));  /* secondaryLabelColor */
+  --fd-accent: 0, calc(136 + 9 * var(--dark)), 255;              /* controlAccentColor (blue) */
+  --fd-kw: color-mix(in srgb, #ff2d55, #ff375f var(--m));        /* systemPink */
+  --fd-str: color-mix(in srgb, #ff383c, #ff4245 var(--m));       /* systemRed */
+  --fd-numc: color-mix(in srgb, #cb30e0, #db34f2 var(--m));      /* systemPurple */
+  --fd-unit: color-mix(in srgb, #767cd4, #868cea var(--m));      /* number blended 45% toward math */
+  --fd-fn: color-mix(in srgb, #0088ff, #0091ff var(--m));        /* systemBlue */
+  --fd-lbl: color-mix(in srgb, #34c759, #30d158 var(--m));       /* systemGreen */
+  --fd-math: color-mix(in srgb, #00c3d0, #00d2e0 var(--m));      /* systemTeal */
   --fd-ms: 400ms;
   border-radius: 12px;
   overflow: hidden;
@@ -21,23 +22,6 @@
   box-shadow: var(--shadow);
   border: 1px solid var(--line);
   color: var(--fd-text);
-}
-@media (prefers-color-scheme: dark) {
-  .fold-demo {
-    --fd-ink: 255, 255, 255;
-    --fd-bg: #1e1e1e;
-    --fd-chrome: #2a2a2a;
-    --fd-text: #ffffff;
-    --fd-ruler: rgba(255, 255, 255, 0.55);
-    --fd-accent: 0, 145, 255;
-    --fd-kw: #ff375f;
-    --fd-str: #ff4245;
-    --fd-numc: #db34f2;
-    --fd-unit: #868cea;
-    --fd-fn: #0091ff;
-    --fd-lbl: #30d158;
-    --fd-math: #00d2e0;
-  }
 }
 
 .fd-bar {

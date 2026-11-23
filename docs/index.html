@@ -15,9 +15,8 @@
   </script>
   <title>Typo: the native Typst editor for macOS</title>
   <meta name="description" content="Typo is a native macOS editor for Typst, built in Swift and SwiftUI on the real Typst compiler. Live preview, a spreadsheet-style table editor, Xcode-style folding and an optional private AI assistant. Free, source available.">
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f7f7fb" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0b0a14" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f7f7fb">
   <meta property="og:title" content="Typo: the native Typst editor for macOS">
   <meta property="og:description" content="Typst, at home on the Mac. Free, source available.">
   <meta property="og:image" content="https://scholzdev.github.io/typo/assets/og.jpg">
@@ -78,11 +77,13 @@
         </div>
         <p class="meta">Free · Source available · Requires macOS 27</p>
       </div>
-      <div class="wrap-wide">
-        <figure class="hero-shot shot">
-          <img src="assets/hero.webp" width="2880" height="1759" fetchpriority="high"
-               alt="The Typo main window: a file navigator on the left, a Typst source file with syntax highlighting and a minimap in the middle, the live PDF preview with a typeset table and figure, and the inspector showing figure and table properties on the right.">
-        </figure>
+      <div class="scene hero-scene" data-scene data-start="0.75">
+        <div class="scene-pin hero-pin">
+          <figure class="hero-shot shot">
+            <img src="assets/hero.webp" width="2880" height="1759" fetchpriority="high"
+                 alt="The Typo main window: a file navigator on the left, a Typst source file with syntax highlighting and a minimap in the middle, the live PDF preview with a typeset table and figure, and the inspector showing figure and table properties on the right.">
+          </figure>
+        </div>
       </div>
     </section>
 
@@ -91,7 +92,7 @@
       <div class="wrap">
         <header class="section-head reveal">
           <p class="eyebrow">The editor</p>
-          <h2>Everything you expect from a real IDE. <em>For your prose.</em></h2>
+          <h2><span class="grad">Everything you expect from a real IDE.</span> <em>For your prose.</em></h2>
         </header>
         <ul class="cards">
           <li class="card reveal">
@@ -130,24 +131,28 @@
     </section>
 
     <!-- Tables -->
-    <section class="section feature" id="tables">
-      <div class="wrap feature-grid">
-        <div class="feature-copy reveal">
-          <p class="eyebrow">Table editor</p>
-          <h2>Tables, the way Numbers does them.</h2>
-          <p>Open any <code>table(…)</code> or <code>grid(…)</code> in a visual grid. Every cell is typeset by Typst itself, with your math, your references and your <code>#set</code> rules.</p>
-          <ul class="ticks">
-            <li>Arrow keys, Tab, Return, copy and paste like a spreadsheet</li>
-            <li>Paste straight from Numbers or Excel, the table grows to fit</li>
-            <li>Merge cells, drag rows and columns, resize widths</li>
-            <li>Styles: Plain, Grid, Header Line, Booktabs, Striped</li>
-            <li>One undoable edit when you press Done</li>
-          </ul>
+    <section class="section showcase" id="tables">
+      <header class="wrap showcase-head reveal">
+        <p class="eyebrow">Table editor</p>
+        <h2>Tables, the way Numbers does them.</h2>
+        <p>Open any <code>table(…)</code> or <code>grid(…)</code> in a visual grid. Every cell is typeset by Typst itself, with your math, your references and your <code>#set</code> rules.</p>
+      </header>
+      <div class="scene showcase-scene" data-scene data-start="0.9">
+        <div class="scene-pin showcase-pin">
+          <figure class="shot showcase-shot">
+            <img src="assets/table.webp" width="2112" height="1372" loading="lazy"
+                 alt="The table editor: a spreadsheet grid with lettered columns and a header row on the left, and a live typeset preview of the same table on the right.">
+          </figure>
         </div>
-        <figure class="shot feature-shot reveal">
-          <img src="assets/table.webp" width="2112" height="1372" loading="lazy"
-               alt="The table editor: a spreadsheet grid with lettered columns and a header row on the left, and a live typeset preview of the same table on the right.">
-        </figure>
+      </div>
+      <div class="wrap">
+        <ul class="ticks ticks-cols reveal">
+          <li>Arrow keys, Tab, Return, copy and paste like a spreadsheet</li>
+          <li>Paste straight from Numbers or Excel, the table grows to fit</li>
+          <li>Merge cells, drag rows and columns, resize widths</li>
+          <li>Styles: Plain, Grid, Header Line, Booktabs, Striped</li>
+          <li>One undoable edit when you press Done</li>
+        </ul>
       </div>
     </section>
 
@@ -158,10 +163,21 @@
           <h2>Sort, total, transpose. <em>Just ask.</em></h2>
           <p>Describe a change in your own words or tap a suggestion: sort, add a totals row, transpose, fill empty cells, translate, fix capitalisation, format numbers. The result lands as a single undo step with a summary.</p>
         </div>
-        <figure class="shot feature-shot reveal">
+        <figure class="shot feature-shot" data-scene data-start="1">
           <img src="assets/table-ai.webp" width="2112" height="1372" loading="lazy"
                alt="The table editor’s Intelligence popover with a “Describe a change” field and suggestion chips such as Sort by A, Add totals row, Transpose and Translate.">
         </figure>
+      </div>
+    </section>
+
+    <!-- Light to dark: the page crossfades while this section is pinned -->
+    <section class="dark-scene" data-scene aria-labelledby="dark-title">
+      <div class="dark-pin">
+        <h2 class="dark-q" id="dark-title">Want it dark?</h2>
+        <figure class="dark-device" aria-hidden="true">
+          <div class="shot dark-shot"><img src="assets/hero.webp" width="2880" height="1759" alt="" loading="lazy"></div>
+        </figure>
+        <p class="dark-a">No problem.</p>
       </div>
     </section>
 
@@ -199,7 +215,7 @@
             <li>Changes apply right away, with an inline diff and a revert bar</li>
           </ul>
         </div>
-        <figure class="shot feature-shot shot-tall reveal">
+        <figure class="shot feature-shot shot-tall" data-scene data-start="1">
           <img src="assets/assistant.webp" width="2450" height="2630" loading="lazy"
                alt="The assistant sidebar next to the editor, showing “Ask About Your Document” and a prompt field with the attached file main.typ.">
         </figure>
@@ -214,7 +230,7 @@
           <h2>Citations without the curly braces.</h2>
           <p>Edit <code>.bib</code> files in a real form, with required-field checks. Insert a citation with <kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd>. Browse Typst Universe, keep local packages, and work offline with a cached package index.</p>
         </div>
-        <figure class="shot feature-shot reveal">
+        <figure class="shot feature-shot" data-scene data-start="1">
           <img src="assets/bib.webp" width="2300" height="1500" loading="lazy"
                alt="The BibTeX editor: a searchable list of entries on the left and a form for The TeXbook by Donald E. Knuth with citation key and fields on the right.">
         </figure>
@@ -229,7 +245,7 @@
           <h2>Settings that feel like Xcode. <em>Because they should.</em></h2>
           <p>Themes, fonts, cursor styles and light or dark. Shortcut sets you can duplicate and rename, conflict filters, and record a new binding with a double-click. Export your settings and take them along.</p>
         </div>
-        <figure class="shot feature-shot shot-small reveal">
+        <figure class="shot feature-shot shot-small" data-scene data-start="1">
           <img src="assets/shortcuts.webp" width="1560" height="1120" loading="lazy"
                alt="The Shortcuts settings pane with a Default shortcut set, an Adapt to current keyboard toggle, and All, Menu, Text, Customized and Conflicts filters.">
         </figure>

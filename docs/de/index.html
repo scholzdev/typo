@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Typo: der native Typst-Editor für macOS</title>
   <meta name="description" content="Typo ist ein nativer Typst-Editor für macOS, gebaut mit Swift und SwiftUI auf dem echten Typst-Compiler. Live-Vorschau, ein Tabelleneditor wie in einer Tabellenkalkulation, Code-Faltung wie in Xcode und ein optionaler, privater KI-Assistent. Kostenlos, Quellcode offen.">
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f7f7fb" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0b0a14" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f7f7fb">
   <meta property="og:title" content="Typo: der native Typst-Editor für macOS">
   <meta property="og:description" content="Typst, zu Hause auf dem Mac. Kostenlos, Quellcode offen.">
   <meta property="og:locale" content="de_DE">
@@ -70,11 +69,13 @@
         </div>
         <p class="meta">Kostenlos · Quellcode offen · Erfordert macOS 27</p>
       </div>
-      <div class="wrap-wide">
-        <figure class="hero-shot shot">
-          <img src="../assets/hero.webp" width="2880" height="1759" fetchpriority="high"
-               alt="Das Hauptfenster von Typo: links der Dateinavigator, in der Mitte eine Typst-Quelldatei mit Syntaxhervorhebung und Minimap, daneben die Live-PDF-Vorschau mit gesetzter Tabelle und Abbildung, rechts der Inspektor mit den Eigenschaften von Abbildung und Tabelle.">
-        </figure>
+      <div class="scene hero-scene" data-scene data-start="0.75">
+        <div class="scene-pin hero-pin">
+          <figure class="hero-shot shot">
+            <img src="../assets/hero.webp" width="2880" height="1759" fetchpriority="high"
+                 alt="Das Hauptfenster von Typo: links der Dateinavigator, in der Mitte eine Typst-Quelldatei mit Syntaxhervorhebung und Minimap, daneben die Live-PDF-Vorschau mit gesetzter Tabelle und Abbildung, rechts der Inspektor mit den Eigenschaften von Abbildung und Tabelle.">
+          </figure>
+        </div>
       </div>
     </section>
 
@@ -83,7 +84,7 @@
       <div class="wrap">
         <header class="section-head reveal">
           <p class="eyebrow">Der Editor</p>
-          <h2>Alles, was du von einer echten IDE erwartest. <em>Für deine Texte.</em></h2>
+          <h2><span class="grad">Alles, was du von einer echten IDE erwartest.</span> <em>Für deine Texte.</em></h2>
         </header>
         <ul class="cards">
           <li class="card reveal">
@@ -122,24 +123,28 @@
     </section>
 
     <!-- Tables -->
-    <section class="section feature" id="tables">
-      <div class="wrap feature-grid">
-        <div class="feature-copy reveal">
-          <p class="eyebrow">Tabelleneditor</p>
-          <h2>Tabellen wie in Numbers.</h2>
-          <p>Öffne jedes <code>table(…)</code> oder <code>grid(…)</code> in einem visuellen Raster. Jede Zelle setzt Typst selbst, mit deinen Formeln, deinen Referenzen und deinen <code>#set</code>-Regeln.</p>
-          <ul class="ticks">
-            <li>Pfeiltasten, Tab, Return, Kopieren und Einfügen wie in einer Tabellenkalkulation</li>
-            <li>Direkt aus Numbers oder Excel einfügen, die Tabelle wächst mit</li>
-            <li>Zellen verbinden, Zeilen und Spalten verschieben, Breiten anpassen</li>
-            <li>Stile: Plain, Grid, Header Line, Booktabs, Striped</li>
-            <li>Ein einziger Undo-Schritt, sobald du auf Done klickst</li>
-          </ul>
+    <section class="section showcase" id="tables">
+      <header class="wrap showcase-head reveal">
+        <p class="eyebrow">Tabelleneditor</p>
+        <h2>Tabellen wie in Numbers.</h2>
+        <p>Öffne jedes <code>table(…)</code> oder <code>grid(…)</code> in einem visuellen Raster. Jede Zelle setzt Typst selbst, mit deinen Formeln, deinen Referenzen und deinen <code>#set</code>-Regeln.</p>
+      </header>
+      <div class="scene showcase-scene" data-scene data-start="0.9">
+        <div class="scene-pin showcase-pin">
+          <figure class="shot showcase-shot">
+            <img src="../assets/table.webp" width="2112" height="1372" loading="lazy"
+                 alt="Der Tabelleneditor: links ein Raster wie in einer Tabellenkalkulation mit Spaltenbuchstaben und Kopfzeile, rechts eine live gesetzte Vorschau derselben Tabelle.">
+          </figure>
         </div>
-        <figure class="shot feature-shot reveal">
-          <img src="../assets/table.webp" width="2112" height="1372" loading="lazy"
-               alt="Der Tabelleneditor: links ein Raster wie in einer Tabellenkalkulation mit Spaltenbuchstaben und Kopfzeile, rechts eine live gesetzte Vorschau derselben Tabelle.">
-        </figure>
+      </div>
+      <div class="wrap">
+        <ul class="ticks ticks-cols reveal">
+          <li>Pfeiltasten, Tab, Return, Kopieren und Einfügen wie in einer Tabellenkalkulation</li>
+          <li>Direkt aus Numbers oder Excel einfügen, die Tabelle wächst mit</li>
+          <li>Zellen verbinden, Zeilen und Spalten verschieben, Breiten anpassen</li>
+          <li>Stile: Plain, Grid, Header Line, Booktabs, Striped</li>
+          <li>Ein einziger Undo-Schritt, sobald du auf Done klickst</li>
+        </ul>
       </div>
     </section>
 
@@ -150,10 +155,21 @@
           <h2>Sortieren, summieren, transponieren. <em>Frag einfach.</em></h2>
           <p>Beschreib eine Änderung in deinen eigenen Worten oder tipp auf einen Vorschlag: sortieren, Summenzeile anfügen, transponieren, leere Zellen füllen, übersetzen, Groß- und Kleinschreibung korrigieren, Zahlen formatieren. Das Ergebnis landet als ein einziger Undo-Schritt, mit Zusammenfassung.</p>
         </div>
-        <figure class="shot feature-shot reveal">
+        <figure class="shot feature-shot" data-scene data-start="1">
           <img src="../assets/table-ai.webp" width="2112" height="1372" loading="lazy"
                alt="Das Intelligence-Popover des Tabelleneditors mit dem Feld „Describe a change“ und Vorschlägen wie Sort by A, Add totals row, Transpose und Translate.">
         </figure>
+      </div>
+    </section>
+
+    <!-- Light to dark: the page crossfades while this section is pinned -->
+    <section class="dark-scene" data-scene aria-labelledby="dark-title">
+      <div class="dark-pin">
+        <h2 class="dark-q" id="dark-title">Lieber dunkel?</h2>
+        <figure class="dark-device" aria-hidden="true">
+          <div class="shot dark-shot"><img src="../assets/hero.webp" width="2880" height="1759" alt="" loading="lazy"></div>
+        </figure>
+        <p class="dark-a">Kein Problem.</p>
       </div>
     </section>
 
@@ -191,7 +207,7 @@
             <li>Änderungen greifen sofort, mit Inline-Diff und einer Leiste zum Zurücksetzen</li>
           </ul>
         </div>
-        <figure class="shot feature-shot shot-tall reveal">
+        <figure class="shot feature-shot shot-tall" data-scene data-start="1">
           <img src="../assets/assistant.webp" width="2450" height="2630" loading="lazy"
                alt="Die Assistenten-Seitenleiste neben dem Editor mit „Ask About Your Document“ und einem Eingabefeld mit der angehängten Datei main.typ.">
         </figure>
@@ -206,7 +222,7 @@
           <h2>Zitieren ohne geschweifte Klammern.</h2>
           <p>Bearbeite <code>.bib</code>-Dateien in einem richtigen Formular, mit Prüfung der Pflichtfelder. Füg ein Zitat mit <kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd> ein. Stöbere im Typst Universe, verwalte lokale Pakete und arbeite offline mit einem zwischengespeicherten Paketindex.</p>
         </div>
-        <figure class="shot feature-shot reveal">
+        <figure class="shot feature-shot" data-scene data-start="1">
           <img src="../assets/bib.webp" width="2300" height="1500" loading="lazy"
                alt="Der BibTeX-Editor: links eine durchsuchbare Liste der Einträge, rechts ein Formular für The TeXbook von Donald E. Knuth mit Zitierschlüssel und Feldern.">
         </figure>
@@ -221,7 +237,7 @@
           <h2>Einstellungen wie in Xcode. <em>So, wie es sich gehört.</em></h2>
           <p>Themes, Schriften, Cursor-Stile, hell oder dunkel. Shortcut-Sets, die du duplizieren und umbenennen kannst, Filter für Konflikte und neue Tastenkürzel per Doppelklick aufnehmen. Exportier deine Einstellungen und nimm sie mit.</p>
         </div>
-        <figure class="shot feature-shot shot-small reveal">
+        <figure class="shot feature-shot shot-small" data-scene data-start="1">
           <img src="../assets/shortcuts.webp" width="1560" height="1120" loading="lazy"
                alt="Der Einstellungsbereich Shortcuts mit dem Shortcut-Set Default, dem Schalter Adapt to current keyboard und den Filtern All, Menu, Text, Customized und Conflicts.">
         </figure>
