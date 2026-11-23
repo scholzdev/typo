@@ -36,7 +36,8 @@ struct ProjectView: View {
             ZStack {
                 if assistant.mode == .assistant { AssistantSidebar(model: assistant) } else { SidebarView(project: project, model: sidebar, files: files) }
             }
-            .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity)
+            // The navigator's system tab strip can't shrink below ~260 pt; a narrower column centred it and cut off every tab's left edge.
+            .frame(minWidth: 280, maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 .navigationSplitViewColumnWidth(min: 300, ideal: 300, max: 440)
                 .toolbar(removing: .sidebarToggle)
                 .toolbar { if !layout.focus, layout.columns != .detailOnly { NavigatorToggles(layout: layout, assistant: assistant, actions: actions, placement: .automatic) } }
