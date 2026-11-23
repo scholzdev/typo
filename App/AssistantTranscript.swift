@@ -22,7 +22,7 @@ struct AssistantTurnView: View {
                     .frame(maxWidth: .infinity)
             }
             if let u = turn.user { AssistantUserBubble(text: u.text) }
-            ForEach(turn.changes) { c in AssistantFileCapsule(change: c) { model.showDiff(c.path) } }
+            ForEach(turn.changes) { c in AssistantFileCapsule(change: c) { model.openChange(c) } }
             ForEach(turn.answers) { m in AssistantMessageView(model: model, message: m) }
             if running { live }
             if !running, !turn.answers.isEmpty, let last = turn.answers.last {
@@ -68,7 +68,7 @@ struct AssistantUserBubble: View {
     }
 }
 
-/// A file the turn changed: icon and name, +N / −N, and M or A; a click shows it in the diff panel.
+/// A file the turn changed: icon and name, +N / −N, and M or A; a click opens the file at its first change.
 struct AssistantFileCapsule: View {
     let change: AssistantFileChange
     let open: () -> Void

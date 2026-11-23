@@ -8,11 +8,13 @@ extension Notification.Name {
     static let assistantDiscardChange = Notification.Name("Tympan.assistantDiscardChange")
 }
 
-/// The bar beside lines the agent changed: a pill with a slowly drifting blue, purple, red and orange gradient and a
-/// faint light rim. Changes from earlier turns get a grey outline instead.
+/// The bar beside lines the agent changed: a pill outlined in a slowly drifting blue, purple, red and orange gradient,
+/// its inside the same gradient washed out to a pastel. Changes from earlier turns get a grey outline instead.
 final class RainbowBarLayer: CALayer {
     private let gradient = CAGradientLayer()
-    private let rim = CALayer()
+    /// Covers all but the outline with the background at 60%, so only the ring shows the full colors.
+    private let wash = CALayer()
+    private static let ring: CGFloat = 1.25
     private static let stops: [Double] = [0, 0.33, 0.66, 1]
     /// A change from an earlier turn.
     var previous = false
@@ -22,9 +24,8 @@ final class RainbowBarLayer: CALayer {
         gradient.startPoint = CGPoint(x: 0.5, y: 0)
         gradient.endPoint = CGPoint(x: 0.5, y: 1)
         gradient.locations = Self.stops.map { $0 as NSNumber }
-        rim.borderWidth = 0.5
         addSublayer(gradient)
-        addSublayer(rim)
+        addSublayer(wash)
         animate()
     }
 
@@ -41,11 +42,11 @@ final class RainbowBarLayer: CALayer {
     func style(for appearance: NSAppearance) {
         appearance.performAsCurrentDrawingAppearance {
             gradient.colors = [NSColor.systemBlue, .systemPurple, .systemRed, .systemOrange].map(\.cgColor)
-            rim.borderColor = NSColor.white.withAlphaComponent(0.35).cgColor
+            wash.backgroundColor = NSColor.textBackgroundColor.withAlphaComponent(0.6).cgColor
             borderColor = NSColor.systemGray.withAlphaComponent(0.5).cgColor
         }
         gradient.isHidden = previous
-        rim.isHidden = previous
+        wash.isHidden = previous
         borderWidth = previous ? 1 : 0
     }
 
@@ -54,8 +55,8 @@ final class RainbowBarLayer: CALayer {
         cornerRadius = bounds.width / 2
         gradient.frame = bounds
         gradient.cornerRadius = cornerRadius
-        rim.frame = bounds.insetBy(dx: 0.5, dy: 0.5)
-        rim.cornerRadius = max(cornerRadius - 0.5, 0)
+        wash.frame = bounds.insetBy(dx: Self.ring, dy: Self.ring)
+        wash.cornerRadius = max(cornerRadius - Self.ring, 0)
     }
 
     /// Eight small random shifts of the inner stops, back and forth over 20 s; none with Reduce Motion.

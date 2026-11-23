@@ -46,7 +46,10 @@ struct ProjectView: View {
             SplitPanes(autosaveName: "Tympan.split.\(project.id.raw)", showsTrailing: !project.preview.isPoppedOut && !layout.focus && layout.showPreview && assistant.mode != .assistant,
                        leading: ZStack {
                            // The editor stays alive under the conversation, so switching back keeps its state.
+                           // Hidden, not just covered: the text view's AppKit drawing (the format guide) showed through.
                            EditorPane(project: project, sidebar: sidebar, tables: tables, actions: actions, layout: layout)
+                               .opacity(assistant.mode == .assistant ? 0 : 1)
+                               .allowsHitTesting(assistant.mode != .assistant)
                            if assistant.mode == .assistant { AssistantChatView(model: assistant) }
                        },
                        trailing: PreviewPane(project: project, popOut: popOut))

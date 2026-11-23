@@ -781,6 +781,13 @@ extension FocusedValues {
         showsDiff = true
     }
 
+    /// Opens a file the turn changed at its first changed line.
+    func openChange(_ c: AssistantFileChange) {
+        let current = RelPath(c.path).flatMap(project.assistantText(of:))
+        let line = c.edits.lazy.compactMap { e in AssistantDiffRows.rows(e.edit, current: current).first { $0.kind != .context }?.line }.first
+        openFile(c.path, line: line)
+    }
+
     /// Opens a project file the transcript links to, at `line` when given.
     func openFile(_ path: String, line: Int? = nil) {
         guard let rel = RelPath(path) ?? ACPFiles.projectPath(path, root: project.rootURL) else { return }

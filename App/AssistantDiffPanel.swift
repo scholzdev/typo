@@ -35,23 +35,31 @@ struct AssistantDiffPanel: View {
     }
 
     private func header(_ c: AssistantFileChange) -> some View {
-        Button {
-            if collapsed.remove(c.path) == nil { collapsed.insert(c.path) }
-        } label: {
-            HStack(spacing: 8) {
+        // The chevron folds the section; the rest of the header opens the file.
+        HStack(spacing: 8) {
+            Button {
+                if collapsed.remove(c.path) == nil { collapsed.insert(c.path) }
+            } label: {
                 Image(systemName: "chevron.down").font(.system(size: 10, weight: .semibold)).foregroundStyle(.secondary)
                     .rotationEffect(.degrees(collapsed.contains(c.path) ? -90 : 0))
+                    .frame(width: 16, height: 16).contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(collapsed.contains(c.path) ? "Expand" : "Collapse")
+            Button { model.openChange(c) } label: {
+              HStack(spacing: 8) {
                 AssistantFileIcon(path: c.path)
                 Text((c.path as NSString).lastPathComponent).lineLimit(1).truncationMode(.middle)
                 Spacer(minLength: 8)
                 AssistantChangeCounts(change: c)
+              }
+              .contentShape(Rectangle())
             }
-            .padding(.horizontal, 10).padding(.vertical, 7)
-            .background(.bar, in: RoundedRectangle(cornerRadius: 10))
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
+            .help(c.path)
         }
-        .buttonStyle(.plain)
-        .help(c.path)
+        .padding(.horizontal, 10).padding(.vertical, 7)
+        .background(.bar, in: RoundedRectangle(cornerRadius: 10))
         .contextMenu {
             Button("Revert Changes in This File") { Task { await model.revert(c) } }
         }

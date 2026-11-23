@@ -44,6 +44,11 @@ struct SplitPanes<Leading: View, Trailing: View>: NSViewRepresentable {
     final class Split: NSSplitView {
         var needsHalf = false
         var wantsTrailing = true
+        // NSSplitView keeps drawing the divider of a hidden pane at its old position: a stray line through the editor.
+        override func drawDivider(in rect: NSRect) {
+            if subviews.count == 2, subviews[1].isHidden { return }
+            super.drawDivider(in: rect)
+        }
         override func layout() {
             // The autosave restore can un-hide a trailing pane that was open when the divider was saved.
             if subviews.count == 2, subviews[1].isHidden == wantsTrailing { subviews[1].isHidden = !wantsTrailing }
