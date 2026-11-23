@@ -111,49 +111,6 @@ struct AssistantChangeCard: View {
     }
 }
 
-/// "1 Change in 1 File" above the prompt, with a list of the changes and Revert for the latest answer.
-struct AssistantChangesBar: View {
-    struct Entry: Identifiable { let id: Int; let path: String; let preview: String }
-
-    let entries: [Entry]
-    /// Nil when Revert is possible, else the tooltip that says why not.
-    var revertBlocker: String?
-    var open: (Int) -> Void = { _ in }
-    var revert: () -> Void = {}
-    @State private var listing = false
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Button { listing.toggle() } label: { Image(systemName: "list.bullet") }
-                .buttonStyle(.plain).accessibilityLabel("Show the changes").help("Lists the changes of the latest answer")
-                .popover(isPresented: $listing, arrowEdge: .top) { list }
-            Text(AssistantChangeSummary.title(changes: entries.count, files: Set(entries.map(\.path)).count)).font(.callout)
-            Spacer()
-            Button("Revert", action: revert).controlSize(.small).disabled(revertBlocker != nil)
-                .help(revertBlocker ?? "Undoes all changes of the latest answer")
-        }
-        .padding(.horizontal, 14).padding(.vertical, 6)
-        .background(.quaternary.opacity(0.35))
-        .overlay(alignment: .top) { Divider() }
-    }
-
-    private var list: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            ForEach(entries) { e in
-                Button { listing = false; open(e.id) } label: {
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text((e.path as NSString).lastPathComponent).fontWeight(.semibold)
-                        Text(e.preview).font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
-                }
-                .buttonStyle(.plain).padding(.vertical, 3)
-            }
-        }
-        .padding(10).frame(width: 280)
-    }
-}
-
 /// A soft rainbow glow around the prompt box while the assistant is answering; still with Reduce Motion.
 struct AssistantGlow: View {
     var radius: CGFloat = 12
@@ -183,7 +140,6 @@ struct AssistantGlow: View {
         AssistantChangeCard(edit: two, status: .applied, revertBlocker: "The changed text was edited since, so it cannot be reverted automatically.")
         AssistantChangeCard(edit: new, status: .pending)
         AssistantChangeCard(edit: bad, status: .failed("The text to replace was not found in gone.typ. The file may have changed since the answer."))
-        AssistantChangesBar(entries: [.init(id: 0, path: one.path, preview: "= Introduction"), .init(id: 1, path: two.path, preview: two.replace)])
         RoundedRectangle(cornerRadius: 12).fill(.background.secondary).frame(height: 70).overlay { AssistantGlow() }
     }
     .padding(16)

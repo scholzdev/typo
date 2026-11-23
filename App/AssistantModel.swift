@@ -765,20 +765,6 @@ extension FocusedValues {
         AssistantEdits.parse(m.text).enumerated().filter { m.edits[$0.offset] == .accepted }.map { ($0.offset, $0.element) }
     }
 
-    /// The latest answer, if it has changes that are still applied.
-    var latestChanges: AssistantMessage? {
-        guard let m = current?.messages.last(where: { $0.role == .assistant }), !appliedChanges(m).isEmpty else { return nil }
-        return m
-    }
-
-    func revertAll(_ m: AssistantMessage) async {
-        // Last first, so a change moved by an earlier one is reverted while its range is still the one tracked.
-        for (i, _) in appliedChanges(m).reversed() {
-            guard let fresh = current?.messages.first(where: { $0.id == m.id }) else { return }
-            await revert(fresh, i)
-        }
-    }
-
     // MARK: Transcript
 
     func setFeedback(_ m: AssistantMessage, _ good: Bool?) {

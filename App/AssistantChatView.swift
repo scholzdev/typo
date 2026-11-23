@@ -47,7 +47,6 @@ struct AssistantChatView: View {
                 transcript
                     .safeAreaInset(edge: .bottom, spacing: 0) {
                         VStack(spacing: 8) {
-                            if let latest = model.latestChanges { changesBar(latest) }
                             if let pending = model.shownPermission {
                                 AssistantPermissionBar(model: model, pending: pending)
                             } else {
@@ -120,17 +119,6 @@ struct AssistantChatView: View {
         guard let d = t.user?.created else { return nil }
         guard let p = previous?.answers.last?.created ?? previous?.user?.created else { return d }
         return !Calendar.current.isDate(d, inSameDayAs: p) || d.timeIntervalSince(p) > 3600 ? d : nil
-    }
-
-    /// "1 Change in 1 File" with the list and Revert, for the latest answer.
-    private func changesBar(_ m: AssistantMessage) -> some View {
-        let changes = model.appliedChanges(m)
-        let blocked = changes.compactMap { model.revertBlocker(m, $0.index) }
-        return AssistantChangesBar(
-            entries: changes.map { .init(id: $0.index, path: $0.edit.path, preview: $0.edit.replace.split(whereSeparator: \.isNewline).first.map(String.init) ?? "") },
-            revertBlocker: blocked.count == changes.count ? blocked.first : nil,
-            open: { i in Task { await model.showInEditor(m, i) } },
-            revert: { Task { await model.revertAll(m) } })
     }
 
     /// Asked before a message when the permission to search the web is "Ask".
