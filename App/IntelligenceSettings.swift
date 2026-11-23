@@ -301,8 +301,10 @@ private struct ProviderSettings: View {
         }
         Section {
             if preset.command?.isEmpty == true { TextField("Name", text: $provider.name) }
-            TextField("Command", text: Binding(get: { provider.command ?? "" }, set: { provider.command = $0 }), prompt: Text("agent --acp"))
-                .font(.body.monospaced())
+            LabeledContent("Command") {
+                TextField("Command", text: Binding(get: { provider.command ?? "" }, set: { provider.command = $0 }), prompt: Text("agent --acp"))
+                    .labelsHidden().multilineTextAlignment(.trailing).font(.body.monospaced())
+            }
             if let found { Text(found.text).font(.callout).foregroundStyle(found.ok ? Color.secondary : .orange) }
         } header: {
             Text("Command")

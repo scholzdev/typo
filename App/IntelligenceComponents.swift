@@ -20,7 +20,7 @@ struct SettingsHeaderCard: View {
                     Text(title).font(.system(size: 13, weight: .regular))
                     Text(text).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                     if let link {
-                        Button(link.title, action: link.action).buttonStyle(.link)
+                        Button(link.title, action: link.action).buttonStyle(.link).focusable(false)
                     }
                 }
             }
