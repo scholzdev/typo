@@ -375,7 +375,7 @@ private struct FieldEditor: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .overlay(alignment: .trailing) {
                 if let remove, hovering {
-                    Button("Remove \(label)", systemImage: "minus.circle.fill", action: remove)
+                    Button(action: remove) { Label { Text("Remove \(Text(label))") } icon: { Image(systemName: "minus.circle.fill") } }
                         .labelStyle(.iconOnly).buttonStyle(.borderless).foregroundStyle(.secondary).help("Remove Field")
                 }
             }

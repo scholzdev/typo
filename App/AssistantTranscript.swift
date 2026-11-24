@@ -387,10 +387,10 @@ struct AssistantMarkdown: View {
         var text = Text("")
         var from = a.startIndex
         for r in fileLinks {
-            text = text + Text(AttributedString(a[from..<r.upperBound])) + Text(" ") + Text(Image(systemName: "arrow.right.circle.fill")).foregroundStyle(.secondary)
+            text = Text("\(text)\(Text(AttributedString(a[from..<r.upperBound]))) \(Text(Image(systemName: "arrow.right.circle.fill")).foregroundStyle(.secondary))")
             from = r.upperBound
         }
-        return (text + Text(AttributedString(a[from..<a.endIndex])), !fileLinks.isEmpty)
+        return (Text("\(text)\(Text(AttributedString(a[from..<a.endIndex])))"), !fileLinks.isEmpty)
     }
 
     enum LineKind {

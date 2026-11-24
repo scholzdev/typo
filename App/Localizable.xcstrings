@@ -12,6 +12,7 @@
       }
     },
     " " : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -308,6 +309,12 @@
           }
         }
       }
+    },
+    "%@%@" : {
+      "shouldTranslate" : false
+    },
+    "%@%@ %@" : {
+      "shouldTranslate" : false
     },
     "%@, %lld packages" : {
       "localizations" : {
