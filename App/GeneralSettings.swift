@@ -110,6 +110,7 @@ struct GeneralSettings: View {
                 .padding(.vertical, 14).padding(.horizontal, 24)
                 .accessibilityElement(children: .combine)
             }
+            AppLanguageSection()
             Section("Starting Points") {
                 Picker("Restore open projects", selection: $restore) {
                     Text("Use System Setting").tag("system")
@@ -211,5 +212,43 @@ struct GeneralSettings: View {
             SettingsTransfer.importSettings(dict)
             transferError = nil
         } catch { transferError = error.localizedDescription }
+    }
+}
+
+/// The app's own language, as in System Settings › General › Language & Region › Applications: the choice is the
+/// app's `AppleLanguages` default, which Foundation reads at launch, so it applies after a restart.
+private struct AppLanguageSection: View {
+    private static let key = "AppleLanguages"
+    private static let launched = UserDefaults.standard.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "")?[key] as? [String]
+    @State private var choice = (launched?.first).map { String($0.prefix(2)) } ?? "system"
+
+    var body: some View {
+        Section {
+            Picker("Language", selection: $choice) {
+                Text("Use System Setting").tag("system")
+                Divider()
+                Text(verbatim: "English").tag("en")
+                Text(verbatim: "Deutsch").tag("de")
+            }
+            .onChange(of: choice) { _, c in
+                if c == "system" { UserDefaults.standard.removeObject(forKey: Self.key) } else { UserDefaults.standard.set([c], forKey: Self.key) }
+            }
+            if choice != ((Self.launched?.first).map { String($0.prefix(2)) } ?? "system") {
+                HStack {
+                    Text("The new language applies after Typo restarts.").font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Restart Typo") { Self.restart() }
+                }
+            }
+        }
+    }
+
+    /// Opens a second instance that waits for this one to quit, so the relaunch survives unsaved-changes prompts.
+    private static func restart() {
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/bin/sh")
+        p.arguments = ["-c", "while kill -0 \(getpid()) 2>/dev/null; do sleep 0.2; done; open \"$0\"", Bundle.main.bundlePath]
+        try? p.run()
+        NSApp.terminate(nil)
     }
 }

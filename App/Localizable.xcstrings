@@ -12658,6 +12658,16 @@
         }
       }
     },
+    "Restart Typo" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typo neu starten"
+          }
+        }
+      }
+    },
     "Restore All Changed Files" : {
       "localizations" : {
         "de" : {
@@ -15092,6 +15102,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Die neue Datei wurde seitdem bearbeitet."
+          }
+        }
+      }
+    },
+    "The new language applies after Typo restarts." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die neue Sprache gilt nach einem Neustart von Typo."
           }
         }
       }
