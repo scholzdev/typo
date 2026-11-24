@@ -181,8 +181,32 @@ struct ProjectWindow: View {
         }
         .focusedSceneValue(\.project, project)
         .onOpenURL { ProjectOpener(recents: recents, openWindow: openWindow).open($0) }
+        #if DEBUG
+        .background(ScreenshotFrame())
+        #endif
     }
 
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
 }
+
+#if DEBUG
+/// `-screenshotWindowFrame "x y w h"` (screen points, origin bottom left) puts a project window there once, so the
+/// docs screenshots come out the same size on every run.
+private struct ScreenshotFrame: NSViewRepresentable {
+    func makeNSView(context: Context) -> Probe { Probe() }
+    func updateNSView(_ nsView: Probe, context: Context) {}
+
+    final class Probe: NSView {
+        private var done = false
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            guard !done, let window, let spec = UserDefaults.standard.string(forKey: "screenshotWindowFrame") else { return }
+            let v = spec.split(separator: " ").compactMap { Double($0) }
+            guard v.count == 4 else { return }
+            done = true
+            DispatchQueue.main.async { window.setFrame(NSRect(x: v[0], y: v[1], width: v[2], height: v[3]), display: true) }
+        }
+    }
+}
+#endif

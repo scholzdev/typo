@@ -83,7 +83,7 @@
       <h2 id="presentation">Presentation mode</h2>
       <p><span class="path">View › Start Presentation</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>Return</kbd>), or the Play button in the toolbar, shows the pages full screen, one at a time. With a second display, such as an iPad with Sidecar, the slides go to that display and the presenter view opens on the display of your project window, as in Keynote. With one display, the slides fill it. <span class="path">View › Start Presentation with Presenter View</span> (<kbd>⌥</kbd><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Return</kbd>) also opens the presenter view on a single display, so you can rehearse.</p>
       <figure class="shot">
-        <img width="1100" height="700" src="images/presenter-view.webp" alt="The presenter view: a green bar at the top, the clock and a timer, the current slide on the left, the next slide on the right, and the presenter notes in a white panel below" loading="lazy" decoding="async">
+        <img width="900" height="573" src="images/presenter-view.webp" alt="The presenter view: a green bar at the top, the clock and a timer, the current slide on the left, the next slide on the right, and the presenter notes in a white panel below" loading="lazy" decoding="async">
         <figcaption>The presenter view shows the current and the next slide, your notes, the time and a timer.</figcaption>
       </figure>
       <p>The presenter view works like Keynote’s presenter display:</p>
@@ -115,6 +115,11 @@
       </div>
 
       <h2 id="notes">Presenter notes</h2>
+      <figure class="shot">
+        <img class="shot-light" width="900" height="550" src="images/presenter-notes-light.webp" alt="A slide deck in Typo: a presenter note card under the first slide, a small yellow note in a line of the second, note marks beside the line numbers, and the notes strip under the preview" loading="lazy" decoding="async">
+        <img class="shot-dark" width="900" height="550" src="images/presenter-notes-dark.webp" alt="A slide deck in Typo: a presenter note card under the first slide, a small yellow note in a line of the second, note marks beside the line numbers, and the notes strip under the preview" loading="lazy" decoding="async">
+        <figcaption>Notes show as cards in the editor, and the notes of the visible slide sit under the preview.</figcaption>
+      </figure>
       <p>Typo stores a note in the source as <code>#metadata("…") &lt;note&gt;</code>. It never appears in the PDF and needs no package. Notes from Touying (<code>#speaker-note[…]</code>) and Polylux (<code>#pdfpc.speaker-note(…)</code>) work too.</p>
       <ul>
         <li>To add a note, choose <span class="path">Format › Add Presenter Note</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>P</kbd>) or the item at the top of the editor’s context menu. A note card opens below the line, ready to type in.</li>

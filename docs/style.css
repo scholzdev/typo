@@ -188,12 +188,6 @@ html.js .hero-shot { transform: rotateX(calc((1 - var(--p, 1)) * 16deg)) scale(c
 .card.wide { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; overflow: hidden; }
 .card-art { margin: -38px -36px -40px 0; align-self: stretch; display: flex; align-items: flex-end; justify-content: flex-end; }
 .card-art img { width: 100%; height: 100%; object-fit: cover; object-position: left top; border-top-left-radius: 14px; box-shadow: 0 0 0 1px var(--tile-line); margin-top: 38px; }
-/* A drawn slide with its notes strip, for the presenter-notes tile. */
-.notes-art { margin-top: 38px; width: 100%; border-top-left-radius: 14px; background: var(--bg); box-shadow: 0 0 0 1px var(--tile-line); padding: 22px 0 0 22px; }
-.notes-art .slide { aspect-ratio: 16 / 9; background: var(--tile); border-radius: 8px 0 0 0; box-shadow: 0 0 0 1px var(--tile-line); padding: 16px 18px; font-weight: 600; font-size: 15px; }
-.notes-art .slide i { display: block; margin-top: 12px; height: 54%; border-radius: 6px; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, #c04fd8 14%, transparent)); }
-.notes-art .strip { background: var(--tile); border-top: 1px solid var(--tile-line); padding: 12px 18px 16px; font-size: 14px; line-height: 1.45; }
-.notes-art .strip b { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.01em; }
 .card h3 { margin: 0; font-size: 24px; line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; }
 .card.wide h3 { font-size: 32px; max-width: 16ch; }
 .card p { margin: 12px 0 0; color: var(--muted); font-size: 17px; line-height: 1.47; max-width: 46ch; }
