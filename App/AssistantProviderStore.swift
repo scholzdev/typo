@@ -47,11 +47,11 @@ extension SettingsKey {
 
     func status(_ p: AssistantProvider) -> String {
         if p.isOnDevice { return onDevice.status }
-        if p.isAgent { return isReady(p) ? "Ready" : "Enter the command" }
-        if p.baseURL.trimmingCharacters(in: .whitespaces).isEmpty { return "Add base URL" }
-        if p.preset.needsKey && !keyed.contains(p.id) { return "Add API key" }
-        if p.model.isEmpty { return "Choose a model" }
-        return "Ready"
+        if p.isAgent { return isReady(p) ? String(localized: "Ready") : String(localized: "Enter the command") }
+        if p.baseURL.trimmingCharacters(in: .whitespaces).isEmpty { return String(localized: "Add base URL") }
+        if p.preset.needsKey && !keyed.contains(p.id) { return String(localized: "Add API key") }
+        if p.model.isEmpty { return String(localized: "Choose a model") }
+        return String(localized: "Ready")
     }
 
     var hasReadyProvider: Bool { providers.contains(where: isReady) }

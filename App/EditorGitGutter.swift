@@ -211,7 +211,7 @@ extension Notification.Name {
         let b = blame[line - 1]
         cardLabel.stringValue = b.isCommitted
             ? "\(b.author) · \(b.date.formatted(.relative(presentation: .named)))\n\(b.summary)\n\(b.shortHash) · \(b.date.formatted(date: .abbreviated, time: .shortened))"
-            : "Not committed yet"
+            : String(localized: "Not committed yet")
         let size = cardLabel.fittingSize
         let screen = window.convertToScreen(ruler.convert(rect, to: nil))
         card.show(size: NSSize(width: size.width + 20, height: size.height + 14), x: screen.maxX + 4, belowY: screen.minY, aboveY: screen.maxY,
@@ -259,17 +259,17 @@ extension Notification.Name {
         case (.revert, .hunk(let h)):
             // The text may have changed since the popover opened: find the hunk again where it now is.
             guard let base, let now = GitGutterMarks.compute(base: base, current: text).hunks.first(where: { $0.oldLines == h.oldLines && $0.newLines == h.newLines }) else { return }
-            buffer.apply([now.revert(in: text)], actionName: "Revert Change")
+            buffer.apply([now.revert(in: text)], actionName: String(localized: "Revert Change"))
         case (.stage, .hunk):
             guard let project else { return }
             let path = buffer.path, line = popoverLine
             Task {
-                do { try await project.stageHunk(of: path, text: text, line: line) } catch { showAlert("Couldn’t Stage the Change", error.localizedDescription) }
+                do { try await project.stageHunk(of: path, text: text, line: line) } catch { showAlert("Couldn’t Stage the Change", error) }
                 NotificationCenter.default.post(name: .gitNeedsRefresh, object: project)
             }
         case (.keep(let choice), .conflict(let c)):
             guard let now = ConflictRegion.parse(text).first(where: { $0.mine == c.mine && $0.theirs == c.theirs }) else { return }
-            buffer.apply([now.resolution(choice, in: text)], actionName: "Resolve Conflict")
+            buffer.apply([now.resolution(choice, in: text)], actionName: String(localized: "Resolve Conflict"))
         default: break
         }
     }

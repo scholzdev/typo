@@ -41,9 +41,9 @@ struct InspectorDocumentBody: View {
         InspectorSection("Statistics") {
             InspectorRow("Pages", model.pages.formatted())
             InspectorRow("Words", model.words.formatted())
-            InspectorRow("Characters", f.characters.formatted() + " in source")
-            InspectorRow("Reading time", InspectorScan.readingMinutes(words: model.words) == 0 ? "None" : "About \(InspectorScan.readingMinutes(words: model.words)) min at \(InspectorScan.wordsPerMinute) wpm")
-            InspectorRow("Language", f.language?.identifier ?? "Not set")
+            InspectorRow("Characters", String(localized: "\(f.characters.formatted()) in source"))
+            InspectorRow("Reading time", InspectorScan.readingMinutes(words: model.words) == 0 ? String(localized: "None") : String(localized: "About \(InspectorScan.readingMinutes(words: model.words)) min at \(InspectorScan.wordsPerMinute) wpm"))
+            InspectorRow("Language", f.language?.identifier ?? String(localized: "Not set"))
         }
         InspectorSection("Words per Section") {
             let rows = model.sections.filter { $0.level > 0 || $0.words > 0 }
@@ -51,7 +51,7 @@ struct InspectorDocumentBody: View {
             ForEach(Array(rows.enumerated()), id: \.offset) { _, s in
                 Button { reveal(s) } label: {
                     HStack {
-                        Text(s.title.isEmpty ? "Before the first heading" : s.title).lineLimit(1).padding(.leading, CGFloat(max(0, s.level - 1)) * 10)
+                        Text(s.title.isEmpty ? String(localized: "Before the first heading") : s.title).lineLimit(1).padding(.leading, CGFloat(max(0, s.level - 1)) * 10)
                         Spacer(minLength: 4)
                         Text(s.words.formatted()).monospacedDigit().foregroundStyle(.secondary)
                     }

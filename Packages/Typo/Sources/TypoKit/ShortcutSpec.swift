@@ -78,24 +78,24 @@ public struct ShortcutSpec: Codable, Hashable, Sendable {
 
     /// Combinations the editor or the system uses; the recorder refuses them. (⌘W is a command here, so not listed.)
     static let reserved: [ShortcutSpec: String] = [
-        ShortcutSpec("q", [.command]): "⌘Q quits the app.",
-        ShortcutSpec("h", [.command]): "⌘H hides the app.",
-        ShortcutSpec("h", [.command, .option]): "⌥⌘H hides the other apps.",
-        ShortcutSpec(",", [.command]): "⌘, opens Settings.",
-        ShortcutSpec("c", [.command]): "⌘C copies.",
-        ShortcutSpec("v", [.command]): "⌘V pastes.",
-        ShortcutSpec("x", [.command]): "⌘X cuts.",
-        ShortcutSpec("z", [.command]): "⌘Z undoes.",
-        ShortcutSpec("z", [.command, .shift]): "⇧⌘Z redoes.",
-        ShortcutSpec("a", [.command]): "⌘A selects all.",
-        ShortcutSpec(.named(.f5)): "F5 completes in the editor.",
-        ShortcutSpec(.named(.escape), [.option]): "⌥Esc completes in the editor.",
+        ShortcutSpec("q", [.command]): String(localized: "⌘Q quits the app.", bundle: .module),
+        ShortcutSpec("h", [.command]): String(localized: "⌘H hides the app.", bundle: .module),
+        ShortcutSpec("h", [.command, .option]): String(localized: "⌥⌘H hides the other apps.", bundle: .module),
+        ShortcutSpec(",", [.command]): String(localized: "⌘, opens Settings.", bundle: .module),
+        ShortcutSpec("c", [.command]): String(localized: "⌘C copies.", bundle: .module),
+        ShortcutSpec("v", [.command]): String(localized: "⌘V pastes.", bundle: .module),
+        ShortcutSpec("x", [.command]): String(localized: "⌘X cuts.", bundle: .module),
+        ShortcutSpec("z", [.command]): String(localized: "⌘Z undoes.", bundle: .module),
+        ShortcutSpec("z", [.command, .shift]): String(localized: "⇧⌘Z redoes.", bundle: .module),
+        ShortcutSpec("a", [.command]): String(localized: "⌘A selects all.", bundle: .module),
+        ShortcutSpec(.named(.f5)): String(localized: "F5 completes in the editor.", bundle: .module),
+        ShortcutSpec(.named(.escape), [.option]): String(localized: "⌥Esc completes in the editor.", bundle: .module),
     ]
 
     /// Why the recorder refuses this combination, or nil when it is allowed.
     public var refusal: String? {
         if let why = Self.reserved[self] { return why }
-        return isValid ? nil : "Use ⌘ or ⌃ with the key, or a function key."
+        return isValid ? nil : String(localized: "Use ⌘ or ⌃ with the key, or a function key.", bundle: .module)
     }
 
     /// The old "<EventModifiers raw value>:<character>" format of the Jump to Definition setting.

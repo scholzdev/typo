@@ -8,7 +8,10 @@ struct UniverseBrowser: View {
     let installed: [String: Set<String>]
     let onInstalled: () async -> Void
 
-    enum Kind: String, CaseIterable { case all = "All", packages = "Packages only", templates = "Templates only" }
+    enum Kind: String, CaseIterable {
+        case all = "All", packages = "Packages only", templates = "Templates only"
+        var title: LocalizedStringKey { switch self { case .all: "All"; case .packages: "Packages only"; case .templates: "Templates only" } }
+    }
 
     @State private var all: [UniversePackage] = []
     @State private var loaded = false
@@ -39,7 +42,7 @@ struct UniverseBrowser: View {
             } else {
                 TextField("Search packages", text: $query).textFieldStyle(.roundedBorder).accessibilityLabel("Search packages")
                 HStack {
-                    Picker("Show", selection: $kind) { ForEach(Kind.allCases, id: \.self) { Text($0.rawValue) } }
+                    Picker("Show", selection: $kind) { ForEach(Kind.allCases, id: \.self) { Text($0.title) } }
                     Picker("Category", selection: $category) {
                         Text("All Categories").tag("")
                         ForEach(categories, id: \.self) { Text($0.capitalized).tag($0) }
@@ -55,7 +58,7 @@ struct UniverseBrowser: View {
                 Text("\(shown.count) of \(all.count) packages").font(.caption).foregroundStyle(.secondary)
             }
             HStack {
-                Text(updated.map { "Updated " + $0.formatted(.relative(presentation: .named)) } ?? "Not downloaded yet")
+                Text(updated.map { String(localized: "Updated \($0.formatted(.relative(presentation: .named)))") } ?? String(localized: "Not downloaded yet"))
                     .font(.caption).foregroundStyle(.secondary)
                 if let indexError { Text(indexError).font(.caption).foregroundStyle(.red).lineLimit(2) }
                 Spacer()
@@ -167,7 +170,7 @@ struct UniverseBrowser: View {
         .frame(width: 460)
     }
 
-    private func detailRow(_ title: String, _ value: some View) -> some View {
+    private func detailRow(_ title: LocalizedStringKey, _ value: some View) -> some View {
         GridRow {
             Text(title).foregroundStyle(.secondary).gridColumnAlignment(.trailing)
             value.textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
@@ -189,7 +192,7 @@ struct UniverseBrowser: View {
         checking = true
         indexError = nil
         do { _ = try await TypstRuntime.shared.value.refreshPackageIndex() }
-        catch { indexError = "Couldn\u{2019}t check: \(error.localizedDescription)" }
+        catch { indexError = String(localized: "Couldn\u{2019}t check: \(error.localizedDescription)") }
         await load()
         checking = false
     }

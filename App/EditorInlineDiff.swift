@@ -21,8 +21,8 @@ import TypoKit
         layer?.zPosition = 1001
         let accept = NSButton(title: "Accept", target: self, action: #selector(acceptChange))
         let reject = NSButton(title: "Reject", target: self, action: #selector(rejectChange))
-        accept.setAccessibilityLabel("Accept the assistant's change")
-        reject.setAccessibilityLabel("Reject the assistant's change")
+        accept.setAccessibilityLabel(String(localized: "Accept the assistant's change"))
+        reject.setAccessibilityLabel(String(localized: "Reject the assistant's change"))
         for b in [reject, accept] {
             b.controlSize = .small
             b.bezelStyle = .rounded

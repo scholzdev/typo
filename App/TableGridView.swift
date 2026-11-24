@@ -73,7 +73,7 @@ final class TableGridView: NSView, NSTextFieldDelegate, NSMenuItemValidation {
         popup.onPick = { [weak self] in self?.accept($0) }
         setAccessibilityElement(true)
         setAccessibilityRole(.table)
-        setAccessibilityLabel("Table cells")
+        setAccessibilityLabel(String(localized: "Table cells"))
         refresh()
     }
 
@@ -537,7 +537,11 @@ final class TableGridView: NSView, NSTextFieldDelegate, NSMenuItemValidation {
         }
     }
 
-    private func item(_ title: String, _ symbol: String? = nil, enabled: Bool = true, on: Bool = false, _ action: @escaping () -> Void) -> NSMenuItem {
+    private func item(_ title: LocalizedStringResource, _ symbol: String? = nil, enabled: Bool = true, on: Bool = false, _ action: @escaping () -> Void) -> NSMenuItem {
+        item(verbatim: String(localized: title), symbol, enabled: enabled, on: on, action)
+    }
+
+    private func item(verbatim title: String, _ symbol: String? = nil, enabled: Bool = true, on: Bool = false, _ action: @escaping () -> Void) -> NSMenuItem {
         let i = ActionMenuItem(title: title) { [weak self] in action(); self?.refresh() }
         if let symbol { i.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil) }
         i.isEnabled = enabled
@@ -558,13 +562,13 @@ final class TableGridView: NSView, NSTextFieldDelegate, NSMenuItemValidation {
         let width = spec.width
         let widthItems: [NSMenuItem] = [
             item("Auto", on: width == .auto) { [state] in state.setWidth(.auto, columns: cols) },
-            item("1fr (share the rest)", on: width == .fraction(1)) { [state] in state.setWidth(.fraction(1), columns: cols) },
-            item("2fr", on: width == .fraction(2)) { [state] in state.setWidth(.fraction(2), columns: cols) },
+            item(verbatim: "1fr (share the rest)", on: width == .fraction(1)) { [state] in state.setWidth(.fraction(1), columns: cols) },
+            item(verbatim: "2fr", on: width == .fraction(2)) { [state] in state.setWidth(.fraction(2), columns: cols) },
             item("Fixed: \(ColumnWidth.points(width.points(fallback: widths[c] / 1.25)).size!)", on: { if case .points = width { true } else { false } }()) { [state, widths] in
                 state.setWidth(.points((widths[c] / 1.25).rounded()), columns: cols)
             },
         ]
-        let widthMenu = NSMenuItem(title: "Width: \(spec.size ?? "auto")", action: nil, keyEquivalent: "")
+        let widthMenu = NSMenuItem(title: String(localized: "Width: \(spec.size ?? "auto")"), action: nil, keyEquivalent: "")
         widthMenu.image = NSImage(systemSymbolName: "arrow.left.and.right", accessibilityDescription: nil)
         widthMenu.submenu = menu(widthItems)
         return menu(alignmentItems(spec) + [.separator(), widthMenu, .separator(),
@@ -587,7 +591,7 @@ final class TableGridView: NSView, NSTextFieldDelegate, NSMenuItemValidation {
         let v: [NSMenuItem] = [("Top", "top", "arrow.up.to.line"), ("Middle", "horizon", "arrow.up.and.down"), ("Bottom", "bottom", "arrow.down.to.line")].map { t, v, s in
             item(t, s, enabled: enabled, on: spec.vertical == v) { [state] in state.setVertical(spec.vertical == v ? nil : v) }
         }
-        let vMenu = NSMenuItem(title: "Vertical Alignment", action: nil, keyEquivalent: "")
+        let vMenu = NSMenuItem(title: String(localized: "Vertical Alignment"), action: nil, keyEquivalent: "")
         vMenu.submenu = menu(v)
         vMenu.isEnabled = enabled
         return h + [vMenu]
@@ -611,14 +615,14 @@ final class TableGridView: NSView, NSTextFieldDelegate, NSMenuItemValidation {
     }
 
     private func cellMenu() -> NSMenu {
-        let insert = NSMenuItem(title: "Insert", action: nil, keyEquivalent: "")
+        let insert = NSMenuItem(title: String(localized: "Insert"), action: nil, keyEquivalent: "")
         insert.submenu = menu([
             item("Row Above", "arrow.up.to.line", enabled: state.selection.rows.lowerBound >= model.headerRows) { [state] in state.insertRows(above: true) },
             item("Row Below", "arrow.down.to.line") { [state] in state.insertRows(above: false) },
             item("Column Left", "arrow.left.to.line") { [state] in state.insertColumns(left: true) },
             item("Column Right", "arrow.right.to.line") { [state] in state.insertColumns(left: false) },
         ])
-        let delete = NSMenuItem(title: "Delete", action: nil, keyEquivalent: "")
+        let delete = NSMenuItem(title: String(localized: "Delete"), action: nil, keyEquivalent: "")
         delete.submenu = menu([
             item("Row", "trash") { [state] in state.deleteRows() },
             item("Column", "trash", enabled: state.selection.columns.count < model.columns.count) { [state] in state.deleteColumns() },
@@ -728,7 +732,7 @@ final class TableGridView: NSView, NSTextFieldDelegate, NSMenuItemValidation {
     @objc func cut(_ sender: Any?) {
         copy(sender)
         state.clearSelection()
-        state.undo.setActionName("Cut")
+        state.undo.setActionName(String(localized: "Cut"))
     }
 
     @objc func paste(_ sender: Any?) {

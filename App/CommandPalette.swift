@@ -239,12 +239,12 @@ struct LibraryView: View {
     private var fontSections: [LibrarySection] {
         let found = FontCatalog.filter(fonts, query: query, category: model.fontCategory)
         let rows = found.map { f in
-            let tags = [f.source == .project ? "Project" : f.source == .builtin ? "Built-in" : nil, f.isMonospaced ? "Mono" : nil].compactMap { $0 }
-            return LibraryRow(id: f.name, title: f.name, subtitle: (f.weights.map(FontCatalog.weightName) + (f.hasItalic ? ["Italic"] : [])).joined(separator: " · "),
+            let tags = [f.source == .project ? String(localized: "Project") : f.source == .builtin ? String(localized: "Built-in") : nil, f.isMonospaced ? String(localized: "Mono") : nil].compactMap { $0 }
+            return LibraryRow(id: f.name, title: f.name, subtitle: (f.weights.map(FontCatalog.weightName) + (f.hasItalic ? [String(localized: "Italic")] : [])).joined(separator: " · "),
                        tile: .character("Aa"), badge: tags.isEmpty ? nil : tags.joined(separator: " · "),
                        checked: model.fontPicks.contains(f.name), font: f)
         }
-        return rows.isEmpty ? [] : [(isSearching ? "Results" : "Fonts", rows)]
+        return rows.isEmpty ? [] : [(isSearching ? String(localized: "Results") : String(localized: "Fonts"), rows)]
     }
 
     private var commandSections: [LibrarySection] {
@@ -254,32 +254,32 @@ struct LibraryView: View {
         if !isSearching {
             var result: [LibrarySection] = []
             let recents = recent.compactMap { id in pool.first { $0.id == id } }.prefix(5)
-            if !recents.isEmpty { result.append(("Recently Used", recents.map(row))) }
+            if !recents.isEmpty { result.append((String(localized: "Recently Used"), recents.map(row))) }
             for menu in Self.menus {
                 let items = pool.filter { $0.menuKey == menu }
-                if !items.isEmpty { result.append((menu, items.map(row))) }
+                if let first = items.first { result.append((String(localized: first.menu), items.map(row))) }
             }
             return result
         }
         let byID = Dictionary(pool.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         let ranked = CommandPalette.filter(pool.map(\.entry), query: query, recent: recent).compactMap { byID[$0.id] }
-        return ranked.isEmpty ? [] : [("Results", ranked.map(row))]
+        return ranked.isEmpty ? [] : [(String(localized: "Results"), ranked.map(row))]
     }
 
     private var snippetSections: [LibrarySection] {
-        func row(_ s: LibrarySnippet) -> LibraryRow { LibraryRow(id: s.id, title: s.title, tile: .symbol(s.symbol), badge: s.category == UserSnippetStore.category ? "User" : s.isBlock ? "Block" : "Inline") }
+        func row(_ s: LibrarySnippet) -> LibraryRow { LibraryRow(id: s.id, title: s.title, tile: .symbol(s.symbol), badge: s.category == UserSnippetStore.category ? String(localized: "User") : s.isBlock ? String(localized: "Block") : String(localized: "Inline")) }
         let recent = recent(snippetRecentStorage)
         let user = userSnippets
         if isSearching {
             let q = query.trimmingCharacters(in: .whitespaces).lowercased()
             let mine = user.filter { $0.title.lowercased().contains(q) || $0.summary.lowercased().contains(q) || $0.plainText.lowercased().contains(q) }
             let found = mine + LibrarySnippets.filter(query, recent: recent)
-            return found.isEmpty ? [] : [("Results", found.map(row))]
+            return found.isEmpty ? [] : [(String(localized: "Results"), found.map(row))]
         }
         var result: [LibrarySection] = []
         if !user.isEmpty { result.append((UserSnippetStore.category, user.map(row))) }
         let recents = recent.compactMap { id in snippet(id) }.prefix(5)
-        if !recents.isEmpty { result.append(("Recently Used", recents.map(row))) }
+        if !recents.isEmpty { result.append((String(localized: "Recently Used"), recents.map(row))) }
         for category in LibrarySnippets.categories {
             result.append((category, LibrarySnippets.all.filter { $0.category == category }.map(row)))
         }
@@ -296,14 +296,14 @@ struct LibraryView: View {
             let folder = (path.raw as NSString).deletingLastPathComponent
             return LibraryRow(id: path.raw, title: (path.raw as NSString).lastPathComponent, subtitle: folder.isEmpty ? nil : folder, tile: .thumbnail(project.url(for: path)))
         }
-        return rows.isEmpty ? [] : [(isSearching ? "Results" : "Images", rows)]
+        return rows.isEmpty ? [] : [(isSearching ? String(localized: "Results") : String(localized: "Images"), rows)]
     }
 
     private var symbolSections: [LibrarySection] {
         let found = SymbolCatalog.filter(SymbolCatalog.all, query: query, recent: recentSymbols.ids)
         let shown = isSearching ? found : Array(found.prefix(Self.symbolLimit))
         let rows = shown.map { LibraryRow(id: $0.id, title: $0.name, subtitle: $0.id, tile: .character($0.text)) }
-        return rows.isEmpty ? [] : [(isSearching ? "Results" : "Symbols", rows)]
+        return rows.isEmpty ? [] : [(isSearching ? String(localized: "Results") : String(localized: "Symbols"), rows)]
     }
 
     /// Rows in display order; a row may appear twice (Recently Used and its group), selection follows the first.
@@ -496,7 +496,7 @@ struct LibraryView: View {
 
     private var notTypst: some View { Text("Open a Typst file to insert.").font(.callout).foregroundStyle(.secondary) }
 
-    private func insertBar(_ title: String, id: String, extra: AnyView? = nil) -> some View {
+    private func insertBar(_ title: LocalizedStringKey, id: String, extra: AnyView? = nil) -> some View {
         VStack(alignment: .trailing, spacing: 6) {
             if kind != .commands, target == nil { notTypst }
             HStack {
@@ -517,10 +517,10 @@ struct LibraryView: View {
         case .commands:
             guard let command = commands.first(where: { $0.id == row.id }) else { return nil }
             return AnyView(VStack(alignment: .leading, spacing: 12) {
-                detailHeader(String(localized: command.title), command.help)
+                detailHeader(String(localized: command.title), command.help.map { String(localized: $0) } ?? "")
                 Grid(alignment: .leadingFirstTextBaseline, horizontalSpacing: 10, verticalSpacing: 6) {
                     GridRow { label("Menu"); Text(command.menu) }
-                    GridRow { label("Shortcut"); Text(command.shortcut?.display ?? "None") }
+                    GridRow { label("Shortcut"); Text(command.shortcut?.display ?? String(localized: "None")) }
                     if let isOn = command.isOn { GridRow { label("State"); Text(isOn ? "On" : "Off") } }
                 }
                 Spacer()
@@ -581,7 +581,7 @@ struct LibraryView: View {
         if let i = model.fontPicks.firstIndex(of: name) { model.fontPicks.remove(at: i) } else { model.fontPicks.append(name) }
     }
 
-    private func label(_ text: String) -> some View {
+    private func label(_ text: LocalizedStringKey) -> some View {
         Text(text).foregroundStyle(.secondary).gridColumnAlignment(.trailing)
     }
 
@@ -626,7 +626,7 @@ struct LibraryView: View {
             let open = NSOpenPanel()
             open.allowedContentTypes = [.image, .pdf]
             open.allowsMultipleSelection = true
-            open.prompt = "Add"
+            open.prompt = String(localized: "Add")
             guard open.runModal() == .OK, !open.urls.isEmpty else { return }
             target.insertImages(.files(open.urls), replacing: target.textView?.selectedRange() ?? NSRange(location: 0, length: 0))
         }

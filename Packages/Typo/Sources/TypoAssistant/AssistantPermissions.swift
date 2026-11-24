@@ -6,7 +6,7 @@ public enum AssistantTool: String, Sendable, Equatable { case webSearch }
 public enum PermissionPolicy: String, Codable, CaseIterable, Sendable {
     case allow, ask, never
     public var title: String {
-        switch self { case .allow: "Allow"; case .ask: "Ask"; case .never: "Never" }
+        switch self { case .allow: String(localized: "Allow", bundle: .module); case .ask: String(localized: "Ask", bundle: .module); case .never: String(localized: "Never", bundle: .module) }
     }
 }
 
@@ -19,27 +19,27 @@ public enum AssistantPermission: String, Codable, CaseIterable, Identifiable, Se
 
     public var title: String {
         switch self {
-        case .webSearch: "Search the web"
-        case .readFiles: "Read the attached files"
-        case .diagnostics: "Include compiler errors"
-        case .changeFiles: "Change files"
-        case .createFiles: "Create new files"
-        case .projectFiles: "Read project files"
-        case .searchProject: "Search the project"
-        case .viewPreview: "View the preview"
+        case .webSearch: String(localized: "Search the web", bundle: .module)
+        case .readFiles: String(localized: "Read the attached files", bundle: .module)
+        case .diagnostics: String(localized: "Include compiler errors", bundle: .module)
+        case .changeFiles: String(localized: "Change files", bundle: .module)
+        case .createFiles: String(localized: "Create new files", bundle: .module)
+        case .projectFiles: String(localized: "Read project files", bundle: .module)
+        case .searchProject: String(localized: "Search the project", bundle: .module)
+        case .viewPreview: String(localized: "View the preview", bundle: .module)
         }
     }
 
     public var detail: String {
         switch self {
-        case .webSearch: "The provider runs web searches for the answer. Your search queries go to the provider."
-        case .readFiles: "Files go to the provider only when you attach them. This cannot be turned off."
-        case .diagnostics: "“Fix the compile errors” sends the current errors with your message."
-        case .changeFiles: "Allow: changes are applied right away and can be reverted. Ask: they are shown and applied when you press Accept. Never: the assistant does not change files."
-        case .createFiles: "Allow: new files are created right away and can be reverted. Ask: they are created when you press Accept. Never: the assistant does not create files."
-        case .projectFiles: "The assistant may read any file of the project, and its outline, to answer. The text goes to the provider."
-        case .searchProject: "The assistant may list the project's files and search them. Matching lines go to the provider."
-        case .viewPreview: "The assistant may render a page of the preview as an image to check the layout. The image goes to the provider."
+        case .webSearch: String(localized: "The provider runs web searches for the answer. Your search queries go to the provider.", bundle: .module)
+        case .readFiles: String(localized: "Files go to the provider only when you attach them. This cannot be turned off.", bundle: .module)
+        case .diagnostics: String(localized: "“Fix the compile errors” sends the current errors with your message.", bundle: .module)
+        case .changeFiles: String(localized: "Allow: changes are applied right away and can be reverted. Ask: they are shown and applied when you press Accept. Never: the assistant does not change files.", bundle: .module)
+        case .createFiles: String(localized: "Allow: new files are created right away and can be reverted. Ask: they are created when you press Accept. Never: the assistant does not create files.", bundle: .module)
+        case .projectFiles: String(localized: "The assistant may read any file of the project, and its outline, to answer. The text goes to the provider.", bundle: .module)
+        case .searchProject: String(localized: "The assistant may list the project's files and search them. Matching lines go to the provider.", bundle: .module)
+        case .viewPreview: String(localized: "The assistant may render a page of the preview as an image to check the layout. The image goes to the provider.", bundle: .module)
         }
     }
 

@@ -138,7 +138,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     await confirmChangedFiles(project)
     while true {
         do { return try await project.saveAll() } catch {
-            if !confirm("Couldn't Save Changes", project.saveError ?? "\(error)", ok: "Retry", cancel: "Discard Changes") { return }
+            if !confirm("Couldn't Save Changes", verbatim: project.saveError ?? "\(error)", ok: "Retry", cancel: "Discard Changes") { return }
         }
     }
 }

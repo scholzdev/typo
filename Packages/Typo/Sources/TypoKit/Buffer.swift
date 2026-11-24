@@ -226,7 +226,7 @@ public typealias EditActions = NSTextStorage.EditActions
     /// Nil leaves the key to the text view.
     public func indentAtCaret(_ selection: NSRange) -> NSRange? {
         guard let o = Indent.tab(in: storage.string, from: selection, settings: indentSettings) else { return nil }
-        apply(o.edits, actionName: "Indent")
+        apply(o.edits, actionName: String(localized: "Indent", bundle: .module))
         return o.selection
     }
 
@@ -235,7 +235,7 @@ public typealias EditActions = NSTextStorage.EditActions
     public func outdentAtCaret(_ selection: NSRange, anywhere: Bool = false) -> NSRange? {
         if anywhere, indentSettings.tabKey != .always { return nil }
         guard let o = Indent.outdent(in: storage.string, from: selection, settings: indentSettings, anywhere: anywhere) else { return nil }
-        apply(o.edits, actionName: "Outdent")
+        apply(o.edits, actionName: String(localized: "Outdent", bundle: .module))
         return o.selection
     }
 
@@ -250,7 +250,7 @@ public typealias EditActions = NSTextStorage.EditActions
         guard isTypst, let o = Reindent.edits(in: storage.string, selection: selection,
                                               spans: syntax.spans(in: NSRange(location: 0, length: storage.length)), settings: indentSettings)
         else { return nil }
-        apply(o.edits, actionName: "Re-Indent")
+        apply(o.edits, actionName: String(localized: "Re-Indent", bundle: .module))
         return o.selection
     }
 
@@ -341,10 +341,10 @@ extension Buffer {
     }
 
     /// Puts the text the change replaced back, as one undo step; other edits of the file stay. False when `canRevert` is false.
-    @discardableResult public func revertAssistant(_ id: UUID, actionName: String? = "Revert Assistant Change") -> Bool {
+    @discardableResult public func revertAssistant(_ id: UUID, actionName: String? = nil) -> Bool {
         guard canRevert(id), let c = aiChanges.first(where: { $0.id == id }) else { return false }
         aiChanges.removeAll { $0.id == id }
-        apply([Replacement(range: c.range, text: c.original)], actionName: actionName)
+        apply([Replacement(range: c.range, text: c.original)], actionName: actionName ?? String(localized: "Revert Assistant Change", bundle: .module))
         return true
     }
 }

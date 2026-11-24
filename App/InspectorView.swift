@@ -14,9 +14,9 @@ enum InspectorTab: String, CaseIterable, Identifiable {
     }
     var title: String {
         switch self {
-        case .file: "File"
-        case .document: "Document"
-        case .selection: "Selection"
+        case .file: String(localized: "File")
+        case .document: String(localized: "Document")
+        case .selection: String(localized: "Selection")
         }
     }
 }
@@ -57,9 +57,9 @@ struct InspectorView: View {
 
 /// A titled group of rows, Xcode style.
 struct InspectorSection<Content: View>: View {
-    let title: String
+    let title: LocalizedStringKey
     @ViewBuilder let content: Content
-    init(_ title: String, @ViewBuilder content: () -> Content) { self.title = title; self.content = content() }
+    init(_ title: LocalizedStringKey, @ViewBuilder content: () -> Content) { self.title = title; self.content = content() }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -73,9 +73,9 @@ struct InspectorSection<Content: View>: View {
 
 /// "Label: value" with the value selectable.
 struct InspectorRow: View {
-    let label: String
+    let label: LocalizedStringKey
     let value: String
-    init(_ label: String, _ value: String) { self.label = label; self.value = value }
+    init(_ label: LocalizedStringKey, _ value: String) { self.label = label; self.value = value }
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -89,7 +89,7 @@ struct InspectorRow: View {
 
 /// A text box that writes on Return or when it loses focus, and only when the text changed.
 struct InspectorField: View {
-    let title: String
+    let title: LocalizedStringKey
     let value: String
     let commit: (String) -> Void
     @State private var draft = ""

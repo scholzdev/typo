@@ -67,14 +67,14 @@ struct FontDetail: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(sample.isEmpty ? "The quick brown fox" : sample).font(fontSwiftUI(family, descriptors: descriptors, size: 28)).lineLimit(2).minimumScaleFactor(0.5)
+            Text(sample.isEmpty ? String(localized: "The quick brown fox") : sample).font(fontSwiftUI(family, descriptors: descriptors, size: 28)).lineLimit(2).minimumScaleFactor(0.5)
                 .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
             TextField("Sample Text", text: $sample).textFieldStyle(.roundedBorder)
             Text(family.name).font(.system(size: 17, weight: .bold))
             Text(sourceNote).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             // Weights as the chips the row shows, then every style spelled out.
-            FlowChips(chips: family.weights.map { FontCatalog.weightName($0) } + (family.hasItalic ? ["Italic"] : []) + (family.isMonospaced ? ["Mono"] : []))
-            Text("Styles: " + family.faces.map(\.style).joined(separator: ", ")).font(.caption).foregroundStyle(.secondary).lineLimit(3)
+            FlowChips(chips: family.weights.map { FontCatalog.weightName($0) } + (family.hasItalic ? [String(localized: "Italic")] : []) + (family.isMonospaced ? [String(localized: "Mono")] : []))
+            Text("Styles: \(family.faces.map(\.style).joined(separator: ", "))").font(.caption).foregroundStyle(.secondary).lineLimit(3)
             Text(FontCatalog.setRule(names)).font(.system(.callout, design: .monospaced)).textSelection(.enabled).padding(8)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color(nsColor: .separatorColor), lineWidth: 1))
@@ -90,9 +90,9 @@ struct FontDetail: View {
 
     private var sourceNote: String {
         switch family.source {
-        case .builtin: "Built into Typst: available on every machine."
-        case .project: "A font file in this project: it travels with the project and wins over an installed font of the same name."
-        case .system: "Installed on this Mac, so exports on other machines may substitute it."
+        case .builtin: String(localized: "Built into Typst: available on every machine.")
+        case .project: String(localized: "A font file in this project: it travels with the project and wins over an installed font of the same name.")
+        case .system: String(localized: "Installed on this Mac, so exports on other machines may substitute it.")
         }
     }
 }

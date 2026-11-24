@@ -5,7 +5,7 @@ import TypoKit
 enum CaretShape: String, CaseIterable, Identifiable {
     case bar, block, underline
     var id: String { rawValue }
-    var title: String { switch self { case .bar: "Vertical Bar"; case .block: "Block"; case .underline: "Underline" } }
+    var title: String { switch self { case .bar: String(localized: "Vertical Bar"); case .block: String(localized: "Block"); case .underline: String(localized: "Underline") } }
     var symbol: String { switch self { case .bar: "character.cursor.ibeam"; case .block: "square.fill"; case .underline: "underline" } }
 }
 
@@ -13,7 +13,7 @@ enum CaretShape: String, CaseIterable, Identifiable {
 enum AppAppearance: String, CaseIterable, Identifiable {
     case light, dark, system    // in System Settings' order
     var id: String { rawValue }
-    var title: String { switch self { case .system: "Auto"; case .light: "Light"; case .dark: "Dark" } }
+    var title: String { switch self { case .system: String(localized: "Auto"); case .light: String(localized: "Light"); case .dark: String(localized: "Dark") } }
 
     @MainActor static func apply() {
         let a = AppAppearance(rawValue: UserDefaults.standard.string(forKey: SettingsKey.appAppearance) ?? "") ?? .system

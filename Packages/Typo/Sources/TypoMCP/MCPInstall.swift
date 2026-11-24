@@ -37,8 +37,8 @@ public enum MCPInstall {
             if let old { try old.write(to: url.appendingPathExtension("bak"), options: .atomic) }
             try merged.write(to: url, options: .atomic)
         } catch {
-            return (false, "The Claude Desktop settings could not be written: \(error.localizedDescription)")
+            return (false, String(localized: "The Claude Desktop settings could not be written: \(error.localizedDescription)", bundle: .module))
         }
-        return (true, "Added. Restart Claude Desktop to use it.")
+        return (true, String(localized: "Added. Restart Claude Desktop to use it.", bundle: .module))
     }
 }

@@ -66,7 +66,7 @@ struct SourceControlSettings: View {
                 }
             }
             Section("Settings") {
-                Button { nav.page = SettingsSubpage(tab: .sourceControl, id: "git", title: "Git Settings") } label: {
+                Button { nav.page = SettingsSubpage(tab: .sourceControl, id: "git", title: String(localized: "Git Settings")) } label: {
                     HStack {
                         Text("Git settings")
                         Spacer()
@@ -241,7 +241,7 @@ private struct SignInForm: View {
             .textFieldStyle(.roundedBorder)
             .disabled(busy)
             VStack(spacing: 4) {
-                Text("\(host.name) \(host == .bitbucketCloud ? "app passwords need these permissions" : "personal access tokens must have these scopes set"):")
+                Text(host == .bitbucketCloud ? "\(host.name) app passwords need these permissions:" : "\(host.name) personal access tokens must have these scopes set:")
                     .bold()
                 ForEach(host.requiredScopes, id: \.self) { Text("✓ \($0)") }
             }

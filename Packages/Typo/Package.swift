@@ -27,16 +27,17 @@ let package = Package(
         .target(
             name: "TypstEngine",
             dependencies: ["TypstBridge"],
+            resources: [.process("Localizable.xcstrings")],
             linkerSettings: [
                 .linkedFramework("Security"),
                 .linkedFramework("CoreFoundation"),
                 .linkedFramework("SystemConfiguration"),
             ]
         ),
-        .target(name: "TypoKit", dependencies: ["TypstEngine"]),
-        .target(name: "TypoAssistant", dependencies: ["TypoKit"]),
-        .target(name: "TypoACP", dependencies: ["ACPProtocol", "TypoAssistant"]),
-        .target(name: "TypoMCP", dependencies: ["MCPProtocol", "TypoKit"]),
+        .target(name: "TypoKit", dependencies: ["TypstEngine"], resources: [.process("Localizable.xcstrings")]),
+        .target(name: "TypoAssistant", dependencies: ["TypoKit"], resources: [.process("Localizable.xcstrings")]),
+        .target(name: "TypoACP", dependencies: ["ACPProtocol", "TypoAssistant"], resources: [.process("Localizable.xcstrings")]),
+        .target(name: "TypoMCP", dependencies: ["MCPProtocol", "TypoKit"], resources: [.process("Localizable.xcstrings")]),
 
         .target(name: "TypoTestSupport", dependencies: ["TypoKit", "TypstEngine"], path: "Tests/TypoTestSupport", resources: [.copy("Fixtures")]),
         .testTarget(name: "JSONRPCTests", dependencies: ["JSONRPC"]),

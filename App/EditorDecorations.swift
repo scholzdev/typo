@@ -85,7 +85,7 @@ import TypstEngine
     override func accessibilityChildren() -> [Any]? {
         swatchHits.map { hit in
             let e = NSAccessibilityElement.element(withRole: .button, frame: window?.convertToScreen(convert(hit.rect, to: nil)) ?? hit.rect,
-                                                   label: "Pick color", parent: self)
+                                                   label: String(localized: "Pick color"), parent: self)
             return e
         }
     }
@@ -440,7 +440,7 @@ extension EditorView.Coordinator {
         let same = { (a: Double, b: CGFloat) in abs(a - Double(b)) < 0.5 / 255 }
         guard !(same(old.red, c.redComponent) && same(old.green, c.greenComponent) && same(old.blue, c.blueComponent) && same(old.alpha, c.alphaComponent)) else { return }
         let text = ColorLiterals.source(red: c.redComponent, green: c.greenComponent, blue: c.blueComponent, alpha: c.alphaComponent)
-        buffer.apply([Replacement(range: range, text: text)], actionName: "Change Color")
+        buffer.apply([Replacement(range: range, text: text)], actionName: String(localized: "Change Color"))
         swatchRange = NSRange(location: range.location, length: (text as NSString).length)
         decor?.refresh()
     }
@@ -481,7 +481,7 @@ private struct ColorWheel: View {
 /// Whether the swatch popover shows the colour wheel (hue and saturation, then brightness) above the channel sliders.
 enum ColorPickerStyle: String, CaseIterable {
     case wheel, sliders
-    var title: String { self == .wheel ? "Color Wheel" : "RGB Sliders" }
+    var title: String { self == .wheel ? String(localized: "Color Wheel") : String(localized: "RGB Sliders") }
 }
 
 struct ColorPopoverView: View {
@@ -499,7 +499,7 @@ struct ColorPopoverView: View {
     }
 
     /// Red, green and blue edit as 0–255, alpha as a percentage, like Typst's own `rgb` arguments.
-    private static let channels: [(name: String, scale: Double, unit: String)] = [("Red", 255, ""), ("Green", 255, ""), ("Blue", 255, ""), ("Alpha", 100, "%")]
+    private static let channels: [(name: String, scale: Double, unit: String)] = [(String(localized: "Red"), 255, ""), (String(localized: "Green"), 255, ""), (String(localized: "Blue"), 255, ""), (String(localized: "Alpha"), 100, "%")]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {

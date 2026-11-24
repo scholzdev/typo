@@ -12,10 +12,10 @@ public enum OnDeviceAvailability: Equatable, Sendable {
     /// The provider row's status line.
     public var status: String {
         switch self {
-        case .available: "Runs on this Mac"
-        case .deviceNotEligible: "This Mac does not support Apple Intelligence"
-        case .appleIntelligenceNotEnabled: "Turn on Apple Intelligence in System Settings"
-        case .modelNotReady: "The model is still downloading. Try again later."
+        case .available: String(localized: "Runs on this Mac", bundle: .module)
+        case .deviceNotEligible: String(localized: "This Mac does not support Apple Intelligence", bundle: .module)
+        case .appleIntelligenceNotEnabled: String(localized: "Turn on Apple Intelligence in System Settings", bundle: .module)
+        case .modelNotReady: String(localized: "The model is still downloading. Try again later.", bundle: .module)
         }
     }
 }
@@ -143,14 +143,14 @@ public enum AppleOnDeviceModel {
             switch e {
             case .contextSizeExceeded: return AssistantError.passageTooLarge
             case .guardrailViolation, .refusal: return AssistantError.declined
-            case .unsupportedLanguageOrLocale: return AssistantError.onDevice("The on-device model does not support this language.")
+            case .unsupportedLanguageOrLocale: return AssistantError.onDevice(String(localized: "The on-device model does not support this language.", bundle: .module))
             case .rateLimited: return AssistantError.rateLimited(retryAfter: nil)
             default: return AssistantError.onDevice(e.localizedDescription)
             }
         }
         // macOS 27 moved the old GenerationError cases to LanguageModelError (above) and this one.
         if let e = error as? SystemLanguageModel.Error, case .assetsUnavailable = e {
-            return AssistantError.onDevice("The on-device model is still downloading or not available on this Mac.")
+            return AssistantError.onDevice(String(localized: "The on-device model is still downloading or not available on this Mac.", bundle: .module))
         }
         return error
     }

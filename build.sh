@@ -62,12 +62,19 @@ if ! xcodebuild -project Typo.xcodeproj -scheme Typo -configuration "$config" -d
     exit 1
 fi
 
-# Xcode fills the String Catalog only when it builds in the IDE; this does the same from the command line.
-stringsdata=$(find "$derived/Build/Intermediates.noindex/Typo.build/$config/Typo.build" -name '*.stringsdata' 2>/dev/null)
-if [[ -n $stringsdata ]]; then
-    args=(); while IFS= read -r f; do args+=(--stringsdata "$f"); done <<<"$stringsdata"
-    xcrun xcstringstool sync App/Localizable.xcstrings "${args[@]}"
-fi
+# Xcode fills the String Catalogs only when it builds in the IDE; this does the same from the command line:
+# the app's, then one per package module that has user-visible strings.
+sync_catalog() {  # catalog, build folder of its target
+    local stringsdata args=()
+    stringsdata=$(find "$derived/Build/Intermediates.noindex/Typo.build/$config/$2" -name '*.stringsdata' 2>/dev/null)
+    [[ -n $stringsdata ]] || return 0
+    while IFS= read -r f; do args+=(--stringsdata "$f"); done <<<"$stringsdata"
+    xcrun xcstringstool sync "$1" "${args[@]}"
+}
+sync_catalog App/Localizable.xcstrings Typo.build
+for module in TypstEngine TypoKit TypoAssistant TypoACP TypoMCP; do
+    sync_catalog "Packages/Typo/Sources/$module/Localizable.xcstrings" "$module-t.build"
+done
 
 rm -rf build/Typo.app
 cp -R "$derived/Build/Products/$config/Typo.app" build/Typo.app

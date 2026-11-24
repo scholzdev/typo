@@ -53,17 +53,18 @@ struct AssistantPermissionBar: View {
         }
     }
 
-    private var agent: String { (model.provider?.name ?? "The agent").replacingOccurrences(of: " (ACP)", with: "") }
+    private var agent: String { (model.provider?.name ?? String(localized: "The agent")).replacingOccurrences(of: " (ACP)", with: "") }
 
     private func option(_ kind: String) -> ACPOption? { pending.options.first { $0.kind == kind } }
 
     /// File access names the file, project files by their project path; anything else names the tool call.
     private var question: AttributedString {
         let paths = pending.call.paths.map { ACPFiles.projectPath($0, root: model.project.rootURL)?.raw ?? $0 }
-        let access = pending.call.kind == "read" ? "Read" : "Read and Write"
+        let access = pending.call.kind == "read" ? String(localized: "Read") : String(localized: "Read and Write")
+        let what = pending.call.title.isEmpty ? String(localized: "continue") : pending.call.title
         let text = (pending.call.changesFiles || pending.call.kind == "read") && !paths.isEmpty
-            ? "Do you want to allow \(agent) **\(access)** access to **\(paths.joined(separator: ", "))**?"
-            : "Do you want to allow \(agent) to **\(pending.call.title.isEmpty ? "continue" : pending.call.title)**?"
+            ? String(localized: "Do you want to allow \(agent) **\(access)** access to **\(paths.joined(separator: ", "))**?")
+            : String(localized: "Do you want to allow \(agent) to **\(what)**?")
         return (try? AttributedString(markdown: text)) ?? AttributedString(text)
     }
 
@@ -96,7 +97,7 @@ struct AssistantPermissionBar: View {
         }
     }
 
-    private func splitButton<M: View>(_ title: String, disabled: Bool, action: @escaping () -> Void, @ViewBuilder menu: () -> M) -> some View {
+    private func splitButton<M: View>(_ title: LocalizedStringKey, disabled: Bool, action: @escaping () -> Void, @ViewBuilder menu: () -> M) -> some View {
         HStack(spacing: 0) {
             Button(action: action) {
                 Text(title).frame(maxWidth: .infinity).padding(.vertical, 6).contentShape(Rectangle())

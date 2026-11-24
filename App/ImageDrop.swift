@@ -69,7 +69,7 @@ extension EditorView.Coordinator {
             case .data(let png): paths = [try project.addPastedImage(png)]; created = paths
             }
         } catch {
-            return showAlert("Couldn’t Add the Image", error.localizedDescription)
+            return showAlert("Couldn’t Add the Image", error)
         }
         Task {
             let labels = await project.labelIndex()

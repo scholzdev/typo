@@ -75,9 +75,9 @@ struct AssistantConversationList: View {
         }
     }
 
-    private func capsule(_ title: String, _ symbol: String, help: String, _ action: @escaping () -> Void) -> some View {
+    private func capsule(_ title: LocalizedStringKey, _ symbol: String, help: LocalizedStringKey, _ action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Label(title, systemImage: symbol).font(.system(size: 12, weight: .medium)).lineLimit(1)
+            Label(title, systemImage: symbol).font(.system(size: 12, weight: .medium)).lineLimit(1).minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity).padding(.vertical, 5)
                 .background(.quaternary.opacity(0.7), in: Capsule())
                 .contentShape(Capsule())
@@ -203,8 +203,8 @@ struct AssistantConversationRow: View {
     /// "Today, 21:57", "Yesterday, 09:10", else the date with the time.
     static func relative(_ d: Date) -> String {
         let cal = Calendar.current, time = d.formatted(date: .omitted, time: .shortened)
-        if cal.isDateInToday(d) { return "Today, \(time)" }
-        if cal.isDateInYesterday(d) { return "Yesterday, \(time)" }
+        if cal.isDateInToday(d) { return String(localized: "Today, \(time)") }
+        if cal.isDateInYesterday(d) { return String(localized: "Yesterday, \(time)") }
         return d.formatted(date: .abbreviated, time: .shortened)
     }
 }

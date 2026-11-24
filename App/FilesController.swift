@@ -170,11 +170,11 @@ import TypstEngine
     /// Finder's prompt for moving onto an existing name.
     private func askNameClash(_ name: String) -> NameClash {
         let alert = NSAlert()
-        alert.messageText = "An item named \u{201C}\(name)\u{201D} already exists in this location."
-        alert.informativeText = "Do you want to replace it with the one you\u{2019}re moving?"
-        alert.addButton(withTitle: "Keep Both")
-        alert.addButton(withTitle: "Stop")
-        alert.addButton(withTitle: "Replace")
+        alert.messageText = String(localized: "An item named \u{201C}\(name)\u{201D} already exists in this location.")
+        alert.informativeText = String(localized: "Do you want to replace it with the one you\u{2019}re moving?")
+        alert.addButton(withTitle: String(localized: "Keep Both"))
+        alert.addButton(withTitle: String(localized: "Stop"))
+        alert.addButton(withTitle: String(localized: "Replace"))
         switch alert.runModal() {
         case .alertFirstButtonReturn: return .keepBoth
         case .alertThirdButtonReturn: return .replace
@@ -255,7 +255,7 @@ import TypstEngine
         }
     }
 
-    func fail(_ title: String, _ error: any Error) {
-        showAlert(title, error.localizedDescription)
+    func fail(_ title: LocalizedStringResource, _ error: any Error) {
+        showAlert(title, error)
     }
 }

@@ -67,7 +67,7 @@ struct AssistantChatView: View {
         HStack(spacing: 6) {
             Image(systemName: "sparkles").foregroundStyle(.secondary)
             Image(systemName: "chevron.right").font(.system(size: 9, weight: .semibold)).foregroundStyle(.tertiary)
-            Text(model.current?.title ?? "New Conversation").font(.system(size: 12)).lineLimit(1)
+            Text(model.current?.title ?? String(localized: "New Conversation")).font(.system(size: 12)).lineLimit(1)
             Spacer()
             if model.current?.messages.contains(where: { !$0.edits.isEmpty }) == true || model.showsDiff {
                 Toggle("Changes", systemImage: "plusminus", isOn: Binding(get: { model.showsDiff }, set: { model.showsDiff = $0 }))
@@ -260,7 +260,7 @@ struct AssistantEditCard: View {
         case .accepted?: .applied
         case .reverted?: .reverted
         case .rejected?: .rejected
-        case .failed?: .failed(message.editFailures?[index] ?? "The change was not applied.")
+        case .failed?: .failed(message.editFailures?[index] ?? String(localized: "The change was not applied."))
         case nil:
             if case .failed(let why) = model.resolution(edit) { .failed(why) } else { .pending }
         }
@@ -321,7 +321,7 @@ struct AssistantPromptBox: View {
     private var providerName: String { (model.provider?.name ?? "the assistant").replacingOccurrences(of: " (ACP)", with: "") }
 
     private var placeholder: String {
-        model.current?.messages.isEmpty == false ? "Follow up with \(providerName)" : "New conversation with \(providerName)"
+        model.current?.messages.isEmpty == false ? String(localized: "Follow up with \(providerName)") : String(localized: "New conversation with \(providerName)")
     }
 
     private var attachmentChips: some View {
@@ -429,13 +429,18 @@ struct AssistantPromptBox: View {
 
     private var picks: [(String, () -> Void)] {
         var out: [(String, () -> Void)] = []
-        if model.hasErrors, model.permissions.policy(.diagnostics) != .never { out.append(("Help me fix the compile errors", { model.send(.fixErrors) })) }
-        if model.hasSelection { out.append(("Explain the selected text", { model.send(.explain) })) }
+        if model.hasErrors, model.permissions.policy(.diagnostics) != .never { out.append((String(localized: "Help me fix the compile errors"), { model.send(.fixErrors) })) }
+        if model.hasSelection { out.append((String(localized: "Explain the selected text"), { model.send(.explain) })) }
         if model.project.isRepository {
-            out.append(("Review the changes I made on this branch", { model.send("Review the changes I made on this branch.") }))
+            out.append((String(localized: "Review the changes I made on this branch"), { model.send("Review the changes I made on this branch.") }))
         }
-        for t in ["Explain this project's structure", "Improve the wording of this section", "Check my citations", "Make my tables consistent"] {
-            out.append((t, { model.send(t + ".") }))
+        // The labels are translated; what is sent to the model stays English.
+        let ideas = [(String(localized: "Explain this project's structure"), "Explain this project's structure"),
+                     (String(localized: "Improve the wording of this section"), "Improve the wording of this section"),
+                     (String(localized: "Check my citations"), "Check my citations"),
+                     (String(localized: "Make my tables consistent"), "Make my tables consistent")]
+        for (label, prompt) in ideas {
+            out.append((label, { model.send(prompt + ".") }))
         }
         return out
     }
@@ -481,7 +486,7 @@ struct AssistantPromptBox: View {
                 if p.isAgent, let models = model.shownAgentOptions?.models, !models.choices.isEmpty {
                     let byDefault = models.choices.first { $0.id == models.current }?.name
                     Group {
-                        Toggle(byDefault.map { "Default (\($0))" } ?? "Default", isOn: Binding(get: { model.model.isEmpty }, set: { _ in model.choose(p, model: "") }))
+                        Toggle(byDefault.map { String(localized: "Default (\($0))") } ?? String(localized: "Default"), isOn: Binding(get: { model.model.isEmpty }, set: { _ in model.choose(p, model: "") }))
                         Divider()
                         ForEach(models.choices) { c in
                             Toggle(c.name, isOn: Binding(get: { model.model == c.id }, set: { _ in model.choose(p, model: c.id) }))
@@ -512,7 +517,7 @@ struct AssistantPromptBox: View {
     }
 
     private var modelTitle: String {
-        guard let p = model.provider else { return "Choose a Model" }
+        guard let p = model.provider else { return String(localized: "Choose a Model") }
         if p.isAgent {
             let models = model.shownAgentOptions?.models
             let id = model.model.isEmpty ? models?.current : model.model
@@ -532,7 +537,7 @@ struct AssistantPromptBox: View {
                 Divider()
                 Button("About Modes…") { showsModes = true }
             } label: {
-                let name = modes.choices.first { $0.id == shown }?.name ?? "Default"
+                let name = modes.choices.first { $0.id == shown }?.name ?? String(localized: "Default")
                 menuLabel(name.localizedCaseInsensitiveContains("mode") ? name : name + " Mode")
             }
             .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
@@ -575,11 +580,11 @@ struct AssistantModesAbout: View {
     /// Our wording for the common mode ids when the agent gives no description.
     static func fallback(_ id: String) -> String {
         switch id {
-        case "default": "Edits files inside the project and asks before running commands or touching anything outside it."
-        case "acceptEdits": "Fewer prompts: the agent decides on edits itself."
-        case "plan": "Plans and answers without changing files."
-        case "bypassPermissions": "Never asks; the agent does what it decides."
-        default: "A mode of the agent."
+        case "default": String(localized: "Edits files inside the project and asks before running commands or touching anything outside it.")
+        case "acceptEdits": String(localized: "Fewer prompts: the agent decides on edits itself.")
+        case "plan": String(localized: "Plans and answers without changing files.")
+        case "bypassPermissions": String(localized: "Never asks; the agent does what it decides.")
+        default: String(localized: "A mode of the agent.")
         }
     }
 }
@@ -670,7 +675,7 @@ struct AssistantPromptField: NSViewRepresentable {
         tv.isVerticallyResizable = true
         tv.isHorizontallyResizable = false
         tv.autoresizingMask = [.width]
-        tv.setAccessibilityLabel("Prompt")
+        tv.setAccessibilityLabel(String(localized: "Prompt"))
         tv.resigned = { [weak coordinator = context.coordinator] in coordinator?.hidePopup() }
         let scroll = NSScrollView()
         scroll.drawsBackground = false

@@ -5,7 +5,7 @@ public struct ShortcutSets: Codable, Equatable, Sendable {
     public static let defaultName = "Default"
     public static let customName = "Custom"
     public static let vimName = "Vim"
-    public static let vimDescription = "For Vim habits: moves Re-Indent from ⌃I (Vim's jump-forward key, also Tab) to ⌥⌘I. Every other app shortcut is a ⌘ or ⌃⇧ chord and stays."
+    public static let vimDescription = String(localized: "For Vim habits: moves Re-Indent from ⌃I (Vim's jump-forward key, also Tab) to ⌥⌘I. Every other app shortcut is a ⌘ or ⌃⇧ chord and stays.", bundle: .module)
     /// Overrides of the built-in sets by name; Default has none.
     public static let builtIns: [String: ShortcutOverrides] = [
         vimName: ShortcutOverrides(["Format/Re-Indent": .some(ShortcutSpec("i", [.command, .option]))]),

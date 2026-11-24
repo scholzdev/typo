@@ -6,9 +6,9 @@ enum TextEditingPage: String, Hashable, CaseIterable {
 
     var title: String {
         switch self {
-        case .display: "Display"
-        case .completion: "Completion"
-        case .indentation: "Indentation"
+        case .display: String(localized: "Display")
+        case .completion: String(localized: "Completion")
+        case .indentation: String(localized: "Indentation")
         }
     }
 

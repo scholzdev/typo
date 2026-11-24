@@ -17,7 +17,7 @@ struct PresenterWindow: View {
         .background(Color(white: 0.08))
         .environment(\.colorScheme, .dark)
         .modifier(SlideKeys(session: session))
-        .navigationTitle(session.map { "Presenter View – \($0.project.main.raw)" } ?? "Presenter View")
+        .navigationTitle(session.map { String(localized: "Presenter View – \($0.project.main.raw)") } ?? String(localized: "Presenter View"))
         .task {
             session = await PresentationSession.attach(id.project)
             if session == nil { dismissWindow(value: id) }
@@ -82,7 +82,7 @@ private struct PresenterContent: View {
                         }
                         Text("Notes").font(.title3).foregroundStyle(.secondary).padding(.top, 12)
                         ScrollView {
-                            Text(session.notes[page] ?? "No notes for this slide.")
+                            Text(session.notes[page] ?? String(localized: "No notes for this slide."))
                                 .font(.title2)
                                 .foregroundStyle(session.notes[page] == nil ? .secondary : .primary)
                                 .frame(maxWidth: .infinity, alignment: .leading)

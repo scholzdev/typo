@@ -58,23 +58,23 @@ struct FileUndo: Sendable {
 extension FilesController {
     /// Puts `back` on the window's undo stack as "Undo `name`". Undoing registers the way forward right away,
     /// while the undo manager is still undoing, so it lands on the redo stack; the operation itself runs after.
-    func registerUndo(_ name: String, _ back: FileUndo) {
+    func registerUndo(_ name: LocalizedStringResource, _ back: FileUndo) {
         guard let um = undoManager else { return }
         let own = um.groupingLevel == 0 && !um.isUndoing && !um.isRedoing
         if own { um.beginUndoGrouping() }
         um.registerUndo(withTarget: self) { c in
             MainActor.assumeIsolated {
-                let verb = c.undoManager?.isUndoing == true ? "Undo" : "Redo"
+                let undoing = c.undoManager?.isUndoing == true
                 let done = Task {
                     do { return try await back.perform(c) } catch {
-                        c.fail("Couldn\u{2019}t \(verb) \(name)", error)
+                        c.fail(undoing ? "Couldn\u{2019}t Undo \(String(localized: name))" : "Couldn\u{2019}t Redo \(String(localized: name))", error)
                         throw error
                     }
                 }
                 c.registerUndo(name, FileUndo { c in try await done.value.perform(c) })
             }
         }
-        um.setActionName(name)
+        um.setActionName(String(localized: name))
         if own { um.endUndoGrouping() }
     }
 
@@ -86,7 +86,7 @@ extension FilesController {
         relocated(path, to: new)
         guard updates.count > 0 else { return }
         let files = updates.edits.keys.map(\.raw).sorted()
-        guard confirm("Update \(updates.count) reference\(updates.count == 1 ? "" : "s") in \(files.count) file\(files.count == 1 ? "" : "s")?", files.joined(separator: "\n"), ok: "Update", cancel: "Don\u{2019}t Update") else { return }
+        guard confirm("Update \(updates.count) references in \(files.count) files?", verbatim: files.joined(separator: "\n"), ok: "Update", cancel: "Don\u{2019}t Update") else { return }
         do { try await project.updateReferences(updates) } catch { fail("Couldn\u{2019}t Update the References", error) }
     }
 }

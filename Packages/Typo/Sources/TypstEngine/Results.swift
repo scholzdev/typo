@@ -8,7 +8,7 @@ public enum PDFStandard: UInt8, Sendable, CaseIterable {
         case .plain: "PDF"
         case .pdfA2b: "PDF/A-2b"
         case .pdfA3b: "PDF/A-3b"
-        case .ua1: "PDF/UA-1 (Accessible)"
+        case .ua1: String(localized: "PDF/UA-1 (Accessible)", bundle: .module)
         }
     }
 }

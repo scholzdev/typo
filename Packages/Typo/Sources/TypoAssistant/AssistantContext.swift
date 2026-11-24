@@ -160,14 +160,14 @@ public enum AssistantEdits {
 
     /// Resolves `edit` against the file's current text; nil `text` means the project has no such file.
     public static func resolve(_ edit: ProposedEdit, text: String?) -> EditResolution {
-        guard let path = RelPath(edit.path) else { return .failed("“\(edit.path)” is not a path inside the project.") }
-        guard FileKind.isText(path.raw) else { return .failed("\(path.raw) is not a text file.") }
+        guard let path = RelPath(edit.path) else { return .failed(String(localized: "“\(edit.path)” is not a path inside the project.", bundle: .module)) }
+        guard FileKind.isText(path.raw) else { return .failed(String(localized: "\(path.raw) is not a text file.", bundle: .module)) }
         guard let text else {
-            return edit.search.isEmpty ? .create(path, edit.replace) : .failed("\(path.raw) does not exist in the project.")
+            return edit.search.isEmpty ? .create(path, edit.replace) : .failed(String(localized: "\(path.raw) does not exist in the project.", bundle: .module))
         }
         let ns = text as NSString
         if edit.search.isEmpty {
-            guard ns.length == 0 else { return .failed("\(path.raw) already exists, so it cannot be created.") }
+            guard ns.length == 0 else { return .failed(String(localized: "\(path.raw) already exists, so it cannot be created.", bundle: .module)) }
             return .replace(path, Replacement(range: NSRange(location: 0, length: 0), text: edit.replace), before: text, after: edit.replace)
         }
         var matches: [NSRange] = [], from = 0
@@ -177,8 +177,8 @@ public enum AssistantEdits {
             matches.append(r)
             from = r.location + 1    // one step, so overlapping matches count too
         }
-        guard let r = matches.first else { return .failed("The text to replace was not found in \(path.raw). The file may have changed since the answer.") }
-        guard matches.count == 1 else { return .failed("The text to replace occurs \(matches.count) times in \(path.raw), so the change is ambiguous.") }
+        guard let r = matches.first else { return .failed(String(localized: "The text to replace was not found in \(path.raw). The file may have changed since the answer.", bundle: .module)) }
+        guard matches.count == 1 else { return .failed(String(localized: "The text to replace occurs \(matches.count) times in \(path.raw), so the change is ambiguous.", bundle: .module)) }
         return .replace(path, Replacement(range: r, text: edit.replace), before: text, after: ns.replacingCharacters(in: r, with: edit.replace))
     }
 }

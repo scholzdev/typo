@@ -40,44 +40,43 @@ enum ComponentsLoader {
         let fonts = EngineVersions.embeddedFonts
         let snapshots = LocalHistory.rootFolder
         let fontCacheSize = DiskUsage.bytes(of: fontIndex)
-        let updated = rt.packageIndexUpdated.map { "Updated " + $0.formatted(.relative(presentation: .named)) } ?? "Not downloaded yet"
+        let updated = rt.packageIndexUpdated.map { String(localized: "Updated \($0.formatted(.relative(presentation: .named)))") } ?? String(localized: "Not downloaded yet")
         let indexCount = rt.packageIndexCount
         return [
-            ComponentSection(title: "Typesetting Engine", items: [
-                ComponentItem(id: "typst", title: "Typst \(EngineVersions.typst)", symbol: "doc.text", status: "Built into Typo",
-                              caption: "The compiler ships with the app and updates with it."),
-                ComponentItem(id: "typstyle", title: "typstyle \(EngineVersions.typstyle)", symbol: "text.alignleft", status: "Built in",
-                              caption: "The code formatter."),
+            ComponentSection(title: String(localized: "Typesetting Engine"), items: [
+                ComponentItem(id: "typst", title: "Typst \(EngineVersions.typst)", symbol: "doc.text", status: String(localized: "Built into Typo"),
+                              caption: String(localized: "The compiler ships with the app and updates with it.")),
+                ComponentItem(id: "typstyle", title: "typstyle \(EngineVersions.typstyle)", symbol: "text.alignleft", status: String(localized: "Built in"),
+                              caption: String(localized: "The code formatter.")),
             ]),
-            ComponentSection(title: "Modules", items: [
-                ComponentItem(id: "module-engine", title: "Typesetting engine", symbol: "gearshape.2",
-                              status: "TypstEngine \(TypstEngineInfo.version) \u{2014} speaks Typst \(TypstEngineInfo.typstVersion)"),
-                ComponentItem(id: "module-acp", title: "Agent client", symbol: "person.2.wave.2",
-                              status: "TypoACP \(TypoACPInfo.version), ACPProtocol \(ACPProtocolInfo.version) \u{2014} speaks ACP v\(ACPProtocolInfo.protocolVersion)"),
-                ComponentItem(id: "module-mcp", title: "MCP server", symbol: "server.rack",
-                              status: "TypoMCP \(TypoMCPInfo.version), MCPProtocol \(MCPProtocolInfo.version) \u{2014} speaks MCP "
-                                  + MCPProtocolInfo.protocolVersions.joined(separator: ", ")),
+            ComponentSection(title: String(localized: "Modules"), items: [
+                ComponentItem(id: "module-engine", title: String(localized: "Typesetting engine"), symbol: "gearshape.2",
+                              status: String(localized: "TypstEngine \(TypstEngineInfo.version) \u{2014} speaks Typst \(TypstEngineInfo.typstVersion)")),
+                ComponentItem(id: "module-acp", title: String(localized: "Agent client"), symbol: "person.2.wave.2",
+                              status: String(localized: "TypoACP \(TypoACPInfo.version), ACPProtocol \(ACPProtocolInfo.version) \u{2014} speaks ACP v\(ACPProtocolInfo.protocolVersion)")),
+                ComponentItem(id: "module-mcp", title: String(localized: "MCP server"), symbol: "server.rack",
+                              status: String(localized: "TypoMCP \(TypoMCPInfo.version), MCPProtocol \(MCPProtocolInfo.version) \u{2014} speaks MCP \(MCPProtocolInfo.protocolVersions.joined(separator: ", "))")),
             ]),
-            ComponentSection(title: "Fonts", items: [
-                ComponentItem(id: "embedded", title: "Embedded Typst Fonts", symbol: "textformat",
-                              status: "\(fonts.files) files: \(fonts.families)"),
-                ComponentItem(id: "system", title: "System Fonts", symbol: "character.book.closed",
-                              status: "\(rt.fontFileCount) font files handed to the engine",
-                              caption: "Font index cache. Rebuilding deletes it and Typo recreates it on the next launch.",
+            ComponentSection(title: String(localized: "Fonts"), items: [
+                ComponentItem(id: "embedded", title: String(localized: "Embedded Typst Fonts"), symbol: "textformat",
+                              status: String(localized: "\(fonts.files) files: \(fonts.families)")),
+                ComponentItem(id: "system", title: String(localized: "System Fonts"), symbol: "character.book.closed",
+                              status: String(localized: "\(rt.fontFileCount) font files handed to the engine"),
+                              caption: String(localized: "Font index cache. Rebuilding deletes it and Typo recreates it on the next launch."),
                               path: fontIndex, sizeBytes: fontCacheSize, actions: [.showInFinder, .rebuildFontIndex]),
             ]),
-            ComponentSection(title: "Packages", items: [
-                ComponentItem(id: "packages", title: "Downloaded Packages", symbol: "shippingbox",
-                              status: "\(installed.count) packages", path: packageDir,
+            ComponentSection(title: String(localized: "Packages"), items: [
+                ComponentItem(id: "packages", title: String(localized: "Downloaded Packages"), symbol: "shippingbox",
+                              status: String(localized: "\(installed.count) packages"), path: packageDir,
                               sizeBytes: installed.reduce(0) { $0 + $1.bytes }, actions: [.showInFinder, .managePackages]),
-                ComponentItem(id: "index", title: "Package Index", symbol: "list.bullet.rectangle",
-                              status: indexCount > 0 ? "\(updated), \(indexCount) packages" : updated,
-                              caption: "The list of @preview packages behind completion and templates.",
+                ComponentItem(id: "index", title: String(localized: "Package Index"), symbol: "list.bullet.rectangle",
+                              status: indexCount > 0 ? String(localized: "\(updated), \(indexCount) packages") : updated,
+                              caption: String(localized: "The list of @preview packages behind completion and templates."),
                               actions: [.refreshIndex]),
             ]),
-            ComponentSection(title: "Local History", items: [
-                ComponentItem(id: "snapshots", title: "Snapshots", symbol: "clock.arrow.circlepath",
-                              status: "All projects", caption: LocalHistory.retentionDescription, path: snapshots,
+            ComponentSection(title: String(localized: "Local History"), items: [
+                ComponentItem(id: "snapshots", title: String(localized: "Snapshots"), symbol: "clock.arrow.circlepath",
+                              status: String(localized: "All projects"), caption: LocalHistory.retentionDescription, path: snapshots,
                               sizeBytes: DiskUsage.bytes(of: snapshots), actions: [.showInFinder]),
             ]),
         ]
@@ -156,7 +155,7 @@ struct ComponentsSettings: View {
         busy = true
         indexMessage = nil
         do { _ = try await TypstRuntime.shared.value.refreshPackageIndex() }
-        catch { indexMessage = "Check failed: \(error.localizedDescription)" }
+        catch { indexMessage = String(localized: "Check failed: \(error.localizedDescription)") }
         busy = false
         await reload()
     }

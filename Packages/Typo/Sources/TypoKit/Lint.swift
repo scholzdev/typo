@@ -17,27 +17,27 @@ public enum Lint {
 
         if !dynamic {
             for (name, defs) in index.definitions where index.references[name] == nil {
-                out += defs.map { ($0, "Label <\(name)> is never referenced") }
+                out += defs.map { ($0, Self.unusedLabelMessage(name)) }
             }
         }
         let docs = documents(typst.map(\.file), paths)
         for (name, defs) in index.definitions where defs.count > 1 {
             for d in defs {
                 let others = defs.filter { $0 != d && !docs[$0.file, default: [$0.file]].isDisjoint(with: docs[d.file, default: [d.file]]) }
-                if !others.isEmpty { out.append((d, "Label <\(name)> is also defined at \(others.map(place).joined(separator: ", "))")) }
+                if !others.isEmpty { out.append((d, String(localized: "Label <\(name)> is also defined at \(others.map(place).joined(separator: ", "))", bundle: .module))) }
             }
         }
         // Only files a `bibliography(…)` names: other .yml files are data.
         let bibs = Set(paths.filter { $0.function == "bibliography" }.map { $0.target.raw.lowercased() })
         if !dynamic, !matches(fullBibliography) {
             for (key, sites) in index.bibKeys where index.references[key] == nil {
-                out += sites.filter { bibs.contains($0.file.raw.lowercased()) }.map { ($0, "Bibliography entry “\(key)” is never cited") }
+                out += sites.filter { bibs.contains($0.file.raw.lowercased()) }.map { ($0, String(localized: "Bibliography entry “\(key)” is never cited", bundle: .module)) }
             }
         }
         let present = Set(existing.map { $0.raw.lowercased() })      // the file system is case-insensitive
         for p in paths where !present.contains(p.target.raw.lowercased()) {
             guard !compiler.contains(where: { $0.file == p.file && (NSIntersectionRange($0.range, p.range).length > 0 || NSLocationInRange($0.range.location, p.range)) }) else { continue }
-            out.append((LabelSite(file: p.file, token: p.range, name: p.range), "File “\(p.target.raw)” does not exist"))
+            out.append((LabelSite(file: p.file, token: p.range, name: p.range), String(localized: "File “\(p.target.raw)” does not exist", bundle: .module)))
         }
         return out.sorted { ($0.0.file.raw, $0.0.token.location) < ($1.0.file.raw, $1.0.token.location) }.enumerated().map { i, h in
             Diagnostic(id: i, severity: .hint, message: h.1, hints: [], origin: .project(Location(file: h.0.file, range: h.0.token)))

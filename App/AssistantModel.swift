@@ -194,7 +194,7 @@ extension FocusedValues {
             // An agent works on the whole project; explaining a passage goes to a model in a new conversation.
             guard let p = providers.defaultModelProvider else {
                 mode = .assistant
-                notice = "Explain with AI needs a model provider. Add one in Settings › Intelligence."
+                notice = String(localized: "Explain with AI needs a model provider. Add one in Settings › Intelligence.")
                 return
             }
             newConversation()
@@ -320,7 +320,7 @@ extension FocusedValues {
     }
 
     private func persist(_ c: AssistantConversation) {
-        do { try store.save(c) } catch { notice = "The conversation could not be saved: \(error.localizedDescription)" }
+        do { try store.save(c) } catch { notice = String(localized: "The conversation could not be saved: \(error.localizedDescription)") }
     }
 
     // MARK: Sending
@@ -335,14 +335,14 @@ extension FocusedValues {
         }
     }
 
-    static let onDeviceWorkflowNotice = "Workflows need project access, which the on-device model doesn't have. Choose another model."
+    static let onDeviceWorkflowNotice = String(localized: "Workflows need project access, which the on-device model doesn't have. Choose another model.")
 
     /// Sends `text` (the draft by default) with the attachments; nothing leaves the Mac before the provider's notice was accepted.
     /// `search` is the answer to the search question, once it was asked.
     func send(_ text: String? = nil, diagnostics: Bool = false, search: Bool? = nil) {
         let question = (text ?? draft).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !question.isEmpty, !isStreaming, let provider, providers.isReady(provider) else { return }
-        guard !isBusy else { notice = "Another conversation is still working. Wait for it or stop it first."; return }
+        guard !isBusy else { notice = String(localized: "Another conversation is still working. Wait for it or stop it first."); return }
         notice = nil
         let workflows = WorkflowStore.shared
         workflows.reload()
@@ -749,7 +749,7 @@ extension FocusedValues {
     /// What "Always Allow" will add to Settings › Permissions, for its confirmation.
     func alwaysAllowNote(_ p: PendingPermission) -> String? {
         let a = AgentAccess.stored.additions(for: p.call.accessRequest, root: project.rootURL.path)
-        let lines = a.commands.map { "“\($0)” will be added to Allowed Commands." } + a.folders.map { "“\($0)” will be added to Allowed Folders." }
+        let lines = a.commands.map { String(localized: "“\($0)” will be added to Allowed Commands.") } + a.folders.map { String(localized: "“\($0)” will be added to Allowed Folders.") }
         return lines.isEmpty ? nil : lines.joined(separator: "\n")
     }
 
@@ -797,7 +797,7 @@ extension FocusedValues {
             let applied: AppliedChange
             switch resolution(edit) {
             case .replace(let path, let r, _, _):
-                let ids = try await project.assistantEdit(path, [r], actionName: "Assistant Edit")
+                let ids = try await project.assistantEdit(path, [r], actionName: String(localized: "Assistant Edit"))
                 applied = AppliedChange(path: path, changeID: ids.first, created: false)
             case .create(let path, let content):
                 let shown = project.selectedFile
@@ -806,7 +806,7 @@ extension FocusedValues {
                 try project.createFile(named: String(parts.last!), in: folder)
                 if project.selectedFile != shown { project.selectedFile = shown }    // createFile shows the new file; the editor stays where it was
                 var ids: [UUID] = []
-                if !content.isEmpty { ids = try await project.assistantEdit(path, [Replacement(range: NSRange(location: 0, length: 0), text: content)], actionName: "Assistant Edit") }
+                if !content.isEmpty { ids = try await project.assistantEdit(path, [Replacement(range: NSRange(location: 0, length: 0), text: content)], actionName: String(localized: "Assistant Edit")) }
                 applied = AppliedChange(path: path, changeID: ids.first, created: true)
             case .failed(let why):
                 return why
@@ -815,7 +815,7 @@ extension FocusedValues {
             update(id, message) { $0.edits[index] = .accepted }
             return nil
         } catch {
-            return "The change could not be applied: \(error.localizedDescription)"
+            return String(localized: "The change could not be applied: \(error.localizedDescription)")
         }
     }
 
@@ -839,15 +839,15 @@ extension FocusedValues {
     /// Nil when the change can be reverted; else why not (for the tooltip).
     func revertBlocker(_ m: AssistantMessage, _ index: Int) -> String? {
         _ = changesRevision
-        guard m.edits[index] == .accepted else { return "This change is not applied." }
+        guard m.edits[index] == .accepted else { return String(localized: "This change is not applied.") }
         guard let a = ledger[key(m.id, index)], let buffer = project.buffer(for: a.path) else {
-            return "This change was applied in an earlier session. Use Undo in the editor."
+            return String(localized: "This change was applied in an earlier session. Use Undo in the editor.")
         }
         if a.created {
-            guard let id = a.changeID else { return buffer.storage.length == 0 ? nil : "The new file was edited since." }
-            return buffer.canRevert(id) ? nil : "The new file was edited since."
+            guard let id = a.changeID else { return buffer.storage.length == 0 ? nil : String(localized: "The new file was edited since.") }
+            return buffer.canRevert(id) ? nil : String(localized: "The new file was edited since.")
         }
-        guard let id = a.changeID, buffer.canRevert(id) else { return "The changed text was edited since, so it cannot be reverted automatically." }
+        guard let id = a.changeID, buffer.canRevert(id) else { return String(localized: "The changed text was edited since, so it cannot be reverted automatically.") }
         return nil
     }
 
@@ -862,7 +862,7 @@ extension FocusedValues {
                 buffer.revertAssistant(c)
             }
         } catch {
-            notice = "The change could not be reverted: \(error.localizedDescription)"
+            notice = String(localized: "The change could not be reverted: \(error.localizedDescription)")
             return
         }
         ledger[key(m.id, index)] = nil
@@ -924,7 +924,7 @@ extension FocusedValues {
     func openFile(_ path: String, line: Int? = nil) {
         guard let rel = RelPath(path) ?? ACPFiles.projectPath(path, root: project.rootURL) else { return }
         Task {
-            do { _ = try await project.open(rel) } catch { notice = "The file could not be opened: \(error.localizedDescription)"; return }
+            do { _ = try await project.open(rel) } catch { notice = String(localized: "The file could not be opened: \(error.localizedDescription)"); return }
             mode = .navigator
             if let line { project.showLine(rel, line: line, column: nil) } else { project.openPermanently(rel) }
         }
@@ -962,7 +962,7 @@ extension FocusedValues {
                 })
             }
         } catch {
-            notice = "The file could not be opened: \(error.localizedDescription)"
+            notice = String(localized: "The file could not be opened: \(error.localizedDescription)")
         }
     }
 }
@@ -987,11 +987,11 @@ extension AssistantModel: ACPHost {
         switch decision {
         case .allow(let rule):
             guard let id = p.options.first(where: { $0.kind == "allow_once" })?.id else { return nil }
-            note(p.call, "Allowed by your settings: \(rule)", builtIn: rule == "Typo's own tools")
+            note(p.call, String(localized: "Allowed by your settings: \(rule)"), builtIn: rule == "Typo's own tools")
             return id
         case .reject(let rule):
             guard let id = p.options.first(where: { $0.kind == "reject_once" })?.id else { return nil }
-            note(p.call, "Refused by your settings: \(rule)")
+            note(p.call, String(localized: "Refused by your settings: \(rule)"))
             return id
         case .ask:
             return nil
@@ -1014,10 +1014,10 @@ extension AssistantModel: ACPHost {
         let path = AgentAccess.resolve(path)
         var call = ACPToolCall(id: "typo-file-\(UUID().uuidString)")
         call.kind = write ? "edit" : "read"
-        call.title = (write ? "Write " : "Read ") + path
+        call.title = write ? String(localized: "Write \(path)") : String(localized: "Read \(path)")
         call.locations = [path]
         let p = PendingPermission(call: call, options: [ACPOption(id: "once", name: "Allow Once", kind: "allow_once"),
-                                                        ACPOption(id: "always", name: "Always Allow for This Folder", kind: "allow_always"),
+                                                        ACPOption(id: "always", name: String(localized: "Always Allow for This Folder"), kind: "allow_always"),
                                                         ACPOption(id: "reject", name: "Don't Allow", kind: "reject_once")])
         var answer = automaticAnswer(p)
         if answer == nil, streamingID != nil { answer = await withCheckedContinuation { c in permissionQueue.append((p, c)) } }
@@ -1074,7 +1074,7 @@ extension AssistantModel: ACPHost {
     }
 
     /// "Claude Code Edit": the undo step names the agent that made it.
-    private var agentEditName: String { "\((provider?.name ?? "Agent").replacingOccurrences(of: " (ACP)", with: "")) Edit" }
+    private var agentEditName: String { String(localized: "\((provider?.name ?? "Agent").replacingOccurrences(of: " (ACP)", with: "")) Edit") }
 
     /// Claude's own Edit and Write tools write the file themselves: hold its reload and note its text, so the write
     /// can land like `writeTextFile`'s.

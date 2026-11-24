@@ -16,9 +16,9 @@ enum ExportTarget: String, CaseIterable, Identifiable {
         case .pdfA2b: "PDF/A-2b"
         case .pdfA3b: "PDF/A-3b"
         case .pdfUA1: PDFStandard.ua1.title
-        case .png: "PNG Images"
-        case .svg: "SVG Images"
-        case .archive: "Project ZIP"
+        case .png: String(localized: "PNG Images")
+        case .svg: String(localized: "SVG Images")
+        case .archive: String(localized: "Project ZIP")
         }
     }
 
@@ -201,8 +201,8 @@ private struct IssueCounts: View {
         let errors = all.filter { $0.severity == .error }.count
         let warnings = all.filter { $0.severity == .warning }.count
         HStack(spacing: 6) {
-            if errors > 0 { count(errors, "xmark.circle.fill", .red, "Errors") }
-            if warnings > 0 { count(warnings, "exclamationmark.triangle.fill", .yellow, "Warnings") }
+            if errors > 0 { count(errors, "xmark.circle.fill", .red, String(localized: "Errors")) }
+            if warnings > 0 { count(warnings, "exclamationmark.triangle.fill", .yellow, String(localized: "Warnings")) }
         }
     }
 

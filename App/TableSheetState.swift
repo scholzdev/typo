@@ -67,7 +67,7 @@ import TypstEngine
 
     /// One undoable step named `name`; nothing is recorded when the model does not change.
     /// `coalesce` joins the change to the previous one while that one coalesced too, until `endCoalescing`.
-    func change(_ name: String, coalesce: Bool = false, _ body: (inout TableModel) -> Void) {
+    func change(_ name: LocalizedStringResource, coalesce: Bool = false, _ body: (inout TableModel) -> Void) {
         commitEdit()
         var m = model
         body(&m)
@@ -78,15 +78,15 @@ import TypstEngine
         clampSelection()
     }
 
-    private func record(_ name: String) {
+    private func record(_ name: LocalizedStringResource) {
         let old = model, sel = (cursor, anchor)
         undo.registerUndo(withTarget: self) { s in s.restore(old, sel, name) }
-        undo.setActionName(name)
+        undo.setActionName(String(localized: name))
     }
 
     func endCoalescing() { coalescing = false }
 
-    private func restore(_ m: TableModel, _ sel: (Point, Point), _ name: String) {
+    private func restore(_ m: TableModel, _ sel: (Point, Point), _ name: LocalizedStringResource) {
         coalescing = false
         record(name)                        // registered while undoing: becomes the redo
         model = m

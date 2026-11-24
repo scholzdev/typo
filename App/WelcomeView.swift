@@ -22,13 +22,14 @@ struct WelcomeView: View {
             Text("Typo").font(.system(size: 20, weight: .bold))
             Text("Version \(version)").foregroundStyle(.secondary).padding(.top, 2)
             HStack(spacing: 8) {
-                Button { if opener.choose() { dismissWindow(id: "welcome") } } label: { Text("Open…").frame(maxWidth: .infinity) }
-                Button { if opener.newProject() { dismissWindow(id: "welcome") } } label: { Text("New Project…").frame(maxWidth: .infinity) }
-                Button { openWindow(id: "templates") } label: { Text("Templates…").frame(maxWidth: .infinity) }
+                Button { if opener.choose() { dismissWindow(id: "welcome") } } label: { Text("Open…").lineLimit(1).minimumScaleFactor(0.8).frame(maxWidth: .infinity) }
+                Button { if opener.newProject() { dismissWindow(id: "welcome") } } label: { Text("New Project…").lineLimit(1).minimumScaleFactor(0.8).frame(maxWidth: .infinity) }
+                Button { openWindow(id: "templates") } label: { Text("Templates…").lineLimit(1).minimumScaleFactor(0.8).frame(maxWidth: .infinity) }
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.capsule)
             .controlSize(.extraLarge)
+            .padding(.horizontal, -12)    // longer titles in other languages get the room of the side margins
             .padding(.top, 20)
             recentList.padding(.top, 18)
         }

@@ -46,12 +46,12 @@ extension Project {
 
 @MainActor func showExportFailure(_ error: any Error, pdfUA: Bool = false) {
     // Typst's PDF/UA errors mostly name no place; the pre-flight hints do.
-    let pointer = "\n\nPDF/UA problems are listed with their places in the Issue navigator when the export target is PDF/UA-1 or Accessibility checks is set to Always."
+    let pointer = "\n\n" + String(localized: "PDF/UA problems are listed with their places in the Issue navigator when the export target is PDF/UA-1 or Accessibility checks is set to Always.")
     if case ProjectError.compileFailed(let diagnostics) = error {
-        showAlert("The Document Has Errors", diagnostics.first?.message ?? "It could not be compiled.")
+        showAlert("The Document Has Errors", verbatim: diagnostics.first?.message ?? String(localized: "It could not be compiled."))
     } else if pdfUA, case ProjectError.exportFailed(let message) = error {
-        showAlert("Could Not Export", message + pointer)
+        showAlert("Could Not Export", verbatim: message + pointer)
     } else {
-        showAlert("Could Not Export", error.localizedDescription)
+        showAlert("Could Not Export", error)
     }
 }

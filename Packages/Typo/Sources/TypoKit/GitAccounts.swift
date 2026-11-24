@@ -33,15 +33,15 @@ public enum GitHost: String, Codable, CaseIterable, Identifiable, Sendable {
     public var needsServer: Bool { fixedServer == nil }
 
     /// What the secret is called on the service.
-    public var tokenLabel: String { self == .bitbucketCloud ? "App Password" : "Token" }
+    public var tokenLabel: String { self == .bitbucketCloud ? String(localized: "App Password", bundle: .module) : String(localized: "Token", bundle: .module) }
 
     /// The scopes (GitHub, GitLab) or permissions (Bitbucket) the token needs for clone, fetch and push.
     public var requiredScopes: [String] {
         switch self {
         case .github, .githubEnterprise: ["admin:public_key", "repo", "user"]
         case .gitlab, .gitlabSelfHosted: ["api", "read_user", "write_repository"]
-        case .bitbucketCloud: ["Account: Read", "Repositories: Write"]
-        case .bitbucketServer: ["Repository: Write"]
+        case .bitbucketCloud: [String(localized: "Account: Read", bundle: .module), String(localized: "Repositories: Write", bundle: .module)]
+        case .bitbucketServer: [String(localized: "Repository: Write", bundle: .module)]
         }
     }
 
@@ -179,7 +179,7 @@ public struct KeychainTokens: GitTokenStoring {
         let status = SecItemAdd(q as CFDictionary, nil)
         guard status == errSecSuccess else {
             let reason = SecCopyErrorMessageString(status, nil) as String? ?? "error \(status)"
-            throw GitError.failed("The token could not be saved in the Keychain: \(reason)")
+            throw GitError.failed(String(localized: "The token could not be saved in the Keychain: \(reason)", bundle: .module))
         }
     }
 
@@ -236,17 +236,17 @@ public struct KeychainTokens: GitTokenStoring {
     /// Checks the token against the service's API and returns the user name it belongs to.
     public nonisolated static func verify(host: GitHost, server: URL, account: String, token: String) async throws -> String {
         guard let request = host.verificationRequest(server: server, account: account, token: token) else {
-            throw GitError.failed("That server address is not valid.")
+            throw GitError.failed(String(localized: "That server address is not valid.", bundle: .module))
         }
         let (data, response): (Data, URLResponse)
         do { (data, response) = try await URLSession.shared.data(for: request) }
-        catch { throw GitError.failed("Couldn’t reach \(server.host() ?? server.absoluteString): \(error.localizedDescription)") }
+        catch { throw GitError.failed(String(localized: "Couldn’t reach \(server.host() ?? server.absoluteString): \(error.localizedDescription)", bundle: .module)) }
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         switch status {
         case 200..<300: return host.login(fromVerification: data) ?? account
-        case 401, 403: throw GitError.failed("\(host.name) did not accept this \(host.tokenLabel.lowercased()). Check that it is current and has the required scopes.")
-        case 404: throw GitError.failed("No \(host.name) API was found at \(server.absoluteString).")
-        default: throw GitError.failed("\(host.name) answered with HTTP status \(status).")
+        case 401, 403: throw GitError.failed(String(localized: "\(host.name) did not accept this \(host.tokenLabel.lowercased()). Check that it is current and has the required scopes.", bundle: .module))
+        case 404: throw GitError.failed(String(localized: "No \(host.name) API was found at \(server.absoluteString).", bundle: .module))
+        default: throw GitError.failed(String(localized: "\(host.name) answered with HTTP status \(status).", bundle: .module))
         }
     }
 }

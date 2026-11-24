@@ -192,23 +192,23 @@ private struct QuickOpenRow: View {
     }
 
     private var breadcrumb: String {
-        guard let f = result.item.file else { return "Typst › Documentation" }
+        guard let f = result.item.file else { return String(localized: "Typst › Documentation") }
         let line = result.line ?? (result.item.line > 0 ? result.item.line : nil)
         return ([projectName] + f.raw.split(separator: "/").map(String.init)).joined(separator: " › ") + (line.map { ":\($0)" } ?? "")
     }
 
     private var badge: String? {
-        if !child, !result.alternates.isEmpty { return "\(result.alternates.count) Alternate\(result.alternates.count == 1 ? "" : "s")" }
-        if let line = result.line { return "Line \(line)" }
+        if !child, !result.alternates.isEmpty { return String(localized: "\(result.alternates.count) Alternates") }
+        if let line = result.line { return String(localized: "Line \(line)") }
         switch result.item.kind {
         case .file: return nil
-        case .heading(let level): return "Heading \(level)"
-        case .label: return "Label"
-        case .function: return "Function"
-        case .variable: return "Variable"
-        case .bibKey: return "Bibliography"
-        case .builtin: return "Built-in"
-        case .bookmark: return "Bookmark"
+        case .heading(let level): return String(localized: "Heading \(level)")
+        case .label: return String(localized: "Label")
+        case .function: return String(localized: "Function")
+        case .variable: return String(localized: "Variable")
+        case .bibKey: return String(localized: "Bibliography")
+        case .builtin: return String(localized: "Built-in")
+        case .bookmark: return String(localized: "Bookmark")
         }
     }
 }

@@ -32,9 +32,9 @@ public enum PreviewFit: String, CaseIterable, Sendable {
 
     public var title: String {
         switch self {
-        case .width: "Fit Width"
-        case .page: "Fit Page"
-        case .twoPages: "Two Pages"
+        case .width: String(localized: "Fit Width", bundle: .module)
+        case .page: String(localized: "Fit Page", bundle: .module)
+        case .twoPages: String(localized: "Two Pages", bundle: .module)
         }
     }
 }

@@ -4,7 +4,10 @@ import TypoKit
 
 /// Settings, Appearance (after Xcode's): the app appearance, a live preview, then the theme colors, fonts and caret.
 struct AppearanceSettings: View {
-    private enum Tab: String, CaseIterable { case theme = "Theme", fonts = "Fonts", editor = "Editor" }
+    private enum Tab: String, CaseIterable {
+        case theme = "Theme", fonts = "Fonts", editor = "Editor"
+        var title: LocalizedStringKey { switch self { case .theme: "Theme"; case .fonts: "Fonts"; case .editor: "Editor" } }
+    }
 
     @AppStorage(SettingsKey.appAppearance) private var appearance = AppAppearance.system.rawValue
     @AppStorage(SettingsKey.editorFontSize) private var fontSize = EditorStyle.defaultSize
@@ -30,7 +33,7 @@ struct AppearanceSettings: View {
                     .frame(height: 190)
                     .listRowInsets(EdgeInsets())
             }
-            CapsuleSegments(items: Tab.allCases.map { ($0, $0.rawValue) }, selection: $tab)
+            CapsuleSegments(items: Tab.allCases.map { ($0, $0.title) }, selection: $tab)
                 .frame(maxWidth: .infinity, alignment: .center)   // centred like Xcode's, not stretched across the pane
                 .listRowBackground(Color.clear)
             switch tab {
@@ -84,7 +87,7 @@ struct AppearanceSettings: View {
                 .foregroundStyle(.secondary)
         }
         ForEach(EditorTheme.sections, id: \.self) { section in
-            Section(section) {
+            Section(LocalizedStringKey(section)) {
                 ForEach(EditorTheme.roles.filter { $0.section == section }) { role in
                     LabeledContent(role.title) {
                         HStack {
@@ -229,7 +232,7 @@ private struct ThemePreview: NSViewRepresentable {
         tv.isEditable = false
         tv.isRichText = false
         tv.textContainerInset = NSSize(width: 4, height: 8)
-        tv.setAccessibilityLabel("Theme preview")
+        tv.setAccessibilityLabel(String(localized: "Theme preview"))
         return scroll
     }
 
@@ -260,7 +263,7 @@ private struct ThemePreview: NSViewRepresentable {
 
 /// Xcode's capsule-shaped segmented control: the system segmented picker only has rounded-rectangle corners.
 struct CapsuleSegments<T: Hashable>: View {
-    let items: [(value: T, title: String)]
+    let items: [(value: T, title: LocalizedStringKey)]
     @Binding var selection: T
 
     var body: some View {

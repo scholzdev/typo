@@ -114,7 +114,7 @@ struct TableAssistPopover: View {
                 }
             }
         } label: {
-            Text(provider.map { $0.isOnDevice ? $0.name : "\($0.name) · \(model)" } ?? "Choose a Model").font(.caption)
+            Text(provider.map { $0.isOnDevice ? $0.name : "\($0.name) · \(model)" } ?? String(localized: "Choose a Model")).font(.caption)
         }
         .menuStyle(.borderlessButton).fixedSize()
         .disabled(phase == .running)
@@ -131,14 +131,14 @@ struct TableAssistPopover: View {
     private var suggestions: some View {
         let column = TableGridView.columnName(state.selectedColumns.lowerBound)
         let chips: [(title: String, request: String?)] = [
-            ("Sort by \(column)", "Sort the body rows by column \(column), ascending. The header row stays first."),
-            ("Add totals row", "Add a totals row at the bottom that sums the numeric columns."),
-            ("Transpose", "Transpose the table: its rows become columns and its columns become rows."),
-            ("Fill empty cells", "Fill the empty cells with values that fit their row and column."),
-            ("Translate…", nil),
-            ("Fix capitalization", "Fix the capitalization of the cell texts consistently: title case in the header, sentence case elsewhere."),
-            ("Generate sample data", "Fill the table with realistic sample data that fits its header and caption, keeping its size."),
-            ("Format numbers", "Format the numbers consistently: the same decimal places within a column, thousands separators where useful."),
+            (String(localized: "Sort by \(column)"), "Sort the body rows by column \(column), ascending. The header row stays first."),
+            (String(localized: "Add totals row"), "Add a totals row at the bottom that sums the numeric columns."),
+            (String(localized: "Transpose"), "Transpose the table: its rows become columns and its columns become rows."),
+            (String(localized: "Fill empty cells"), "Fill the empty cells with values that fit their row and column."),
+            (String(localized: "Translate…"), nil),
+            (String(localized: "Fix capitalization"), "Fix the capitalization of the cell texts consistently: title case in the header, sentence case elsewhere."),
+            (String(localized: "Generate sample data"), "Fill the table with realistic sample data that fits its header and caption, keeping its size."),
+            (String(localized: "Format numbers"), "Format the numbers consistently: the same decimal places within a column, thousands separators where useful."),
         ]
         return ChipFlow(spacing: 6) {
             ForEach(chips, id: \.title) { chip in
@@ -173,7 +173,7 @@ struct TableAssistPopover: View {
             }
         case .done(let summary, let applied):
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Label(summary ?? (applied == nil ? "The table is unchanged." : "Changed the table."), systemImage: "sparkles")
+                Label(summary ?? (applied == nil ? String(localized: "The table is unchanged.") : String(localized: "Changed the table.")), systemImage: "sparkles")
                     .symbolRenderingMode(.multicolor)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer()
@@ -232,8 +232,8 @@ struct TableAssistPopover: View {
                     if case .text(let t) = e { reply += t }
                 }
                 try Task.checkCancellation()
-                guard state.model == before else { phase = .failed("The table changed while the model was answering."); return }
-                guard let result = TableAssist.apply(reply, to: before) else { phase = .failed("Couldn't read the model's table."); return }
+                guard state.model == before else { phase = .failed(String(localized: "The table changed while the model was answering.")); return }
+                guard let result = TableAssist.apply(reply, to: before) else { phase = .failed(String(localized: "Couldn't read the model's table.")); return }
                 state.change("Intelligence") { $0 = result.model }
                 if text == prompt { prompt = "" }
                 phase = .done(summary: result.summary, applied: result.model == before ? nil : result.model)

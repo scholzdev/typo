@@ -86,7 +86,7 @@ struct AddReferenceSheet: View {
 
     private func fetch() {
         guard !fetching else { return }
-        guard let id = ReferenceID.parse(input) else { error = "Enter a DOI (10.xxxx/…), an arXiv ID (2101.00001) or a valid ISBN-10 or ISBN-13."; return }
+        guard let id = ReferenceID.parse(input) else { error = String(localized: "Enter a DOI (10.xxxx/…), an arXiv ID (2101.00001) or a valid ISBN-10 or ISBN-13."); return }
         fetching = true; error = nil; draft = nil; existing = nil
         Task {
             usedKeys = await project.usedReferenceKeys()

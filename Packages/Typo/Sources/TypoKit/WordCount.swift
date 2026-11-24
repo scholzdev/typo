@@ -16,9 +16,12 @@ public enum WordCount {
     /// "4,075 words", "12 of 4,075 words" with a selection, or "4,075 / 20,000 words" with a goal (a selection wins).
     public static func label(total: Int, selected: Int? = nil, goal: Int? = nil, locale: Locale = .current) -> String {
         func n(_ v: Int) -> String { v.formatted(.number.locale(locale)) }
-        let unit = total == 1 ? "word" : "words"
-        if selected == nil, let goal { return "\(n(total)) / \(n(goal)) words" }
-        return selected.map { "\(n($0)) of \(n(total)) \(unit)" } ?? "\(n(total)) \(unit)"
+        if selected == nil, let goal { return String(localized: "\(n(total)) / \(n(goal)) words", bundle: .module) }
+        if let selected {
+            return total == 1 ? String(localized: "\(n(selected)) of \(n(total)) word", bundle: .module)
+                              : String(localized: "\(n(selected)) of \(n(total)) words", bundle: .module)
+        }
+        return total == 1 ? String(localized: "\(n(total)) word", bundle: .module) : String(localized: "\(n(total)) words", bundle: .module)
     }
 }
 

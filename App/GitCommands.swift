@@ -32,7 +32,7 @@ extension AppCommands {
         let remote = idle && model?.hasRemote == true
         let hasChanges = !(model?.status?.changes.isEmpty ?? true)
         func changesTab() { sidebar?.tab = .changes }
-        func run(_ title: String, _ op: @escaping (Project) async throws -> Void) {
+        func run(_ title: LocalizedStringResource, _ op: @escaping (Project) async throws -> Void) {
             guard let project, let model else { return }
             Task { await model.run(project, title) { try await op(project) } }
         }
@@ -66,7 +66,7 @@ extension AppCommands {
         ]
     }
 
-    static let gitHelpTexts: [String: String] = [
+    static let gitHelpTexts: [String: LocalizedStringResource] = [
         "Git/Create Git Repository": "Starts tracking this project's versions with git.",
         "Git/Show Changes": "Opens the Changes tab: changed files, staging and the commit message.",
         "Git/Show File History": "Lists the commits that changed the current file, with the diff of each.",

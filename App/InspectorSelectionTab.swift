@@ -36,7 +36,7 @@ struct InspectorSelectionTab: View {
                 // The figure that was shown, not the one under the caret now: focus leaves the field after a click in the editor.
                 guard let b = buffer, let f = FigureInfo.at(shown.call.range.location + 1, in: b.storage.string), f.call.range.location == shown.call.range.location,
                       f.value(field) != value, let r = f.edit(field, to: value) else { return }
-                b.apply([r], actionName: "Edit Figure")
+                b.apply([r], actionName: String(localized: "Edit Figure"))
                 revision += 1
             },
             editTable: { tables.beginEdit() },
@@ -84,7 +84,7 @@ struct InspectorSelectionTab: View {
               ColorLiterals.scan(b.storage.string).contains(where: { $0.range == range }) else { return }
         let text = ColorLiterals.source(red: c.redComponent, green: c.greenComponent, blue: c.blueComponent, alpha: c.alphaComponent)
         guard (b.storage.string as NSString).substring(with: range) != text else { return }
-        b.apply([Replacement(range: range, text: text)], actionName: "Change Color")
+        b.apply([Replacement(range: range, text: text)], actionName: String(localized: "Change Color"))
         colorRange = NSRange(location: range.location, length: (text as NSString).length)
     }
 }
@@ -121,7 +121,7 @@ struct InspectorSelectionBody: View {
                 switch t {
                 case .table(let m):
                     InspectorRow("Columns", m.columns.count.formatted())
-                    InspectorRow("Header", m.header == nil ? "No" : "Yes")
+                    InspectorRow("Header", m.header == nil ? String(localized: "No") : String(localized: "Yes"))
                     Button("Edit Table…", systemImage: "tablecells.badge.ellipsis", action: editTable).help("Edit this table in the table editor")
                 case .unsupported(let reason):
                     Text(reason).font(.callout).foregroundStyle(.secondary)
@@ -136,7 +136,7 @@ struct InspectorSelectionBody: View {
         if let l = selection.label {
             InspectorSection(l.hit.kind == .reference ? "Reference" : "Label") {
                 InspectorRow("Name", l.hit.name)
-                InspectorRow("Defined", l.definedIn.map { _ in l.definitionCount == 1 ? "Once" : "\(l.definitionCount) times" } ?? "Nowhere")
+                InspectorRow("Defined", l.definedIn.map { _ in l.definitionCount == 1 ? String(localized: "Once") : String(localized: "\(l.definitionCount) times") } ?? String(localized: "Nowhere"))
                 InspectorRow("References", l.references.count.formatted())
                 if let d = l.definedIn {
                     Button("Go to \(l.hit.kind == .bibKey ? "Entry" : "Definition") in \(d.file.name)", systemImage: "arrow.turn.down.right") { open(d) }

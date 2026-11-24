@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Cancel + default action at the trailing edge of a sheet footer; the caller supplies the HStack and Spacer.
 struct SheetButtons: View {
-    let ok: String
+    let ok: LocalizedStringKey
     var disabled = false
     var shortcut: KeyboardShortcut = .defaultAction
     let cancel: () -> Void

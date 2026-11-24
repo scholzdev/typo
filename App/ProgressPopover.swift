@@ -78,7 +78,7 @@ struct ProgressPopover: View {
             }
             if let f = progress.fraction(total: total) {
                 ProgressView(value: f)
-                Text("\(total.formatted()) of \(progress.goal!.formatted()) words (\(Int(f * 100)) %)").font(.caption).foregroundStyle(.secondary)
+                Text("\(total.formatted()) of \(progress.goal!.formatted()) words (\(f.formatted(.percent.precision(.fractionLength(0)))))").font(.caption).foregroundStyle(.secondary)
             }
             let today = progress.today(total: total)
             Text("Today: \(today >= 0 ? "+" : "\u{2212}")\(abs(today).formatted()) words").monospacedDigit()
@@ -88,7 +88,7 @@ struct ProgressPopover: View {
                     ForEach(chapters) { c in
                         RowButton { reveal(c) } label: {
                             HStack {
-                                Text(c.title.isEmpty ? (c.level == 0 ? "Front matter" : "Untitled") : c.title).lineLimit(1)
+                                Text(c.title.isEmpty ? (c.level == 0 ? String(localized: "Front matter") : String(localized: "Untitled")) : c.title).lineLimit(1)
                                 Spacer(minLength: 12)
                                 Text(c.words.formatted()).monospacedDigit().foregroundStyle(.secondary)
                             }

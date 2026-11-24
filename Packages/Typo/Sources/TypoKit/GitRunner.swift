@@ -5,9 +5,9 @@ public enum GitError: Error, LocalizedError {
     case notInstalled, noRemote, timedOut(String), failed(String)
     public var errorDescription: String? {
         switch self {
-        case .notInstalled: "git was not found (looked in /opt/homebrew/bin, /usr/local/bin and /usr/bin)."
-        case .noRemote: "No remote is configured. Add a remote first."
-        case .timedOut(let c): "git \(c) did not finish in time."
+        case .notInstalled: String(localized: "git was not found (looked in /opt/homebrew/bin, /usr/local/bin and /usr/bin).", bundle: .module)
+        case .noRemote: String(localized: "No remote is configured. Add a remote first.", bundle: .module)
+        case .timedOut(let c): String(localized: "git \(c) did not finish in time.", bundle: .module)
         case .failed(let m): m
         }
     }

@@ -281,7 +281,7 @@ extension DecorationView {
                                                     .foregroundColor: colors.ruler.withAlphaComponent(fade)]
         // A block reads `{ ··· }` like Xcode: a dots pill, then the closing line in its own colours; a section gives its line count.
         let tail = foldTail?(start)
-        let label = (tail != nil ? "•••" : "⋯ \(n) \(n == 1 ? "line" : "lines")") as NSString
+        let label = (tail != nil ? "•••" : String(localized: "⋯ \(n) lines")) as NSString
         let size = label.size(withAttributes: attrs)
         let b = last.typographicBounds
         let rect = NSRect(x: frame.minX + b.maxX + (tail != nil ? 5 : 8), y: frame.minY + b.minY + (b.height - size.height - 2) / 2,

@@ -28,15 +28,21 @@ struct ExportCommands: Commands {
 
 @MainActor enum ProjectExporter {
     /// Warns about fonts the engine could not find; false when the user cancels.
-    private static func confirmFonts(_ project: Project, ok: String) -> Bool {
+    private static func confirmFonts(_ project: Project, printing: Bool) -> Bool {
         let names = QuickFixes.missingFonts(in: project.diagnostics)
         guard !names.isEmpty else { return true }
         let list = ListFormatter.localizedString(byJoining: names)
-        return confirm("Some Fonts Are Missing", "\(list) \(names.count == 1 ? "isn\u{2019}t" : "aren\u{2019}t") installed, so the document uses a replacement font. Install \(names.count == 1 ? "it" : "them") or choose other fonts, then \(ok == "Print Anyway" ? "print" : "export") again.", ok: ok)
+        let detail: LocalizedStringResource = switch (names.count == 1, printing) {
+        case (true, true): "\(list) isn\u{2019}t installed, so the document uses a replacement font. Install it or choose other fonts, then print again."
+        case (true, false): "\(list) isn\u{2019}t installed, so the document uses a replacement font. Install it or choose other fonts, then export again."
+        case (false, true): "\(list) aren\u{2019}t installed, so the document uses a replacement font. Install them or choose other fonts, then print again."
+        case (false, false): "\(list) aren\u{2019}t installed, so the document uses a replacement font. Install them or choose other fonts, then export again."
+        }
+        return confirm("Some Fonts Are Missing", detail, ok: printing ? "Print Anyway" : "Export Anyway")
     }
 
     static func print(_ project: Project) async {
-        guard confirmFonts(project, ok: "Print Anyway") else { return }
+        guard confirmFonts(project, printing: true) else { return }
         do {
             let data = try await project.exportPDF(standard: .plain)
             guard let document = PDFDocument(data: data),
@@ -48,12 +54,12 @@ struct ExportCommands: Commands {
             op.jobTitle = (project.pdfFileName as NSString).deletingPathExtension
             if let window = NSApp.keyWindow { op.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil) } else { op.run() }
         } catch {
-            showAlert("Could Not Print", error.localizedDescription)
+            showAlert("Could Not Print", error)
         }
     }
 
     static func pdf(_ project: Project, _ standard: PDFStandard) async {
-        guard confirmFonts(project, ok: "Export Anyway") else { return }
+        guard confirmFonts(project, printing: false) else { return }
         do {
             let count = try await project.exportPageCount()
             let panel = NSSavePanel()
@@ -65,7 +71,7 @@ struct ExportCommands: Commands {
             guard panel.runModal() == .OK, let url = panel.url else { return }
             var spans: [PageSpan]?
             switch PageSelection.parse(pages?.text ?? "", pageCount: count) {
-            case .failure(let f)?: return showAlert("Check the Pages", f.message)
+            case .failure(let f)?: return showAlert("Check the Pages", verbatim: f.message)
             case .success(let s)?: spans = s
             case nil: spans = nil
             }
@@ -86,7 +92,7 @@ struct ExportCommands: Commands {
 
     /// `.png`'s ppi is chosen in the panel. One page: a save panel. Several: a folder (the sandbox grants no siblings of a saved file).
     static func pages(_ project: Project, _ requested: PageFormat) async {
-        guard confirmFonts(project, ok: "Export Anyway") else { return }
+        guard confirmFonts(project, printing: false) else { return }
         do {
             let count = try await project.exportPageCount()
             let isPNG = requested != .svg
@@ -103,8 +109,8 @@ struct ExportCommands: Commands {
                 open.canChooseFiles = false
                 open.canChooseDirectories = true
                 open.canCreateDirectories = true
-                open.prompt = "Export"
-                open.message = "Choose a folder for \(count) \(ext.uppercased()) files."
+                open.prompt = String(localized: "Export")
+                open.message = String(localized: "Choose a folder for \(count) \(ext.uppercased()) files.")
                 panel = open
             }
             panel.accessoryView = accessory?.view
@@ -118,7 +124,7 @@ struct ExportCommands: Commands {
                 guard confirm("Replace Existing Files?", "Some files named \u{201C}\(stem)-…\(".\(ext)")\u{201D} already exist in this folder.", ok: "Replace") else { return }
             }
             let data = try await project.exportPages(format)
-            guard data.count == urls.count else { throw ProjectError.exportFailed("The document changed while exporting. Try again.") }
+            guard data.count == urls.count else { throw ProjectError.exportFailed(String(localized: "The document changed while exporting. Try again.")) }
             for (d, url) in zip(data, urls) { try d.write(to: url, options: .atomic) }
         } catch {
             showExportFailure(error)
@@ -134,10 +140,10 @@ struct ExportCommands: Commands {
     var text: String { field.stringValue }
 
     init(pageCount: Int) {
-        field.placeholderString = "All \(pageCount) pages, or e.g. 1-3, 7, 9-"
-        field.setAccessibilityLabel("Pages to export")
+        field.placeholderString = String(localized: "All \(pageCount) pages, or e.g. 1-3, 7, 9-")
+        field.setAccessibilityLabel(String(localized: "Pages to export"))
         field.widthAnchor.constraint(equalToConstant: 240).isActive = true
-        let stack = NSStackView(views: [NSTextField(labelWithString: "Pages:"), field])
+        let stack = NSStackView(views: [NSTextField(labelWithString: String(localized: "Pages:")), field])
         stack.edgeInsets = NSEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
         view = stack
     }
@@ -149,9 +155,9 @@ struct ExportCommands: Commands {
     let view: NSView
 
     init() {
-        popup.addItems(withTitles: Self.choices.map { "\($0) ppi" })
+        popup.addItems(withTitles: Self.choices.map { String(localized: "\($0) ppi") })
         popup.selectItem(at: 2)
-        let stack = NSStackView(views: [NSTextField(labelWithString: "Resolution:"), popup])
+        let stack = NSStackView(views: [NSTextField(labelWithString: String(localized: "Resolution:")), popup])
         stack.edgeInsets = NSEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
         view = stack
     }

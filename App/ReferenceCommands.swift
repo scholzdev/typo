@@ -51,7 +51,7 @@ struct ReferenceCommands: Commands {
         if let hit = index.hit(in: file, at: offset) {
             guard let (site, count) = index.target(of: hit.name) else {
                 NSSound.beep()
-                return toast("No definition for @\(hit.name)")
+                return toast(String(localized: "No definition for @\(hit.name)"))
             }
             project.show(site.file, range: site.token, flash: true)
             if count > 1 { toast("\(count) definitions of <\(hit.name)>; showing the first") }
@@ -68,9 +68,9 @@ struct ReferenceCommands: Commands {
         case .file(let f): return project.openPermanently(f)
         case .builtin(let doc):
             // Nothing to jump to: the full documentation instead (Quick Help, ⌥-click, is the short form).
-            guard !doc.docs.isEmpty, let (caret, window) = caretRect(offset) else { return toast("`\(doc.name)` is built into Typst") }
+            guard !doc.docs.isEmpty, let (caret, window) = caretRect(offset) else { return toast(String(localized: "`\(doc.name)` is built into Typst")) }
             return DocsPanel.shared.show(doc: doc, caret: caret, in: window)
-        case .package(let spec): return toast("Defined in package \(spec)")
+        case .package(let spec): return toast(String(localized: "Defined in package \(spec)"))
         case nil: break
         }
         if let symbol = await project.bindingIndex().symbol(in: file, at: offset) {
@@ -130,7 +130,7 @@ struct ReferenceCommands: Commands {
         guard !sites.isEmpty else { return NSSound.beep() }
         let rows = ReferenceRow.make(sites, project: project)
         let refs = rows.filter { !$0.isDefinition }.count, defs = rows.count - refs
-        let title = defs == 1 ? "\(refs) reference\(refs == 1 ? "" : "s") to “\(name)”" : "\(defs) definitions, \(refs) reference\(refs == 1 ? "" : "s") to “\(name)”"
+        let title = defs == 1 ? String(localized: "\(refs) references to “\(name)”") : String(localized: "\(defs) definitions, \(refs) references to “\(name)”")
         guard let tv = NSApp.keyWindow?.firstResponder as? NSTextView, let window = tv.window else { return }
         let caret = tv.firstRect(forCharacterRange: tv.selectedRange(), actualRange: nil)
         let results = ReferenceResults.of(project)
@@ -177,19 +177,19 @@ struct ReferenceCommands: Commands {
         let close = { window.endSheet(sheet) }
         let labels = await project.labelIndex()
         if let hit = labels.hit(in: file, at: offset) {
-            sheet.contentViewController = NSHostingController(rootView: RenameView(title: "Rename “\(hit.name)”", old: hit.name, summary: labels.renameSummary(of: hit.name), validate: { labels.validate($0, replacing: hit.name) }, cancel: close) { new in
+            sheet.contentViewController = NSHostingController(rootView: RenameView(title: String(localized: "Rename “\(hit.name)”"), old: hit.name, summary: labels.renameSummary(of: hit.name), validate: { labels.validate($0, replacing: hit.name) }, cancel: close) { new in
                 close()
                 do {
-                    for (f, edits) in labels.rename(hit.name, to: new) { try await project.edit(f, edits, actionName: "Rename Label") }
-                } catch { showAlert("Couldn’t Rename", "\(error)") }
+                    for (f, edits) in labels.rename(hit.name, to: new) { try await project.edit(f, edits, actionName: String(localized: "Rename Label")) }
+                } catch { showAlert("Couldn’t Rename", error) }
             })
             return window.beginSheet(sheet, completionHandler: nil)
         }
         let index = await project.bindingIndex()
         guard let symbol = index.symbol(in: file, at: offset) else { return NSSound.beep() }
-        guard index.isRenameable(symbol) else { return toast("This name comes from the file name; rename the file instead.") }
+        guard index.isRenameable(symbol) else { return toast(String(localized: "This name comes from the file name; rename the file instead.")) }
         let snapshot = buffer.storage.string
-        sheet.contentViewController = NSHostingController(rootView: RenameView(title: "Rename “\(symbol.name)”", old: symbol.name, summary: index.renameSummary(of: symbol), validate: { index.validate($0, for: symbol) }, cancel: close) { new in
+        sheet.contentViewController = NSHostingController(rootView: RenameView(title: String(localized: "Rename “\(symbol.name)”"), old: symbol.name, summary: index.renameSummary(of: symbol), validate: { index.validate($0, for: symbol) }, cancel: close) { new in
             close()
             var index = index, symbol = symbol
             if buffer.storage.string != snapshot {
@@ -198,8 +198,8 @@ struct ReferenceCommands: Commands {
                 symbol = s
             }
             do {
-                for (f, edits) in index.rename(symbol, to: new) { try await project.edit(f, edits, actionName: "Rename") }
-            } catch { showAlert("Couldn’t Rename", "\(error)") }
+                for (f, edits) in index.rename(symbol, to: new) { try await project.edit(f, edits, actionName: String(localized: "Rename")) }
+            } catch { showAlert("Couldn’t Rename", error) }
         })
         window.beginSheet(sheet, completionHandler: nil)
     }

@@ -6,10 +6,10 @@ extension ProjectOpener {
     /// Asks where the new project folder goes; nil when cancelled.
     static func askForNewFolder(named name: String, message: String) -> URL? {
         let panel = NSSavePanel()
-        panel.title = "New Project"
+        panel.title = String(localized: "New Project")
         panel.message = message
-        panel.prompt = "Create"
-        panel.nameFieldLabel = "Project Name:"
+        panel.prompt = String(localized: "Create")
+        panel.nameFieldLabel = String(localized: "Project Name:")
         panel.nameFieldStringValue = name
         panel.canCreateDirectories = true
         return panel.runModal() == .OK ? panel.url : nil
@@ -17,7 +17,7 @@ extension ProjectOpener {
 
     /// A new folder with an empty main.typ. An existing folder (Save panel "Replace") is an error, never merged.
     @discardableResult func newProject() -> Bool {
-        guard let folder = Self.askForNewFolder(named: "Untitled", message: "Choose a name and location for the new project.") else { return false }
+        guard let folder = Self.askForNewFolder(named: "Untitled", message: String(localized: "Choose a name and location for the new project.")) else { return false }
         let lang = Locale.current.language.languageCode?.identifier ?? "en"
         let paper = ["US", "CA", "MX"].contains(Locale.current.region?.identifier ?? "") ? "us-letter" : "a4"
         do {
@@ -27,7 +27,7 @@ extension ProjectOpener {
             openWindow(value: try recents.register(root: folder, main: RelPath("main.typ")!))
             return true
         } catch {
-            showAlert("Could Not Create \"\(folder.lastPathComponent)\"", error.localizedDescription)
+            showAlert("Could Not Create \"\(folder.lastPathComponent)\"", error)
             return false
         }
     }
@@ -138,7 +138,7 @@ struct TemplateChooser: View {
 
     private func create(_ template: PackageTemplate) {
         guard creating == nil,
-              let folder = ProjectOpener.askForNewFolder(named: template.name, message: "Choose a name and location for the new project from \(template.name).")
+              let folder = ProjectOpener.askForNewFolder(named: template.name, message: String(localized: "Choose a name and location for the new project from \(template.name)."))
         else { return }
         creating = template
         Task {
@@ -149,7 +149,7 @@ struct TemplateChooser: View {
                 dismissWindow(id: "welcome")
                 dismiss()
             } catch {
-                showAlert("Could Not Create \"\(folder.lastPathComponent)\"", error.localizedDescription)
+                showAlert("Could Not Create \"\(folder.lastPathComponent)\"", error)
             }
         }
     }

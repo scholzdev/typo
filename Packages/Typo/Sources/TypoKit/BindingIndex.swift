@@ -222,13 +222,13 @@ public struct BindingIndex: Sendable {
 
     /// A message when `new` cannot replace the symbol's name; nil when it can.
     public func validate(_ new: String, for s: BindingSymbol) -> String? {
-        if new.isEmpty { return "The name can't be empty." }
-        if !Self.isValidIdentifier(new) { return "Use letters, digits, _ and - only, starting with a letter or _." }
-        if Self.keywords.contains(new) { return "“\(new)” is a keyword." }
-        if new == s.name { return "That is the current name." }
-        if !isRenameable(s) { return "This name comes from the file's name." }
+        if new.isEmpty { return String(localized: "The name can't be empty.", bundle: .module) }
+        if !Self.isValidIdentifier(new) { return String(localized: "Use letters, digits, _ and - only, starting with a letter or _.", bundle: .module) }
+        if Self.keywords.contains(new) { return String(localized: "“\(new)” is a keyword.", bundle: .module) }
+        if new == s.name { return String(localized: "That is the current name.", bundle: .module) }
+        if !isRenameable(s) { return String(localized: "This name comes from the file's name.", bundle: .module) }
         for site in sites(of: s) {
-            if resolve(new, in: site.file, at: site.range.location) != nil { return "“\(new)” is already used." }
+            if resolve(new, in: site.file, at: site.range.location) != nil { return String(localized: "“\(new)” is already used.", bundle: .module) }
         }
         return nil
     }

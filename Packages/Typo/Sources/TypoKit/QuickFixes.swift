@@ -105,7 +105,7 @@ extension Project {
             let inner = NSRange(location: loc.range.location + 1, length: loc.range.length - 2)
             let installed = await fontFamilyNames(host: loc.file).filter { !$0.hasPrefix(".") && !$0.contains("\"") }
             return QuickFixes.fontSuggestions(name, installed: installed).map {
-                QuickFix(title: "Use \u{201C}\($0)\u{201D}", edits: [loc.file: [Replacement(range: inner, text: $0)]])
+                QuickFix(title: String(localized: "Use \u{201C}\($0)\u{201D}", bundle: .module), edits: [loc.file: [Replacement(range: inner, text: $0)]])
             }
         case .packageUpdate(let name, let version):
             let sources = textSources(where: FileKind.isTypst).compactMap(\.loaded)
@@ -121,7 +121,7 @@ extension Project {
         let target = NSRange(location: loc.range.location + at.location, length: at.length)
         let asRef = shown.hasPrefix("@")
         return QuickFixes.closest(name, in: Array(index.definitions.keys) + Array(index.bibKeys.keys)).map { new in
-            QuickFix(title: "Change to \(asRef ? "@" : "<")\(new)\(asRef ? "" : ">")", edits: [loc.file: [Replacement(range: target, text: new)]])
+            QuickFix(title: String(localized: "Change to \(asRef ? "@" : "<")\(new)\(asRef ? "" : ">")", bundle: .module), edits: [loc.file: [Replacement(range: target, text: new)]])
         }
     }
 
@@ -146,10 +146,10 @@ extension Project {
                 }
                 edit = Replacement(range: NSRange(location: at, length: 0), text: line)
             }
-            fixes.append(QuickFix(title: "Import `\(name)` from \"\(path)\"", edits: [loc.file: [edit]]))
+            fixes.append(QuickFix(title: String(localized: "Import `\(name)` from \"\(path)\"", bundle: .module), edits: [loc.file: [edit]]))
         }
         for new in QuickFixes.closest(name, in: index.visibleNames(in: loc.file, at: loc.range.location)) {
-            fixes.append(QuickFix(title: "Change to `\(new)`", edits: [loc.file: [Replacement(range: loc.range, text: new)]]))
+            fixes.append(QuickFix(title: String(localized: "Change to `\(new)`", bundle: .module), edits: [loc.file: [Replacement(range: loc.range, text: new)]]))
         }
         return fixes
     }
@@ -170,6 +170,6 @@ extension Project {
         }
         scored.sort { ($0.2, $0.1, $0.0) < ($1.2, $1.1, $1.0) }
         let inner = NSRange(location: loc.range.location + 1, length: loc.range.length - 2)
-        return scored.prefix(3).map { QuickFix(title: "Change to \"\($0.0)\"", edits: [loc.file: [Replacement(range: inner, text: $0.0)]]) }
+        return scored.prefix(3).map { QuickFix(title: String(localized: "Change to \"\($0.0)\"", bundle: .module), edits: [loc.file: [Replacement(range: inner, text: $0.0)]]) }
     }
 }

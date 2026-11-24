@@ -12,7 +12,7 @@ struct SnippetSettings: View {
             VStack(spacing: 0) {
                 List(store.snippets, selection: $selection) { s in
                     HStack {
-                        Text(s.title.isEmpty ? "Untitled" : s.title).lineLimit(1)
+                        Text(s.title.isEmpty ? String(localized: "Untitled") : s.title).lineLimit(1)
                         Spacer()
                         if !s.prefix.isEmpty {
                             Text(s.prefix).font(.caption.monospaced()).padding(.horizontal, 5)

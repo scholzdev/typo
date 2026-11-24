@@ -35,7 +35,7 @@ enum Refactorings {
         let body = inner.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !body.isEmpty else { return [] }
         let block = isSpace(ns.character(at: eq.location + 1)) && isSpace(ns.character(at: NSMaxRange(eq) - 2))
-        let (title, text) = block ? ("Convert to Inline Equation", "$" + body + "$") : ("Convert to Block Equation", "$ " + body + " $")
+        let (title, text) = block ? (String(localized: "Convert to Inline Equation", bundle: .module), "$" + body + "$") : (String(localized: "Convert to Block Equation", bundle: .module), "$ " + body + " $")
         return [Refactoring(title: title, range: eq, snippet: Snippet(text: text, placeholders: []))]
     }
 
@@ -43,8 +43,8 @@ enum Refactorings {
         let line = ns.lineRange(for: NSRange(location: sel.location, length: 0))
         guard let h = Folding.candidates(ns).first(where: { $0.marker >= line.location && $0.marker < NSMaxRange(line) }),
               spans.contains(where: { $0.tag == .heading && $0.range.location == h.marker }) else { return [] }
-        let demote = Refactoring(title: "Demote Heading", range: NSRange(location: h.marker, length: 0), snippet: Snippet(text: "=", placeholders: []))
-        let promote = Refactoring(title: "Promote Heading", range: NSRange(location: h.marker, length: 1), snippet: Snippet(text: "", placeholders: []))
+        let demote = Refactoring(title: String(localized: "Demote Heading", bundle: .module), range: NSRange(location: h.marker, length: 0), snippet: Snippet(text: "=", placeholders: []))
+        let promote = Refactoring(title: String(localized: "Promote Heading", bundle: .module), range: NSRange(location: h.marker, length: 1), snippet: Snippet(text: "", placeholders: []))
         return h.level > 1 ? [promote, demote] : [demote]
     }
 
@@ -68,7 +68,7 @@ enum Refactorings {
         let text = "\(prefix)name = \(open)\(picked)\(close)\n\(head)\(ref)name\(end)"
         let first = NSRange(location: prefix.utf16.count, length: 4)
         let second = NSRange(location: (text as NSString).length - 4 - end.utf16.count, length: 4)
-        return [Refactoring(title: "Extract to Variable", range: NSRange(location: line.location, length: NSMaxRange(sel) - line.location),
+        return [Refactoring(title: String(localized: "Extract to Variable", bundle: .module), range: NSRange(location: line.location, length: NSMaxRange(sel) - line.location),
                             snippet: Snippet(text: text, placeholders: [first, second], groups: [1, 1]))]
     }
 }

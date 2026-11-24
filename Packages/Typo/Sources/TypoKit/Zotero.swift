@@ -48,13 +48,13 @@ public enum ZoteroError: Error, Equatable, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .unsavedChanges(let f): "\u{201C}\(f)\u{201D} has unsaved changes, so Zotero didn\u{2019}t overwrite it. Save or revert it, then sync again."
-        case .notRunning: "Zotero isn\u{2019}t running."
-        case .localAPIDisabled: "Turn on \u{201C}Allow other applications on this computer to communicate with Zotero\u{201D} in Zotero \u{203A} Settings \u{203A} Advanced."
-        case .badKey: "Zotero refused the API key. Check the key and its library access at zotero.org/settings/keys."
-        case .missingKey: "No Zotero API key is saved. Connect Zotero again."
-        case .rateLimited(let s): "Zotero asked to wait \(s) seconds before the next sync."
-        case .http(let s): "Zotero answered with an error (HTTP \(s))."
+        case .unsavedChanges(let f): String(localized: "\u{201C}\(f)\u{201D} has unsaved changes, so Zotero didn\u{2019}t overwrite it. Save or revert it, then sync again.", bundle: .module)
+        case .notRunning: String(localized: "Zotero isn\u{2019}t running.", bundle: .module)
+        case .localAPIDisabled: String(localized: "Turn on \u{201C}Allow other applications on this computer to communicate with Zotero\u{201D} in Zotero \u{203A} Settings \u{203A} Advanced.", bundle: .module)
+        case .badKey: String(localized: "Zotero refused the API key. Check the key and its library access at zotero.org/settings/keys.", bundle: .module)
+        case .missingKey: String(localized: "No Zotero API key is saved. Connect Zotero again.", bundle: .module)
+        case .rateLimited(let s): String(localized: "Zotero asked to wait \(s) seconds before the next sync.", bundle: .module)
+        case .http(let s): String(localized: "Zotero answered with an error (HTTP \(s)).", bundle: .module)
         case .network(let m): m
         }
     }

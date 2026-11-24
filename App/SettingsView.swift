@@ -20,16 +20,16 @@ enum SettingsTab: String, CaseIterable {
 
     var title: String {
         switch self {
-        case .general: "General"
-        case .appearance: "Appearance"
-        case .intelligence: "Intelligence"
-        case .navigation: "Navigation"
-        case .textEditing: "Editing"
-        case .shortcuts: "Shortcuts"
-        case .snippets: "Snippets"
-        case .packages: "Packages"
-        case .sourceControl: "Source Control"
-        case .components: "Components"
+        case .general: String(localized: "General")
+        case .appearance: String(localized: "Appearance")
+        case .intelligence: String(localized: "Intelligence")
+        case .navigation: String(localized: "Navigation")
+        case .textEditing: String(localized: "Editing")
+        case .shortcuts: String(localized: "Shortcuts")
+        case .snippets: String(localized: "Snippets")
+        case .packages: String(localized: "Packages")
+        case .sourceControl: String(localized: "Source Control")
+        case .components: String(localized: "Components")
         }
     }
 
@@ -87,7 +87,7 @@ struct SettingsView: View {
         let n = packageUpdates.updates.count
         return Text("\(n)").font(.caption.weight(.semibold)).monospacedDigit().foregroundStyle(.white)
             .padding(.horizontal, 6).padding(.vertical, 1).background(Color.accentColor, in: Capsule())
-            .accessibilityLabel("\(n) \(n == 1 ? "update" : "updates")")
+            .accessibilityLabel("\(n) updates")
     }
 
     private func go(to p: SettingsPlace) {

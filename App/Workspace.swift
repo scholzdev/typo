@@ -97,7 +97,7 @@ struct EditorBottomBar: View {
         .overlay(alignment: .top) { Divider() }
     }
 
-    private func button(_ symbol: String, _ label: String, _ help: String, _ command: Formatting.Command) -> some View {
+    private func button(_ symbol: String, _ label: LocalizedStringKey, _ help: LocalizedStringKey, _ command: Formatting.Command) -> some View {
         Button(label, systemImage: symbol) { actions.format(command) }.help(help)
     }
 }
@@ -108,7 +108,7 @@ private struct CaretStatusButton: View {
     let layout: EditorLayout
 
     var body: some View {
-        Button((actions.caretStatus ?? "").replacingOccurrences(of: "Line ", with: "Line: ").replacingOccurrences(of: ", Col ", with: "  Col: ")) { layout.quickOpen = .line }
+        Button(actions.caretStatus ?? "") { layout.quickOpen = .line }
             .labelStyle(.titleOnly).buttonStyle(.borderless).font(.system(size: 11).monospacedDigit()).foregroundStyle(.secondary)
             .help("Go to Line (⌘L)")
     }
@@ -129,7 +129,7 @@ struct GlassCluster<Content: View>: View {
 
 /// An on/off control inside a `GlassCluster`: a borderless button whose symbol takes the accent colour while on.
 struct ClusterToggle: View {
-    let title: String
+    let title: LocalizedStringKey
     let symbol: String
     @Binding var isOn: Bool
 
@@ -169,6 +169,7 @@ struct PreviewToolbar: View {
     @State private var pageField = ""
     private var preview: PreviewModel { project.preview }
     private var pageWidth: CGFloat { preview.pages.first?.size.width ?? 595 }
+    private func percent(_ p: Int) -> String { (Double(p) / 100).formatted(.percent.precision(.fractionLength(0))) }
 
     var body: some View {
         GlassEffectContainer(spacing: 8) {
@@ -187,9 +188,9 @@ struct PreviewToolbar: View {
         GlassCluster {
             Button("Zoom Out", systemImage: "minus.magnifyingglass") { preview.zoom(by: 0.8) }
                 .help("Zoom Out")
-            Menu("\(PreviewMath.percent(zoom: preview.zoom, fitWidth: preview.fitWidth, pageWidth: pageWidth)) %") {
+            Menu(percent(PreviewMath.percent(zoom: preview.zoom, fitWidth: preview.fitWidth, pageWidth: pageWidth))) {
                 ForEach(PreviewMath.presets, id: \.self) { p in
-                    Button("\(p) %") { preview.set(zoom: PreviewMath.zoom(percent: p, fitWidth: preview.fitWidth, pageWidth: pageWidth)) }
+                    Button(percent(p)) { preview.set(zoom: PreviewMath.zoom(percent: p, fitWidth: preview.fitWidth, pageWidth: pageWidth)) }
                 }
                 Divider()
                 Picker("Fit", selection: Bindable(preview).fit) {
@@ -274,7 +275,7 @@ struct PreviewToolbar: View {
         .help("More preview controls")
     }
 
-    private var popOutTitle: String { preview.isPoppedOut ? "Return Preview to Window" : "Pop Out Preview" }
+    private var popOutTitle: String { preview.isPoppedOut ? String(localized: "Return Preview to Window") : String(localized: "Pop Out Preview") }
 
     private func present() { PresentationSession.start(project, presenter: false, openWindow: openWindow) }
 
@@ -390,7 +391,7 @@ private struct BranchSwitcher: View {
             if !model.branches.isEmpty { Divider() }
             Button("New Branch…") { creating = true }
         } label: {
-            Label(model.status?.branch ?? model.detachedCommit ?? "No commits", systemImage: "arrow.triangle.branch")
+            Label(model.status?.branch ?? model.detachedCommit ?? String(localized: "No commits"), systemImage: "arrow.triangle.branch")
                 .font(.system(size: 11)).lineLimit(1)
                 .padding(.horizontal, 8).padding(.vertical, 2)
                 .background(Color.primary.opacity(0.06), in: .capsule)

@@ -127,7 +127,7 @@ struct ShortcutRecorder: View {
     @State private var refusal: String?
 
     var body: some View {
-        Text(recording ? "Press keys…" : spec?.display ?? "")
+        Text(recording ? String(localized: "Press keys…") : spec?.display ?? "")
             .monospacedDigit()
             .contentShape(Rectangle())
             .onTapGesture { recording.toggle() }
@@ -205,8 +205,8 @@ struct ShortcutsSettings: View {
 
     /// The app menu's items are the system's; the editor's keys are not menu items. Both are read-only.
     private var entries: [ShortcutEntry] {
-        func fixed(_ section: String, _ title: String, _ symbol: String, _ keys: String, editor: Bool) -> ShortcutEntry {
-            ShortcutEntry(id: "\(section)/\(title)", section: section, title: title, systemImage: symbol, fixed: keys, isEditorKey: editor)
+        func fixed(_ section: String, _ title: LocalizedStringResource, _ symbol: String, _ keys: String, editor: Bool) -> ShortcutEntry {
+            ShortcutEntry(id: "\(section)/\(title.key)", section: section, title: String(localized: title), systemImage: symbol, fixed: keys, isEditorKey: editor)
         }
         let accept = switch CompletionPreferences.acceptKeys { case .both: "↩, ⇥"; case .returnOnly: "↩"; case .tabOnly: "⇥" }
         let app = [fixed("Typo", "About Typo", "info.circle", "", editor: false), fixed("Typo", "Settings…", "gearshape", "⌘,", editor: false),
@@ -217,7 +217,7 @@ struct ShortcutsSettings: View {
                     fixed("Editor", "Indent", "increase.indent", "⇥", editor: true), fixed("Editor", "Outdent", "decrease.indent", "⇧⇥", editor: true)]
         // Export is File's submenu.
         let menu = commands.map { c in
-            ShortcutEntry(id: c.id, section: c.menuKey == "Export" ? "File" : c.menuKey, title: c.menuKey == "Export" ? "Export ▸ \(String(localized: c.title))" : String(localized: c.title), systemImage: c.systemImage, command: c)
+            ShortcutEntry(id: c.id, section: c.menuKey == "Export" ? "File" : c.menuKey, title: c.menuKey == "Export" ? String(localized: "Export ▸ \(String(localized: c.title))") : String(localized: c.title), systemImage: c.systemImage, command: c)
         }
         return (app + menu + keys).enumerated().sorted { (Self.rank($0.element.section), $0.offset) < (Self.rank($1.element.section), $1.offset) }.map(\.element)
     }
@@ -295,7 +295,7 @@ struct ShortcutsSettings: View {
     }
 
     private func header(conflicted: Int) -> some View {
-        func segments(_ choices: [(ShortcutScope, String)]) -> some View {
+        func segments(_ choices: [(ShortcutScope, LocalizedStringKey)]) -> some View {
             Picker("Show", selection: Binding<ShortcutScope?>(get: { choices.contains { $0.0 == scope } ? scope : nil }, set: { if let s = $0 { scope = s } })) {
                 ForEach(choices, id: \.0) { Text($0.1).tag(Optional($0.0)) }
             }
@@ -347,8 +347,8 @@ struct ShortcutsSettings: View {
             Spacer()
             if !others.isEmpty {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow)
-                    .help("Also used by " + others.joined(separator: ", "))
-                    .accessibilityLabel("Conflicts with " + others.joined(separator: ", "))
+                    .help("Also used by \(others.joined(separator: ", "))")
+                    .accessibilityLabel("Conflicts with \(others.joined(separator: ", "))")
             }
             Group {
                 if let c {

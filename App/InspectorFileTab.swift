@@ -14,7 +14,7 @@ struct InspectorFileFacts {
     var encoding: String?
     var lineEnding: String?
     var indentation: String?
-    var indentationSource = "App settings"
+    var indentationSource = String(localized: "App settings")
 
     var name: String { (path as NSString).lastPathComponent }
 }
@@ -44,10 +44,11 @@ struct InspectorFileTab: View {
                                    size: (attrs?[.size] as? NSNumber)?.intValue, modified: attrs?[.modificationDate] as? Date, isTypst: FileKind.isTypst(file.raw))
         if let b = project.openBuffer(file) {
             let format = b.diskFormat, indent = b.indentSettings
-            f.encoding = (format.encoding.rawValue == "utf8" ? "UTF-8" : format.encoding.rawValue) + (format.bom ? " with BOM" : "")
-            f.lineEnding = ["lf": "LF (Unix)", "crlf": "CRLF (Windows)", "cr": "CR (classic Mac)"][format.lineEnding.rawValue]
-            f.indentation = indent.useTabs ? "Tabs, width \(indent.tabWidth)" : "\(indent.indentWidth) spaces"
-            f.indentationSource = indent.preferEditorConfig ? ".editorconfig, else app settings" : "App settings"
+            let encoding = format.encoding.rawValue == "utf8" ? "UTF-8" : format.encoding.rawValue
+            f.encoding = format.bom ? String(localized: "\(encoding) with BOM") : encoding
+            f.lineEnding = ["lf": String(localized: "LF (Unix)"), "crlf": String(localized: "CRLF (Windows)"), "cr": String(localized: "CR (classic Mac)")][format.lineEnding.rawValue]
+            f.indentation = indent.useTabs ? String(localized: "Tabs, width \(indent.tabWidth)") : String(localized: "\(indent.indentWidth) spaces")
+            f.indentationSource = indent.preferEditorConfig ? String(localized: ".editorconfig, else app settings") : String(localized: "App settings")
         }
         return f
     }

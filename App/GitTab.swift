@@ -61,11 +61,11 @@ import TypstEngine
     }
 
     /// Runs one git operation with the spinner on, shows git's stderr on failure, then refreshes.
-    func run(_ project: Project, _ title: String, _ op: () async throws -> Void) async {
+    func run(_ project: Project, _ title: LocalizedStringResource, _ op: () async throws -> Void) async {
         guard !busy else { return }
         busy = true
         await staging?.value                            // a commit must see every checkbox clicked before it
-        do { try await op() } catch { showAlert(title, error.localizedDescription) }
+        do { try await op() } catch { showAlert(title, error) }
         busy = false
         await refresh(project)
     }
@@ -94,7 +94,7 @@ extension GitModel {
             await previous?.value
             do {
                 if on { try await project.stage(cs) } else { try await project.unstage(cs) }
-            } catch { showAlert(on ? "Couldn’t Stage" : "Couldn’t Unstage", error.localizedDescription) }
+            } catch { showAlert(on ? "Couldn’t Stage" : "Couldn’t Unstage", error) }
             endStaging()
             await refresh(project)
         }
@@ -302,9 +302,9 @@ struct GitTab: View {
     /// "Commit 2 Files" when some are checked, "Commit All" when none are.
     private var commitTitle: String {
         switch stagedCount {
-        case 0: "Commit All"
-        case 1: "Commit 1 File"
-        case let n: "Commit \(n) Files"
+        case 0: String(localized: "Commit All")
+        case 1: String(localized: "Commit 1 File")
+        case let n: String(localized: "Commit \(n) Files")
         }
     }
 
@@ -349,7 +349,7 @@ struct GitTab: View {
         .help("Put changes aside and bring them back later")
     }
 
-    private func stashOp(_ st: GitStash, _ title: String, _ op: @escaping () async throws -> Void) {
+    private func stashOp(_ st: GitStash, _ title: LocalizedStringResource, _ op: @escaping () async throws -> Void) {
         Task { await model.run(project, title, op) }
     }
 
@@ -460,7 +460,7 @@ struct DiffContent: View {
 
     /// A button on each hunk header (Stage / Unstage); it gets the hunk's index in the diff.
     struct HunkAction {
-        let title: String
+        let title: LocalizedStringKey
         let perform: (Int) -> Void
     }
 
@@ -776,7 +776,7 @@ private struct ChangeDiffSheet: View {
         applying = true
         Task {
             do { try await project.applyHunk(hunk, of: patch, unstage: unstage) } catch {
-                showAlert(unstage ? "Couldn’t Unstage the Hunk" : "Couldn’t Stage the Hunk", error.localizedDescription)
+                showAlert(unstage ? "Couldn’t Unstage the Hunk" : "Couldn’t Stage the Hunk", error)
             }
             await model.refresh(project)
             await load()

@@ -127,14 +127,14 @@ struct AgentPermissionsSettings: View {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
-        panel.prompt = "Allow"
+        panel.prompt = String(localized: "Allow")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         let path = AgentAccess.resolve(url.path)
         if !access.folders.contains(path) { access.folders = (access.folders + [path]).sorted() }
     }
 
     /// A titled list as in Xcode: rows sorted alphabetically, a click selects one, + and − below.
-    private func rules(_ list: WritableKeyPath<AgentAccess, [String]>, selection: Binding<String?>, title: String, text: String,
+    private func rules(_ list: WritableKeyPath<AgentAccess, [String]>, selection: Binding<String?>, title: LocalizedStringKey, text: LocalizedStringKey,
                        add: @escaping () -> Void) -> some View {
         let items = access[keyPath: list]
         return VStack(alignment: .leading, spacing: 0) {
@@ -182,7 +182,7 @@ struct AssistantPermissionsSection: View {
                             ForEach(p.choices, id: \.self) { Text($0.title).tag($0) }
                         }
                     } else {
-                        LabeledContent(p.title, value: "Always on")
+                        LabeledContent(p.title, value: String(localized: "Always on"))
                     }
                     Text(p.detail).font(.caption).foregroundStyle(.secondary)
                     if p == .webSearch {
@@ -231,7 +231,7 @@ struct AssistantPermissionsPopover: View {
                                               set: { model.setPermission(p, $0 ? p.onPolicy : .never) }))
                     .disabled(searchMissing)
             }
-            Text(searchMissing ? "Not available with \(model.provider?.name ?? "this provider")" : policy == .ask && p == .webSearch ? "Asks before each message" : policy == .ask && p == .projectFiles ? "Asks before reading a file" : policy == .ask && p == .viewPreview ? "Asks before looking at the preview" : policy == .ask && (p == .changeFiles || p == .createFiles) ? "Shows a card to accept first" : policy == .allow && p == .changeFiles ? "Applies changes right away" : policy == .allow && p == .createFiles ? "Creates files right away" : p.detail)
+            Text(searchMissing ? String(localized: "Not available with \(model.provider?.name ?? String(localized: "this provider"))") : policy == .ask && p == .webSearch ? String(localized: "Asks before each message") : policy == .ask && p == .projectFiles ? String(localized: "Asks before reading a file") : policy == .ask && p == .viewPreview ? String(localized: "Asks before looking at the preview") : policy == .ask && (p == .changeFiles || p == .createFiles) ? String(localized: "Shows a card to accept first") : policy == .allow && p == .changeFiles ? String(localized: "Applies changes right away") : policy == .allow && p == .createFiles ? String(localized: "Creates files right away") : p.detail)
                 .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
         }
     }

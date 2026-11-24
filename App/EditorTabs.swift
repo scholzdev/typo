@@ -158,7 +158,7 @@ struct JumpBar: View {
         }
     }
 
-    private func issueButton(_ title: String, _ symbol: String, forward: Bool, _ issues: [Diagnostic]) -> some View {
+    private func issueButton(_ title: LocalizedStringKey, _ symbol: String, forward: Bool, _ issues: [Diagnostic]) -> some View {
         Button(title, systemImage: symbol) {
             let caret = actions.editor?.textView?.selectedRange().location ?? 0
             func offset(_ d: Diagnostic) -> Int? { if case .project(let l) = d.origin { l.range.location } else { nil } }
@@ -199,7 +199,7 @@ struct JumpBar: View {
                 segment(title(of: region), icon: Image(systemName: "number.square.fill").foregroundStyle(.purple)) { headingMenu(regions) }
             } else if !regions.isEmpty {
                 chevron
-                segment("No Selection", icon: EmptyView()) { headingMenu(regions) }.foregroundStyle(.secondary)
+                segment(String(localized: "No Selection"), icon: EmptyView()) { headingMenu(regions) }.foregroundStyle(.secondary)
             }
         }
         .foregroundStyle(focused ? .primary : .secondary)
@@ -269,7 +269,7 @@ struct JumpBar: View {
         guard region.heading < text.length else { return "" }
         let line = text.substring(with: text.lineRange(for: NSRange(location: region.heading, length: 0)))
         let t = line.drop { $0 == "=" || $0 == " " }.trimmingCharacters(in: .whitespacesAndNewlines)
-        return t.isEmpty ? "Untitled" : t
+        return t.isEmpty ? String(localized: "Untitled") : t
     }
 }
 

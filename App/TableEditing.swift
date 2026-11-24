@@ -36,7 +36,7 @@ import TypstEngine
         let lines = completion.missingImports(cells: cells, file: buffer.path)
         guard !lines.isEmpty else { return }
         let at = CellCompletion.importInsertionPoint(in: buffer.storage.string)
-        buffer.apply([Replacement(range: NSRange(location: at, length: 0), text: lines)], actionName: "Add Import")
+        buffer.apply([Replacement(range: NSRange(location: at, length: 0), text: lines)], actionName: String(localized: "Add Import"))
     }
 
     func insert(rows: Int, columns: Int, header: Bool, figure: Bool) {
@@ -71,7 +71,7 @@ struct TableInsertPopover: View {
                 }
             }
             .onHover { if !$0 { hovered = nil } }
-            Text(hovered.map { "\($0.column) columns × \($0.row) rows" } ?? "Choose a size")
+            Text(hovered.map { String(localized: "\($0.column) columns × \($0.row) rows") } ?? String(localized: "Choose a size"))
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
             Toggle("Header row", isOn: $header)

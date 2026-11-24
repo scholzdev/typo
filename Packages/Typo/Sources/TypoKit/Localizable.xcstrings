@@ -1,0 +1,1736 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ / %@ words" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@ words"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ / %2$@ Wörter"
+          }
+        }
+      }
+    },
+    "%@ answered with HTTP status %lld." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ antwortete mit HTTP-Status %lld."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ answered with HTTP status %2$lld."
+          }
+        }
+      }
+    },
+    "%@ did not accept this %@. Check that it is current and has the required scopes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hat diesen Wert (%2$@) nicht akzeptiert. Prüfen, ob er aktuell ist und die nötigen Berechtigungen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ did not accept this %2$@. Check that it is current and has the required scopes."
+          }
+        }
+      }
+    },
+    "%@ of %@ word" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@ word"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ von %2$@ Wort"
+          }
+        }
+      }
+    },
+    "%@ of %@ words" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@ words"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ von %2$@ Wörtern"
+          }
+        }
+      }
+    },
+    "%@ word" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Wort"
+          }
+        }
+      }
+    },
+    "%@ words" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Wörter"
+          }
+        }
+      }
+    },
+    "%@, %@ selected" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, %@ ausgewählt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@ selected"
+          }
+        }
+      }
+    },
+    "%lld characters" : {
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Zeichen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Zeichen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld character"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld characters"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld lines" : {
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Zeile"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Zeilen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld line"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lines"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "A folder named \"%@\" already exists." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Ordner namens „%@“ ist bereits vorhanden."
+          }
+        }
+      }
+    },
+    "Account: Read" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account: Lesen"
+          }
+        }
+      }
+    },
+    "Add Reference" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quelle hinzufügen"
+          }
+        }
+      }
+    },
+    "Add `alt: \"\"`" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "`alt: \"\"` hinzufügen"
+          }
+        }
+      }
+    },
+    "Add `title: []`" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "`title: []` hinzufügen"
+          }
+        }
+      }
+    },
+    "Additions" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergänzungen"
+          }
+        }
+      }
+    },
+    "App Password" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Passwort"
+          }
+        }
+      }
+    },
+    "Background" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrund"
+          }
+        }
+      }
+    },
+    "Bibliography entry “%@” is never cited" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Literatureintrag „%@“ wird nie zitiert"
+          }
+        }
+      }
+    },
+    "Booktabs" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Booktabs"
+          }
+        }
+      }
+    },
+    "Change to \"%@\"" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In „%@“ ändern"
+          }
+        }
+      }
+    },
+    "Change to %@%@%@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %@%@%@ ändern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Change to %1$@%2$@%3$@"
+          }
+        }
+      }
+    },
+    "Change to `%@`" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In `%@` ändern"
+          }
+        }
+      }
+    },
+    "Change to level %lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Ebene %lld ändern"
+          }
+        }
+      }
+    },
+    "Comments" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommentare"
+          }
+        }
+      }
+    },
+    "Convert to Block Equation" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In abgesetzte Formel umwandeln"
+          }
+        }
+      }
+    },
+    "Convert to Inline Equation" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Inline-Formel umwandeln"
+          }
+        }
+      }
+    },
+    "Could not get the template package: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Vorlagenpaket konnte nicht abgerufen werden: %@"
+          }
+        }
+      }
+    },
+    "Couldn’t reach %@: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ nicht erreichbar: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Couldn’t reach %1$@: %2$@"
+          }
+        }
+      }
+    },
+    "Current line" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Zeile"
+          }
+        }
+      }
+    },
+    "Current line number" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Zeilennummer"
+          }
+        }
+      }
+    },
+    "Cursor" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cursor"
+          }
+        }
+      }
+    },
+    "Deletions" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschungen"
+          }
+        }
+      }
+    },
+    "Demote Heading" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überschrift herabstufen"
+          }
+        }
+      }
+    },
+    "Emphasis" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hervorhebung"
+          }
+        }
+      }
+    },
+    "Enter a branch name." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Branchnamen eingeben."
+          }
+        }
+      }
+    },
+    "Enter a repository URL." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repository-URL eingeben."
+          }
+        }
+      }
+    },
+    "Errors" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler"
+          }
+        }
+      }
+    },
+    "Escapes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escape-Sequenzen"
+          }
+        }
+      }
+    },
+    "Every snapshot of the last %lld hours is kept, then the newest of each day for %lld days, never more than %lld per project." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Schnappschüsse der letzten %lld Stunden bleiben erhalten, danach der jeweils neueste jedes Tages für %lld Tage, höchstens %lld pro Projekt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Every snapshot of the last %1$lld hours is kept, then the newest of each day for %2$lld days, never more than %3$lld per project."
+          }
+        }
+      }
+    },
+    "Extract to Variable" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Variable auslagern"
+          }
+        }
+      }
+    },
+    "F5 completes in the editor." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "F5 vervollständigt im Editor."
+          }
+        }
+      }
+    },
+    "File “%@” does not exist" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei „%@“ existiert nicht"
+          }
+        }
+      }
+    },
+    "Fit Page" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite einpassen"
+          }
+        }
+      }
+    },
+    "Fit Width" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breite einpassen"
+          }
+        }
+      }
+    },
+    "For Vim habits: moves Re-Indent from ⌃I (Vim's jump-forward key, also Tab) to ⌥⌘I. Every other app shortcut is a ⌘ or ⌃⇧ chord and stays." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für Vim-Gewohnheiten: Verschiebt „Neu einrücken“ von ⌃I (Vims Vorwärtssprung, auch Tab) auf ⌥⌘I. Alle anderen Kurzbefehle der App sind ⌘- oder ⌃⇧-Kombinationen und bleiben."
+          }
+        }
+      }
+    },
+    "Functions" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktionen"
+          }
+        }
+      }
+    },
+    "Grid" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raster"
+          }
+        }
+      }
+    },
+    "Header Line" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopfzeile"
+          }
+        }
+      }
+    },
+    "Headings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überschriften"
+          }
+        }
+      }
+    },
+    "Import `%@` from \"%@\"" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "`%@` aus „%@“ importieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import `%1$@` from \"%2$@\""
+          }
+        }
+      }
+    },
+    "Inactive selection" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inaktive Auswahl"
+          }
+        }
+      }
+    },
+    "Indent" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrücken"
+          }
+        }
+      }
+    },
+    "Insert `#set document(title: [])`" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "`#set document(title: [])` einfügen"
+          }
+        }
+      }
+    },
+    "Insert `#set text(lang: \"%@\")`" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "`#set text(lang: \"%@\")` einfügen"
+          }
+        }
+      }
+    },
+    "Interpolation" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interpolation"
+          }
+        }
+      }
+    },
+    "It holds %lld entries instead of one." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es enthält %lld Einträge statt einem."
+          }
+        }
+      }
+    },
+    "Keywords" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlüsselwörter"
+          }
+        }
+      }
+    },
+    "Label <%@> is also defined at %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Label <%@> ist auch in %@ definiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Label <%1$@> is also defined at %2$@"
+          }
+        }
+      }
+    },
+    "Label <%@> is never referenced" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf Label <%@> wird nie verwiesen"
+          }
+        }
+      }
+    },
+    "Labels" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels"
+          }
+        }
+      }
+    },
+    "Labels and References" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels und Verweise"
+          }
+        }
+      }
+    },
+    "Line %lld, Col %lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeile %lld, Spalte %lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Line %1$lld, Col %2$lld"
+          }
+        }
+      }
+    },
+    "Line numbers" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeilennummern"
+          }
+        }
+      }
+    },
+    "Links" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        }
+      }
+    },
+    "List markers" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listenmarkierungen"
+          }
+        }
+      }
+    },
+    "Math" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mathematik"
+          }
+        }
+      }
+    },
+    "Math delimiters" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mathe-Begrenzer"
+          }
+        }
+      }
+    },
+    "Math operators" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mathe-Operatoren"
+          }
+        }
+      }
+    },
+    "Math parentheses" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mathe-Klammern"
+          }
+        }
+      }
+    },
+    "Modifications" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Änderungen"
+          }
+        }
+      }
+    },
+    "Move Section" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abschnitt verschieben"
+          }
+        }
+      }
+    },
+    "No %@ API was found at %@." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unter %2$@ wurde keine %1$@-API gefunden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No %1$@ API was found at %2$@."
+          }
+        }
+      }
+    },
+    "No Zotero API key is saved. Connect Zotero again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Zotero-API-Schlüssel gesichert. Zotero erneut verbinden."
+          }
+        }
+      }
+    },
+    "No reference was found for this DOI, arXiv ID or ISBN." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für diese DOI, arXiv-ID oder ISBN wurde kein Verweis gefunden."
+          }
+        }
+      }
+    },
+    "No remote is configured. Add a remote first." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Remote konfiguriert. Zuerst ein Remote hinzufügen."
+          }
+        }
+      }
+    },
+    "Numbers" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlen"
+          }
+        }
+      }
+    },
+    "Only headings written with `=` can be moved." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur mit `=` geschriebene Überschriften lassen sich verschieben."
+          }
+        }
+      }
+    },
+    "Operators" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operatoren"
+          }
+        }
+      }
+    },
+    "Outdent" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausrücken"
+          }
+        }
+      }
+    },
+    "Plain" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einfach"
+          }
+        }
+      }
+    },
+    "Promote Heading" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überschrift höherstufen"
+          }
+        }
+      }
+    },
+    "Punctuation" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interpunktion"
+          }
+        }
+      }
+    },
+    "Raw" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Roh"
+          }
+        }
+      }
+    },
+    "Re-Indent" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu einrücken"
+          }
+        }
+      }
+    },
+    "References" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verweise"
+          }
+        }
+      }
+    },
+    "Repositories: Write" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repositories: Schreiben"
+          }
+        }
+      }
+    },
+    "Repository: Write" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repository: Schreiben"
+          }
+        }
+      }
+    },
+    "Restore File" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei wiederherstellen"
+          }
+        }
+      }
+    },
+    "Revert Assistant Change" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Änderung des Assistenten zurücknehmen"
+          }
+        }
+      }
+    },
+    "Selection" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswahl"
+          }
+        }
+      }
+    },
+    "Strings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeichenketten"
+          }
+        }
+      }
+    },
+    "Striped" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestreift"
+          }
+        }
+      }
+    },
+    "Strong" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fett"
+          }
+        }
+      }
+    },
+    "Sync from Zotero" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von Zotero synchronisieren"
+          }
+        }
+      }
+    },
+    "TODO markers" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TODO-Markierungen"
+          }
+        }
+      }
+    },
+    "Term list terms" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begriffe der Begriffsliste"
+          }
+        }
+      }
+    },
+    "Text" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        }
+      }
+    },
+    "That change is no longer there." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Änderung ist nicht mehr vorhanden."
+          }
+        }
+      }
+    },
+    "That is the current name." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist der aktuelle Name."
+          }
+        }
+      }
+    },
+    "That server address is not valid." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Serveradresse ist ungültig."
+          }
+        }
+      }
+    },
+    "The answer could not be read as a bibliography entry. %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Antwort konnte nicht als Literatureintrag gelesen werden. %@"
+          }
+        }
+      }
+    },
+    "The document has %lld pages, so there is no page %lld." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Dokument hat %#@pages@, daher gibt es keine Seite %2$lld."
+          },
+          "substitutions" : {
+            "pages" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg Seite"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg Seiten"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The document has %#@pages@, so there is no page %2$lld."
+          },
+          "substitutions" : {
+            "pages" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg page"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg pages"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "The key “%@” is already used in this project." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Schlüssel „%@“ wird in diesem Projekt bereits verwendet."
+          }
+        }
+      }
+    },
+    "The lookup service could not be reached. Check your internet connection." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Suchdienst ist nicht erreichbar. Die Internetverbindung prüfen."
+          }
+        }
+      }
+    },
+    "The name can't be empty." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Name darf nicht leer sein."
+          }
+        }
+      }
+    },
+    "The service answered with status %lld." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Dienst antwortete mit Status %lld."
+          }
+        }
+      }
+    },
+    "The template package is invalid: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Vorlagenpaket ist ungültig: %@"
+          }
+        }
+      }
+    },
+    "The token could not be saved in the Keychain: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Token konnte nicht im Schlüsselbund gesichert werden: %@"
+          }
+        }
+      }
+    },
+    "This change is already staged." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Änderung ist bereits vorgemerkt."
+          }
+        }
+      }
+    },
+    "This name comes from the file's name." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Name stammt vom Dateinamen."
+          }
+        }
+      }
+    },
+    "This section is inside a content block and can't leave it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Abschnitt liegt in einem Inhaltsblock und kann ihn nicht verlassen."
+          }
+        }
+      }
+    },
+    "Token" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Token"
+          }
+        }
+      }
+    },
+    "Turn on “Allow other applications on this computer to communicate with Zotero” in Zotero › Settings › Advanced." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„Andere Anwendungen auf diesem Computer dürfen mit Zotero kommunizieren“ in Zotero › Einstellungen › Erweitert einschalten."
+          }
+        }
+      }
+    },
+    "Two Pages" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwei Seiten"
+          }
+        }
+      }
+    },
+    "Units" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einheiten"
+          }
+        }
+      }
+    },
+    "Untitled" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Titel"
+          }
+        }
+      }
+    },
+    "Use letters, digits, _ and - only, starting with a letter or _." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Buchstaben, Ziffern, _ und - verwenden, beginnend mit einem Buchstaben oder _."
+          }
+        }
+      }
+    },
+    "Use “%@”" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ verwenden"
+          }
+        }
+      }
+    },
+    "Use ⌘ or ⌃ with the key, or a function key." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘ oder ⌃ mit der Taste verwenden oder eine Funktionstaste."
+          }
+        }
+      }
+    },
+    "Wrap the first row in `table.header`" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erste Zeile in `table.header` einschließen"
+          }
+        }
+      }
+    },
+    "Zotero answered with an error (HTTP %lld)." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zotero antwortete mit einem Fehler (HTTP %lld)."
+          }
+        }
+      }
+    },
+    "Zotero asked to wait %lld seconds before the next sync." : {
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Zotero bittet, %lld Sekunde bis zur nächsten Synchronisierung zu warten."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Zotero bittet, %lld Sekunden bis zur nächsten Synchronisierung zu warten."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Zotero asked to wait %lld second before the next sync."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Zotero asked to wait %lld seconds before the next sync."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Zotero isn’t running." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zotero läuft nicht."
+          }
+        }
+      }
+    },
+    "Zotero refused the API key. Check the key and its library access at zotero.org/settings/keys." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zotero hat den API-Schlüssel abgelehnt. Schlüssel und Bibliothekszugriff unter zotero.org/settings/keys prüfen."
+          }
+        }
+      }
+    },
+    "git %@ did not finish in time." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "git %@ wurde nicht rechtzeitig beendet."
+          }
+        }
+      }
+    },
+    "git was not found (looked in /opt/homebrew/bin, /usr/local/bin and /usr/bin)." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "git wurde nicht gefunden (gesucht in /opt/homebrew/bin, /usr/local/bin und /usr/bin)."
+          }
+        }
+      }
+    },
+    "“%@” cannot be moved into itself." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ kann nicht in sich selbst verschoben werden."
+          }
+        }
+      }
+    },
+    "“%@” cannot replace an item that contains it or is inside it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ kann kein Objekt ersetzen, das es enthält oder in ihm liegt."
+          }
+        }
+      }
+    },
+    "“%@” contains this project and cannot be copied into it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ enthält dieses Projekt und kann nicht hineinkopiert werden."
+          }
+        }
+      }
+    },
+    "“%@” could not be moved to the Trash: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$@“ konnte nicht in den Papierkorb gelegt werden: %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "“%1$@” could not be moved to the Trash: %2$@"
+          }
+        }
+      }
+    },
+    "“%@” could not be moved: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$@“ konnte nicht verschoben werden: %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "“%1$@” could not be moved: %2$@"
+          }
+        }
+      }
+    },
+    "“%@” has unsaved changes, so Zotero didn’t overwrite it. Save or revert it, then sync again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ hat nicht gesicherte Änderungen, daher hat Zotero die Datei nicht überschrieben. Sichern oder zurücksetzen und dann erneut abgleichen."
+          }
+        }
+      }
+    },
+    "“%@” is a keyword." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ist ein Schlüsselwort."
+          }
+        }
+      }
+    },
+    "“%@” is already used." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ wird bereits verwendet."
+          }
+        }
+      }
+    },
+    "“%@” is not a page or a range of pages." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ist keine Seite und kein Seitenbereich."
+          }
+        }
+      }
+    },
+    "“%@” is not a valid branch name." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ist kein gültiger Branch-Name."
+          }
+        }
+      }
+    },
+    "“%@” is not a valid key: use letters, digits, and _ - : . starting with a letter." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ist kein gültiger Schlüssel: Buchstaben, Ziffern und _ - : . verwenden, beginnend mit einem Buchstaben."
+          }
+        }
+      }
+    },
+    "“%@” runs backwards." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ verläuft rückwärts."
+          }
+        }
+      }
+    },
+    "⇧⌘Z redoes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⇧⌘Z wiederholt."
+          }
+        }
+      }
+    },
+    "⌘, opens Settings." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘, öffnet die Einstellungen."
+          }
+        }
+      }
+    },
+    "⌘A selects all." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘A wählt alles aus."
+          }
+        }
+      }
+    },
+    "⌘C copies." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘C kopiert."
+          }
+        }
+      }
+    },
+    "⌘H hides the app." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘H blendet die App aus."
+          }
+        }
+      }
+    },
+    "⌘Q quits the app." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘Q beendet die App."
+          }
+        }
+      }
+    },
+    "⌘V pastes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘V fügt ein."
+          }
+        }
+      }
+    },
+    "⌘X cuts." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘X schneidet aus."
+          }
+        }
+      }
+    },
+    "⌘Z undoes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘Z widerruft."
+          }
+        }
+      }
+    },
+    "⌥Esc completes in the editor." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌥Esc vervollständigt im Editor."
+          }
+        }
+      }
+    },
+    "⌥⌘H hides the other apps." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌥⌘H blendet die anderen Apps aus."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -83,7 +83,7 @@ public enum Universe {
 public enum PackageInstallError: LocalizedError, Equatable {
     case fetchFailed(String)
     public var errorDescription: String? {
-        switch self { case .fetchFailed(let m): "Could not download the package: \(m)" }
+        switch self { case .fetchFailed(let m): String(localized: "Could not download the package: \(m)", bundle: .module) }
     }
 }
 

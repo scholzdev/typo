@@ -18,10 +18,10 @@ public enum PageSelection {
                 return .some(n)
             }
             guard let first = page(parts[0]), let last = parts.count == 2 ? page(parts[1]) : first,
-                  first != nil || last != nil else { return .failure(Failure("“\(item)” is not a page or a range of pages.")) }
-            if let f = first, let l = last, f > l { return .failure(Failure("“\(item)” runs backwards.")) }
+                  first != nil || last != nil else { return .failure(Failure(String(localized: "“\(item)” is not a page or a range of pages.", bundle: .module))) }
+            if let f = first, let l = last, f > l { return .failure(Failure(String(localized: "“\(item)” runs backwards.", bundle: .module))) }
             if let p = [first, last].compactMap({ $0 }).first(where: { $0 > pageCount }) {
-                return .failure(Failure("The document has \(pageCount) page\(pageCount == 1 ? "" : "s"), so there is no page \(p)."))
+                return .failure(Failure(String(localized: "The document has \(pageCount) pages, so there is no page \(p).", bundle: .module)))
             }
             spans.append(PageSpan(first: first, last: last))
         }

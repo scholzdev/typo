@@ -23,7 +23,7 @@ public final class ACPProcess: Sendable {
         var fds: [[Int32]] = []
         for _ in 0..<3 {
             var p: [Int32] = [0, 0]
-            guard pipe(&p) == 0 else { fds.joined().forEach { close($0) }; throw ACPError(ACPError.closed, "No pipe for the agent: \(String(cString: strerror(errno)))") }
+            guard pipe(&p) == 0 else { fds.joined().forEach { close($0) }; throw ACPError(ACPError.closed, String(localized: "No pipe for the agent: \(String(cString: strerror(errno)))", bundle: .module)) }
             p.forEach { _ = fcntl($0, F_SETFD, FD_CLOEXEC) }
             fds.append(p)
         }

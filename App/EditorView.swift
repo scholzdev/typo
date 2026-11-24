@@ -156,8 +156,8 @@ final class EditorTextView: NSTextView {
         let i = characterIndexForInsertion(at: convert(event.locationInWindow, from: nil))
         if !NSLocationInRange(i, selectedRange()) { setSelectedRange(NSRange(location: i, length: 0)) }
         if navigableRange?(i) != nil {
-            let items = [("Jump to Definition", "arrow.right.circle", #selector(jumpToDefinition(_:))),
-                         ("Find References", "list.bullet.rectangle", #selector(findReferences(_:)))]
+            let items = [(String(localized: "Jump to Definition"), "arrow.right.circle", #selector(jumpToDefinition(_:))),
+                         (String(localized: "Find References"), "list.bullet.rectangle", #selector(findReferences(_:)))]
             for (n, (title, symbol, action)) in items.enumerated() {
                 let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
                 item.target = self
@@ -168,21 +168,21 @@ final class EditorTextView: NSTextView {
         }
         if fixableAt?(i) == true || hasRefactorings?() == true {
             quickFixClick = (i, convert(event.locationInWindow, from: nil))
-            let item = NSMenuItem(title: "Quick Fixes…", action: #selector(quickFixes(_:)), keyEquivalent: "")
+            let item = NSMenuItem(title: String(localized: "Quick Fixes…"), action: #selector(quickFixes(_:)), keyEquivalent: "")
             item.target = self
             item.image = NSImage(systemSymbolName: "lightbulb", accessibilityDescription: nil)
             menu?.insertItem(item, at: 0)
             menu?.insertItem(.separator(), at: 1)
         }
         if selectedRange().length > 0, onExplainSelection != nil {
-            let item = NSMenuItem(title: "Explain with AI", action: #selector(explainSelection(_:)), keyEquivalent: "")
+            let item = NSMenuItem(title: String(localized: "Explain with AI"), action: #selector(explainSelection(_:)), keyEquivalent: "")
             item.target = self
             item.image = NSImage(systemSymbolName: "sparkles", accessibilityDescription: nil)
             menu?.insertItem(item, at: 0)
             menu?.insertItem(.separator(), at: 1)
         }
         if tableAtCaret?() == true {
-            let item = NSMenuItem(title: "Edit Table…", action: #selector(editTable(_:)), keyEquivalent: "")
+            let item = NSMenuItem(title: String(localized: "Edit Table…"), action: #selector(editTable(_:)), keyEquivalent: "")
             item.target = self
             item.image = NSImage(systemSymbolName: "tablecells.badge.ellipsis", accessibilityDescription: nil)
             menu?.insertItem(item, at: 0)
@@ -190,7 +190,7 @@ final class EditorTextView: NSTextView {
         }
         if let marked = bookmarkedAt?(i) {
             bookmarkClick = i
-            let item = NSMenuItem(title: marked ? "Remove Bookmark" : "Add Bookmark", action: #selector(toggleBookmark(_:)), keyEquivalent: "")
+            let item = NSMenuItem(title: marked ? String(localized: "Remove Bookmark") : String(localized: "Add Bookmark"), action: #selector(toggleBookmark(_:)), keyEquivalent: "")
             item.target = self
             item.image = NSImage(systemSymbolName: marked ? "bookmark.slash" : "bookmark", accessibilityDescription: nil)
             menu?.insertItem(item, at: 0)

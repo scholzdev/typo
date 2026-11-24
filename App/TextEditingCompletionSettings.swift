@@ -12,9 +12,9 @@ enum AcceptKeys: String, CaseIterable {
 
     var title: String {
         switch self {
-        case .both: "Return and Tab"
-        case .returnOnly: "Return only"
-        case .tabOnly: "Tab only"
+        case .both: String(localized: "Return and Tab")
+        case .returnOnly: String(localized: "Return only")
+        case .tabOnly: String(localized: "Tab only")
         }
     }
 }

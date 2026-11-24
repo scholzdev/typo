@@ -47,8 +47,8 @@ struct ZoteroBanner: View {
     }
 
     private func details(_ link: ZoteroLink) -> String {
-        let synced = link.lastSynced.map { "Last synced \($0.formatted(.relative(presentation: .named)))" } ?? "Not synced yet"
-        return ([link.libraryName, synced] + [link.entryCount.map { "\($0) entries" }].compactMap { $0 }).joined(separator: " \u{00B7} ")
+        let synced = link.lastSynced.map { String(localized: "Last synced \($0.formatted(.relative(presentation: .named)))") } ?? String(localized: "Not synced yet")
+        return ([link.libraryName, synced] + [link.entryCount.map { String(localized: "\($0) entries") }].compactMap { $0 }).joined(separator: " \u{00B7} ")
     }
 }
 
@@ -80,7 +80,7 @@ struct ZoteroConnectSheet: View {
         VStack(spacing: 0) {
             Form {
                 Section {
-                    Picker("Source", selection: $source) {
+                    Picker("Library Source", selection: $source) {
                         Text("Local Zotero App").tag(ZoteroSource.local)
                         Text("Zotero Account").tag(ZoteroSource.web)
                     }
@@ -157,7 +157,7 @@ struct ZoteroConnectSheet: View {
     private func connect() async {
         guard let targetPath else { return }
         if source == .web {
-            if !apiKey.isEmpty, !ZoteroKeychain.setKey(apiKey, for: userID) { error = "The key could not be saved in the Keychain."; return }
+            if !apiKey.isEmpty, !ZoteroKeychain.setKey(apiKey, for: userID) { error = String(localized: "The key could not be saved in the Keychain."); return }
             UserDefaults.standard.set(userID, forKey: ZoteroKeychain.userIDKey)
         }
         if project.allFiles.contains(targetPath), project.zoteroLink?.target != targetPath,

@@ -86,8 +86,8 @@ struct MergeEditorSheet: View {
 
     private var columnTitles: some View {
         HStack(spacing: 12) {
-            Text(blocks.first.map(\.mineLabel).flatMap { $0.isEmpty ? nil : $0 } ?? "Ours").frame(maxWidth: .infinity, alignment: .leading)
-            Text(blocks.first.map(\.theirsLabel).flatMap { $0.isEmpty ? nil : $0 } ?? "Theirs").frame(maxWidth: .infinity, alignment: .leading)
+            Text(blocks.first.map(\.mineLabel).flatMap { $0.isEmpty ? nil : $0 } ?? String(localized: "Ours")).frame(maxWidth: .infinity, alignment: .leading)
+            Text(blocks.first.map(\.theirsLabel).flatMap { $0.isEmpty ? nil : $0 } ?? String(localized: "Theirs")).frame(maxWidth: .infinity, alignment: .leading)
         }
         .font(.caption.bold()).foregroundStyle(.secondary)
     }
@@ -113,9 +113,9 @@ struct MergeEditorSheet: View {
         let c = i < choices.count ? choices[i] : nil
         return VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
-                pick("Use Ours", .mine, i)
-                pick("Use Theirs", .theirs, i)
-                pick("Use Both", .both, i)
+                pick(String(localized: "Use Ours"), .mine, i)
+                pick(String(localized: "Use Theirs"), .theirs, i)
+                pick(String(localized: "Use Both"), .both, i)
                 Text("Conflict \(i + 1)").font(.caption).foregroundStyle(.secondary)
             }
             .controlSize(.small)
@@ -148,11 +148,11 @@ struct MergeEditorSheet: View {
 
     private func load() async {
         await project.reloadChangedFiles()              // git rewrote the file outside the buffer
-        guard let p = RelPath(change.path) else { loadError = "Invalid path"; return }
+        guard let p = RelPath(change.path) else { loadError = String(localized: "Invalid path"); return }
         do {
             text = try await project.open(p).storage.string
             choices = Array(repeating: nil, count: ConflictRegion.parse(text ?? "").count)
-        } catch { loadError = "Couldn’t open “\(change.path)”." }
+        } catch { loadError = String(localized: "Couldn’t open “\(change.path)”.") }
     }
 
     private func apply() {
@@ -164,7 +164,7 @@ struct MergeEditorSheet: View {
         Task {
             await model.run(project, "Couldn’t Resolve “\(change.path)”") {
                 let length = (try await project.open(p)).storage.length
-                try await project.edit(p, [Replacement(range: NSRange(location: 0, length: length), text: resolved)], actionName: "Resolve Conflicts")
+                try await project.edit(p, [Replacement(range: NSRange(location: 0, length: length), text: resolved)], actionName: String(localized: "Resolve Conflicts"))
                 if complete { try await project.stage([change]) } else { try await project.saveAll() }
             }
         }

@@ -52,11 +52,11 @@ public enum ReferenceError: LocalizedError, Equatable {
 
     public var errorDescription: String? {
         switch self {
-        case .notFound: "No reference was found for this DOI, arXiv ID or ISBN."
-        case .offline: "The lookup service could not be reached. Check your internet connection."
-        case .unreadable(let why): "The answer could not be read as a bibliography entry. \(why)"
-        case .invalidKey(let k): "“\(k)” is not a valid key: use letters, digits, and _ - : . starting with a letter."
-        case .keyInUse(let k): "The key “\(k)” is already used in this project."
+        case .notFound: String(localized: "No reference was found for this DOI, arXiv ID or ISBN.", bundle: .module)
+        case .offline: String(localized: "The lookup service could not be reached. Check your internet connection.", bundle: .module)
+        case .unreadable(let why): String(localized: "The answer could not be read as a bibliography entry. \(why)", bundle: .module)
+        case .invalidKey(let k): String(localized: "“\(k)” is not a valid key: use letters, digits, and _ - : . starting with a letter.", bundle: .module)
+        case .keyInUse(let k): String(localized: "The key “\(k)” is already used in this project.", bundle: .module)
         }
     }
 }
@@ -94,7 +94,7 @@ public struct ReferenceDraft: Sendable, Equatable {
     private static func parse(_ bibtex: String) throws -> (key: String, year: Int?, draft: ReferenceDraft) {
         let r = Bridge.bibliography(bibtex, yaml: false)
         guard r.error == nil, r.entries.count == 1, let e = r.entries.first else {
-            throw ReferenceError.unreadable(r.error ?? "It holds \(r.entries.count) entries instead of one.")
+            throw ReferenceError.unreadable(r.error ?? String(localized: "It holds \(r.entries.count) entries instead of one.", bundle: .module))
         }
         return (e.key, e.year, ReferenceDraft(bibtex: bibtex, entry: e))
     }
@@ -141,7 +141,7 @@ public enum ReferenceLookup {
         do {
             let (data, status) = try await fetch(req)
             if status == 404 { throw ReferenceError.notFound }
-            guard (200..<300).contains(status) else { throw ReferenceError.unreadable("The service answered with status \(status).") }
+            guard (200..<300).contains(status) else { throw ReferenceError.unreadable(String(localized: "The service answered with status \(status).", bundle: .module)) }
             return (data, status)
         } catch let e as ReferenceError {
             throw e
@@ -230,11 +230,11 @@ extension Project {
         let buffer = try await open(path)
         let text = buffer.storage.string
         let lead = text.isEmpty ? "" : text.hasSuffix("\n\n") ? "" : text.hasSuffix("\n") ? "\n" : "\n\n"
-        try await edit(path, [Replacement(range: NSRange(location: (text as NSString).length, length: 0), text: lead + draft.bibtex)], actionName: "Add Reference")
+        try await edit(path, [Replacement(range: NSRange(location: (text as NSString).length, length: 0), text: lead + draft.bibtex)], actionName: String(localized: "Add Reference", bundle: .module))
         if target == nil, appendBibliography {
             let main = try await open(self.main).storage.string
             let line = (main.isEmpty || main.hasSuffix("\n") ? "" : "\n") + "\n#bibliography(\"refs.bib\")\n"
-            try await edit(self.main, [Replacement(range: NSRange(location: (main as NSString).length, length: 0), text: line)], actionName: "Add Reference")
+            try await edit(self.main, [Replacement(range: NSRange(location: (main as NSString).length, length: 0), text: line)], actionName: String(localized: "Add Reference", bundle: .module))
         }
         return path
     }

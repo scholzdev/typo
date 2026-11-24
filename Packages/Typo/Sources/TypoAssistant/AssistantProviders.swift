@@ -27,56 +27,56 @@ public struct AssistantPreset: Identifiable, Sendable, Equatable {
 
     public static let anthropic = AssistantPreset(id: "anthropic", name: "Claude", organization: "Anthropic", wire: .anthropic, baseURL: "https://api.anthropic.com/v1",
                                                   chatPath: "/messages", modelsPath: "/models", needsKey: true, isLocal: false,
-                                                  caption: "Uses the Anthropic API with your API key.",
+                                                  caption: String(localized: "Uses the Anthropic API with your API key.", bundle: .module),
                                                   models: ["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5", "claude-fable-5-2"])
     /// Apple's model on this Mac: no key, no host, nothing leaves the Mac. Always listed, never stored.
     public static let onDevice = AssistantPreset(id: "on-device", name: "On-Device (Apple Intelligence)", organization: "Apple", wire: .onDevice, baseURL: "",
                                                  chatPath: "", modelsPath: nil, needsKey: false, isLocal: true,
-                                                 caption: "Apple's model on this Mac. Nothing leaves the Mac; it sees a passage, not whole files.",
+                                                 caption: String(localized: "Apple's model on this Mac. Nothing leaves the Mac; it sees a passage, not whole files.", bundle: .module),
                                                  models: ["Apple Foundation Model"])
     public static let customInternet = AssistantPreset(id: "custom-internet", name: "Internet Hosted", organization: "Custom", wire: .openAI, baseURL: nil,
                                                        chatPath: "/chat/completions", modelsPath: "/models", needsKey: false, isLocal: false,
-                                                       caption: "Any server with an OpenAI-compatible chat completions API.", models: [])
+                                                       caption: String(localized: "Any server with an OpenAI-compatible chat completions API.", bundle: .module), models: [])
     public static let customLocal = AssistantPreset(id: "custom-local", name: "Locally Hosted", organization: "Custom", wire: .openAI, baseURL: nil,
                                                     chatPath: "/chat/completions", modelsPath: "/models", needsKey: false, isLocal: true,
-                                                    caption: "A model server on this Mac with an OpenAI-compatible API.", models: [])
+                                                    caption: String(localized: "A model server on this Mac with an OpenAI-compatible API.", bundle: .module), models: [])
 
     /// The presets of "Add a Provider…", in menu order; the two custom ones come from "Add a Model Provider…".
     public static let all: [AssistantPreset] = [
         anthropic,
         AssistantPreset(id: "openai", name: "OpenAI", organization: "OpenAI", wire: .openAI, baseURL: "https://api.openai.com/v1",
-                        chatPath: "/chat/completions", modelsPath: "/models", needsKey: true, isLocal: false, caption: "Uses the OpenAI API with your API key.", models: []),
+                        chatPath: "/chat/completions", modelsPath: "/models", needsKey: true, isLocal: false, caption: String(localized: "Uses the OpenAI API with your API key.", bundle: .module), models: []),
         AssistantPreset(id: "openrouter", name: "OpenRouter", organization: "OpenRouter", wire: .openAI, baseURL: "https://openrouter.ai/api/v1",
                         chatPath: "/chat/completions", modelsPath: "/models", needsKey: true, isLocal: false,
-                        caption: "Many models from many providers with one OpenRouter API key. Model ids look like anthropic/claude-sonnet-5.5.", models: []),
+                        caption: String(localized: "Many models from many providers with one OpenRouter API key. Model ids look like anthropic/claude-sonnet-5.5.", bundle: .module), models: []),
         // Both serve each model on its own protocol; OpenCodeClient picks it from the public model list.
         AssistantPreset(id: "opencode-zen", name: "OpenCode Zen", organization: "OpenCode", wire: .openCode, baseURL: "https://opencode.ai/inference",
                         chatPath: "", modelsPath: "/v1/models", needsKey: true, isLocal: false,
-                        caption: "Pay-as-you-go access to Claude, GPT, Gemini, DeepSeek, Kimi, GLM, Qwen and more with your OpenCode Zen API key.",
+                        caption: String(localized: "Pay-as-you-go access to Claude, GPT, Gemini, DeepSeek, Kimi, GLM, Qwen and more with your OpenCode Zen API key.", bundle: .module),
                         models: []),
         AssistantPreset(id: "opencode-go", name: "OpenCode Go", organization: "OpenCode", wire: .openCode, baseURL: "https://opencode.ai/inference/go",
                         chatPath: "", modelsPath: "/v1/models", needsKey: true, isLocal: false,
-                        caption: "The OpenCode Go subscription's models (Kimi, GLM, DeepSeek, Qwen, MiniMax, GPT Luna, Claude Haiku and more) with your OpenCode API key.",
+                        caption: String(localized: "The OpenCode Go subscription's models (Kimi, GLM, DeepSeek, Qwen, MiniMax, GPT Luna, Claude Haiku and more) with your OpenCode API key.", bundle: .module),
                         models: []),
         AssistantPreset(id: "deepseek", name: "DeepSeek", organization: "DeepSeek", wire: .openAI, baseURL: "https://api.deepseek.com",
-                        chatPath: "/chat/completions", modelsPath: "/models", needsKey: true, isLocal: false, caption: "Uses the DeepSeek API with your API key.", models: []),
+                        chatPath: "/chat/completions", modelsPath: "/models", needsKey: true, isLocal: false, caption: String(localized: "Uses the DeepSeek API with your API key.", bundle: .module), models: []),
         AssistantPreset(id: "moonshot", name: "Kimi", organization: "Moonshot AI", wire: .openAI, baseURL: "https://api.moonshot.ai/v1",
                         chatPath: "/chat/completions", modelsPath: "/models", needsKey: true, isLocal: false,
-                        caption: "The international platform. Keys of the China platform (moonshot.cn) do not work here.", models: []),
+                        caption: String(localized: "The international platform. Keys of the China platform (moonshot.cn) do not work here.", bundle: .module), models: []),
         AssistantPreset(id: "zhipu", name: "GLM (Z.ai)", organization: "Zhipu AI", wire: .openAI, baseURL: "https://api.z.ai/api/paas/v4",
                         chatPath: "/chat/completions", modelsPath: nil, needsKey: true, isLocal: false,
-                        caption: "The international platform. Type the model id, such as one listed in the Z.ai documentation.", models: []),
+                        caption: String(localized: "The international platform. Type the model id, such as one listed in the Z.ai documentation.", bundle: .module), models: []),
         AssistantPreset(id: "zhipu-cn", name: "GLM (BigModel, China)", organization: "Zhipu AI", wire: .openAI, baseURL: "https://open.bigmodel.cn/api/paas/v4",
                         chatPath: "/chat/completions", modelsPath: nil, needsKey: true, isLocal: false,
-                        caption: "The mainland China platform. Type the model id.", models: []),
+                        caption: String(localized: "The mainland China platform. Type the model id.", bundle: .module), models: []),
         AssistantPreset(id: "qwen", name: "Qwen", organization: "Alibaba Cloud Model Studio", wire: .openAI, baseURL: nil,
                         chatPath: "/chat/completions", modelsPath: nil, needsKey: true, isLocal: false,
-                        caption: "Enter your workspace's base URL, such as https://<workspace>.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1 (cn-beijing in mainland China). Keys only work in their own region. Type the model id.",
+                        caption: String(localized: "Enter your workspace's base URL, such as https://<workspace>.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1 (cn-beijing in mainland China). Keys only work in their own region. Type the model id.", bundle: .module),
                         models: []),
         AssistantPreset(id: "ollama", name: "Ollama", organization: "Ollama", wire: .openAI, baseURL: "http://localhost:11434/v1",
-                        chatPath: "/chat/completions", modelsPath: "/models", needsKey: false, isLocal: true, caption: "Runs models on this Mac. No API key needed.", models: []),
+                        chatPath: "/chat/completions", modelsPath: "/models", needsKey: false, isLocal: true, caption: String(localized: "Runs models on this Mac. No API key needed.", bundle: .module), models: []),
         AssistantPreset(id: "lmstudio", name: "LM Studio", organization: "LM Studio", wire: .openAI, baseURL: "http://localhost:1234/v1",
-                        chatPath: "/chat/completions", modelsPath: "/models", needsKey: false, isLocal: true, caption: "Runs models on this Mac. No API key needed by default.", models: []),
+                        chatPath: "/chat/completions", modelsPath: "/models", needsKey: false, isLocal: true, caption: String(localized: "Runs models on this Mac. No API key needed by default.", bundle: .module), models: []),
     ]
 
     static func agent(_ id: String, _ name: String, _ organization: String, _ command: String, caption: String, login: String?) -> AssistantPreset {
@@ -87,22 +87,22 @@ public struct AssistantPreset: Identifiable, Sendable, Equatable {
     /// The agents of "Add a Provider…"; the last one takes any command line.
     public static let agents: [AssistantPreset] = [
         agent("acp-claude", "Claude Code (ACP)", "Anthropic", "npx -y @agentclientprotocol/claude-agent-acp",
-              caption: "Claude Code as an agent on this Mac, with your Claude Code login. It reads and changes the project's files itself. Needs Node.js.",
-              login: "Log in first: run `claude` in Terminal and use /login, then try again."),
+              caption: String(localized: "Claude Code as an agent on this Mac, with your Claude Code login. It reads and changes the project's files itself. Needs Node.js.", bundle: .module),
+              login: String(localized: "Log in first: run `claude` in Terminal and use /login, then try again.", bundle: .module)),
         agent("acp-codex", "Codex (ACP)", "OpenAI", "npx -y @agentclientprotocol/codex-acp",
-              caption: "OpenAI's Codex as an agent on this Mac, with your Codex login. It reads and changes the project's files itself. Needs Node.js.",
-              login: "Log in first: run `codex` in Terminal and sign in, then try again."),
+              caption: String(localized: "OpenAI's Codex as an agent on this Mac, with your Codex login. It reads and changes the project's files itself. Needs Node.js.", bundle: .module),
+              login: String(localized: "Log in first: run `codex` in Terminal and sign in, then try again.", bundle: .module)),
         agent("acp-gemini", "Gemini CLI (ACP)", "Google", "gemini --acp",
-              caption: "Google's Gemini CLI as an agent on this Mac. Install it first, for example with Homebrew.",
-              login: "Log in first: run `gemini` in Terminal and sign in, then try again."),
+              caption: String(localized: "Google's Gemini CLI as an agent on this Mac. Install it first, for example with Homebrew.", bundle: .module),
+              login: String(localized: "Log in first: run `gemini` in Terminal and sign in, then try again.", bundle: .module)),
         agent("acp-goose", "Goose (ACP)", "Block", "goose acp",
-              caption: "The Goose agent on this Mac. Install it and set up its model provider first.",
-              login: "Set up Goose first: run `goose configure` in Terminal, then try again."),
+              caption: String(localized: "The Goose agent on this Mac. Install it and set up its model provider first.", bundle: .module),
+              login: String(localized: "Set up Goose first: run `goose configure` in Terminal, then try again.", bundle: .module)),
         agent("acp-opencode", "OpenCode (ACP)", "OpenCode", "opencode acp",
-              caption: "The OpenCode agent on this Mac. Install it first.",
-              login: "Log in first: run `opencode auth login` in Terminal, then try again."),
+              caption: String(localized: "The OpenCode agent on this Mac. Install it first.", bundle: .module),
+              login: String(localized: "Log in first: run `opencode auth login` in Terminal, then try again.", bundle: .module)),
         agent("acp-custom", "Custom Agent (ACP)", "Custom", "",
-              caption: "Any agent that speaks the Agent Client Protocol over stdio. Enter the command line that starts it.", login: nil),
+              caption: String(localized: "Any agent that speaks the Agent Client Protocol over stdio. Enter the command line that starts it.", bundle: .module), login: nil),
     ]
 
     public static func named(_ id: String) -> AssistantPreset? { (all + agents + [onDevice, customInternet, customLocal]).first { $0.id == id } }

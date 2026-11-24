@@ -8,20 +8,33 @@ extension UTType {
     static let typstSource = UTType(exportedAs: "com.example.typst-source", conformingTo: .plainText)
 }
 
-@MainActor func showAlert(_ title: String, _ detail: String) {
+@MainActor func showAlert(_ title: LocalizedStringResource, _ detail: LocalizedStringResource) {
+    showAlert(title, verbatim: String(localized: detail))
+}
+
+/// For details that are already text: an error's description, a diagnostic from Typst.
+@MainActor func showAlert(_ title: LocalizedStringResource, verbatim detail: String) {
     let a = NSAlert()
-    a.messageText = title
+    a.messageText = String(localized: title)
     a.informativeText = detail
     a.runModal()
 }
 
-@MainActor func confirm(_ title: String, _ detail: String, ok: String, cancel: String = "Cancel", style: NSAlert.Style = .warning) -> Bool {
+@MainActor func showAlert(_ title: LocalizedStringResource, _ error: any Error) {
+    showAlert(title, verbatim: error.localizedDescription)
+}
+
+@MainActor func confirm(_ title: LocalizedStringResource, _ detail: LocalizedStringResource, ok: LocalizedStringResource, cancel: LocalizedStringResource = "Cancel", style: NSAlert.Style = .warning) -> Bool {
+    confirm(title, verbatim: String(localized: detail), ok: ok, cancel: cancel, style: style)
+}
+
+@MainActor func confirm(_ title: LocalizedStringResource, verbatim detail: String, ok: LocalizedStringResource, cancel: LocalizedStringResource = "Cancel", style: NSAlert.Style = .warning) -> Bool {
     let a = NSAlert()
     a.alertStyle = style
-    a.messageText = title
+    a.messageText = String(localized: title)
     a.informativeText = detail
-    a.addButton(withTitle: ok)
-    a.addButton(withTitle: cancel)
+    a.addButton(withTitle: String(localized: ok))
+    a.addButton(withTitle: String(localized: cancel))
     return a.runModal() == .alertFirstButtonReturn
 }
 
@@ -41,8 +54,8 @@ extension UTType {
             let typ = UTType.types(tag: "typ", tagClass: .filenameExtension, conformingTo: nil)
             panel.allowedContentTypes = [.typstSource] + typ + (folders ? [.folder] : [])
         }
-        panel.message = folders && files ? "Choose a Typst project folder or a .typ file"
-            : folders ? "Choose a Typst project folder" : "Choose a .typ file"
+        panel.message = folders && files ? String(localized: "Choose a Typst project folder or a .typ file")
+            : folders ? String(localized: "Choose a Typst project folder") : String(localized: "Choose a .typ file")
         guard panel.runModal() == .OK, let url = panel.url else { return false }
         return open(url)
     }
@@ -74,7 +87,7 @@ extension UTType {
             }
         }
         do { openWindow(value: try recents.register(root: root, main: main)) } catch {
-            showAlert("Could Not Open \"\(root.lastPathComponent)\"", error.localizedDescription)
+            showAlert("Could Not Open \"\(root.lastPathComponent)\"", error)
             return false
         }
         return true
@@ -85,8 +98,8 @@ extension UTType {
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.directoryURL = file.deletingLastPathComponent()
-        panel.prompt = "Grant Access"
-        panel.message = "To resolve imports and images next to \"\(file.lastPathComponent)\", Typo needs access to its folder."
+        panel.prompt = String(localized: "Grant Access")
+        panel.message = String(localized: "To resolve imports and images next to \"\(file.lastPathComponent)\", Typo needs access to its folder.")
         return panel.runModal() == .OK ? panel.url : nil
     }
 }

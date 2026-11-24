@@ -18,12 +18,12 @@ struct AppCommand: Identifiable {
     /// Non-nil for toggles: the menu shows a Toggle, the palette a checkmark.
     var isOn: Bool? = nil
     /// One short sentence on what the command does, shown in the palette's detail pane.
-    var help = ""
+    var help: LocalizedStringResource? = nil
     let action: @MainActor () -> Void
 
     /// `idTitle` replaces the title's catalog key in the id when the title interpolates a value.
     init(menu: LocalizedStringResource, title: LocalizedStringResource, idTitle: String? = nil, systemImage: String, shortcut: KeyboardShortcut? = nil,
-         isEnabled: Bool = true, isOn: Bool? = nil, help: String = "", action: @escaping @MainActor () -> Void) {
+         isEnabled: Bool = true, isOn: Bool? = nil, help: LocalizedStringResource? = nil, action: @escaping @MainActor () -> Void) {
         self.menu = menu; self.title = title; self.menuKey = menu.key; self.id = "\(menu.key)/\(idTitle ?? title.key)"
         self.systemImage = systemImage; self.shortcut = shortcut; self.isEnabled = isEnabled; self.isOn = isOn; self.help = help; self.action = action
     }
@@ -289,11 +289,11 @@ struct AppCommand: Identifiable {
         let groups = newProject(ctx) + open(ctx) + fileItems(ctx) + save(ctx) + tabs(ctx) + print(ctx) + export(ctx) + snapshots(ctx) + multiCursor() + format(ctx)
             + preview(ctx) + editorView(ctx) + navigate(ctx) + tabSwitching(ctx) + git(ctx)
         return groups.flatMap { $0 }.filter { !forPalette || $0.id != "File/Close Window" }
-            .map { var c = $0; c.help = helpTexts[c.id] ?? ""; if forPalette { c.shortcut = ShortcutStore.shared.resolved(c) }; return c }
+            .map { var c = $0; c.help = helpTexts[c.id]; if forPalette { c.shortcut = ShortcutStore.shared.resolved(c) }; return c }
     }
 
     /// Help sentences by command id (see `AppCommand.help`).
-    static let helpTexts: [String: String] = gitHelpTexts.merging([
+    static let helpTexts: [String: LocalizedStringResource] = gitHelpTexts.merging([
         "File/New Project…": "Creates a new Typst project in a folder you choose and opens it in a new window.",
         "File/New Project from Template…": "Opens the template gallery to start a project from a template.",
         "File/Open…": "Chooses an existing project folder and opens it in a window.",

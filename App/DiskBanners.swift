@@ -3,9 +3,9 @@ import SwiftUI
 import TypoKit
 
 private struct FileBanner: View {
-    let message: String
-    let secondary: String
-    let primary: String
+    let message: LocalizedStringKey
+    let secondary: LocalizedStringKey
+    let primary: LocalizedStringKey
     let onSecondary: () -> Void
     let onPrimary: () -> Void
 

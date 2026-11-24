@@ -1,0 +1,132 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Agents answer in the assistant panel only." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agents antworten nur im Assistentenbereich."
+          }
+        }
+      }
+    },
+    "No pipe for the agent: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Pipe für den Agent: %@"
+          }
+        }
+      }
+    },
+    "The agent" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Agent"
+          }
+        }
+      }
+    },
+    "The agent asks you to log in first. Log in with its own command line tool, then try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Agent verlangt zuerst eine Anmeldung. Mit dessen eigenem Befehlszeilenwerkzeug anmelden und es dann erneut versuchen."
+          }
+        }
+      }
+    },
+    "The agent has no command. Enter it in Settings › Intelligence." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für den Agent ist kein Befehl angegeben. In Einstellungen › Intelligenz eintragen."
+          }
+        }
+      }
+    },
+    "The agent opened no session." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Agent hat keine Sitzung geöffnet."
+          }
+        }
+      }
+    },
+    "The agent reported an error: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Agent meldete einen Fehler: %@"
+          }
+        }
+      }
+    },
+    "The agent speaks protocol version %lld; Typo speaks version %lld." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The agent speaks protocol version %1$lld; Typo speaks version %2$lld."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Agent verwendet Protokollversion %lld, Typo verwendet Version %lld."
+          }
+        }
+      }
+    },
+    "The agent stopped." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Agent wurde angehalten."
+          }
+        }
+      }
+    },
+    "The agent stopped:\n%@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Agent wurde angehalten:\n%@"
+          }
+        }
+      }
+    },
+    "“%@” was not found. Install Node.js, which brings npx." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ wurde nicht gefunden. Node.js installieren, das npx mitbringt."
+          }
+        }
+      }
+    },
+    "“%@” was not found. Install it, or enter its full path in Settings › Intelligence." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ wurde nicht gefunden. Installieren oder den vollständigen Pfad in Einstellungen › Intelligenz eintragen."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

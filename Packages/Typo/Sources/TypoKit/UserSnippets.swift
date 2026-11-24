@@ -18,7 +18,7 @@ public struct UserSnippet: Codable, Identifiable, Hashable, Sendable {
 
     /// The library entry (category "User").
     public var librarySnippet: LibrarySnippet {
-        LibrarySnippet(id: Self.libraryID(id), title: title.isEmpty ? "Untitled" : title, summary: summary, category: Self.category,
+        LibrarySnippet(id: Self.libraryID(id), title: title.isEmpty ? String(localized: "Untitled", bundle: .module) : title, summary: summary, category: Self.category,
                        symbol: "curlybraces", apply: body, isBlock: isBlock)
     }
 

@@ -22,7 +22,7 @@ extension Project {
 
     public func addRemote(_ url: String, git: GitRunner = GitRunner()) async throws {
         let u = url.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !u.isEmpty, !u.hasPrefix("-") else { throw GitError.failed("Enter a repository URL.") }
+        guard !u.isEmpty, !u.hasPrefix("-") else { throw GitError.failed(String(localized: "Enter a repository URL.", bundle: .module)) }
         _ = try await git.run(["remote", "add", "origin", u], in: rootURL)
     }
 
@@ -85,9 +85,9 @@ extension Project {
     /// Creates `name` at HEAD and switches to it; the working tree and index stay as they are.
     public func createBranch(_ name: String, git: GitRunner = GitRunner()) async throws {
         let n = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !n.isEmpty, !n.hasPrefix("-") else { throw GitError.failed("Enter a branch name.") }
+        guard !n.isEmpty, !n.hasPrefix("-") else { throw GitError.failed(String(localized: "Enter a branch name.", bundle: .module)) }
         do { _ = try await git.run(["check-ref-format", "--branch", n], in: rootURL) }
-        catch { throw GitError.failed("“\(n)” is not a valid branch name.") }
+        catch { throw GitError.failed(String(localized: "“\(n)” is not a valid branch name.", bundle: .module)) }
         _ = try await git.run(["switch", "-c", n], in: rootURL)
     }
 
@@ -151,7 +151,7 @@ extension Project {
 
     /// Stages hunk `i` of an unstaged patch, or unstages it from a staged one.
     public func applyHunk(_ i: Int, of patch: GitPatch, unstage: Bool, git: GitRunner = GitRunner()) async throws {
-        guard let text = patch.patch(forHunk: i) else { throw GitError.failed("That change is no longer there.") }
+        guard let text = patch.patch(forHunk: i) else { throw GitError.failed(String(localized: "That change is no longer there.", bundle: .module)) }
         _ = try await git.run(["apply", "--cached", "--recount"] + (unstage ? ["--reverse"] : []) + ["-"], in: rootURL, input: text)
     }
 
@@ -160,7 +160,7 @@ extension Project {
     public func stageHunk(of path: RelPath, text: String, line: Int, git: GitRunner = GitRunner()) async throws {
         let index = (try? await git.run(["show", ":./" + path.raw], in: rootURL)) ?? ""   // not in the index yet: empty
         guard let hunk = GitGutterMarks.compute(base: index, current: text).hunk(at: line) else {
-            throw GitError.failed("This change is already staged.")
+            throw GitError.failed(String(localized: "This change is already staged.", bundle: .module))
         }
         let blob = try await git.run(["hash-object", "-w", "--stdin", "--path", path.raw], in: rootURL, input: hunk.apply(to: index))
             .trimmingCharacters(in: .whitespacesAndNewlines)

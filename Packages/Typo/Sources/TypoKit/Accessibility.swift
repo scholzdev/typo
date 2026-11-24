@@ -100,23 +100,23 @@ public enum Accessibility {
         switch rule {
         case .imageAlt:
             guard let c = call("image") else { return [] }
-            return [fix("Add `alt: \"\"`", addArg("alt: \"\"", to: c), caret: "alt: \"")]
+            return [fix(String(localized: "Add `alt: \"\"`", bundle: .module), addArg("alt: \"\"", to: c), caret: "alt: \"")]
         case .headingLevel:
             let all = headings(in: text)
             guard let i = all.firstIndex(where: { $0.marker == range }), i > 0 else { return [] }
             let level = all[i - 1].level + 1
-            return [QuickFix(title: "Change to level \(level)", edits: [file: [Replacement(range: range, text: String(repeating: "=", count: level))]])]
+            return [QuickFix(title: String(localized: "Change to level \(level)", bundle: .module), edits: [file: [Replacement(range: range, text: String(repeating: "=", count: level))]])]
         case .tableHeader:
             guard let c = call("table"), let wrap = wrapFirstRow(c, in: ns) else { return [] }
-            return [QuickFix(title: "Wrap the first row in `table.header`", edits: [file: [wrap]])]
+            return [QuickFix(title: String(localized: "Wrap the first row in `table.header`", bundle: .module), edits: [file: [wrap]])]
         case .documentTitle:
-            if let c = call("document") { return [fix("Add `title: []`", addArg("title: []", to: c), caret: "title: [")] }
-            return [fix("Insert `#set document(title: [])`", insertAfterLeadingSets("#set document(title: [])\n", in: ns), caret: "title: [")]
+            if let c = call("document") { return [fix(String(localized: "Add `title: []`", bundle: .module), addArg("title: []", to: c), caret: "title: [")] }
+            return [fix(String(localized: "Insert `#set document(title: [])`", bundle: .module), insertAfterLeadingSets("#set document(title: [])\n", in: ns), caret: "title: [")]
         case .textLanguage:
             let line = "#set text(lang: \"\(language)\")\n"
             let edit = insertAfterLeadingSets(line, in: ns)
             let at = (edit.text as NSString).range(of: language, options: .backwards)
-            return [QuickFix(title: "Insert `#set text(lang: \"\(language)\")`", edits: [file: [edit]],
+            return [QuickFix(title: String(localized: "Insert `#set text(lang: \"\(language)\")`", bundle: .module), edits: [file: [edit]],
                              selection: NSRange(location: edit.range.location + at.location, length: at.length))]
         }
     }

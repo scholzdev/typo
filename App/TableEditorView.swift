@@ -153,7 +153,7 @@ struct TableEditorView: View {
                     Toggle(style.title, isOn: Binding(get: { model.style == style }, set: { _ in state.applyStyle(style) }))
                 }
             } label: {
-                Label(model.style?.title ?? "Custom Style", systemImage: "line.3.horizontal")
+                Label(model.style?.title ?? String(localized: "Custom Style"), systemImage: "line.3.horizontal")
             }
             .labelStyle(TitledLabelStyle(titled: !compact))
             .fixedSize()
@@ -201,13 +201,13 @@ struct TableEditorView: View {
 
     /// Light fills that keep black text readable; the Typst source is what the cell gets.
     private static let fills: [(name: String, typst: String, color: NSColor)] = [
-        ("Grey", "luma(235)", NSColor(white: 0.92, alpha: 1)),
-        ("Red", "red.lighten(70%)", NSColor(srgbRed: 1, green: 0.78, blue: 0.76, alpha: 1)),
-        ("Orange", "orange.lighten(70%)", NSColor(srgbRed: 1, green: 0.86, blue: 0.73, alpha: 1)),
-        ("Yellow", "yellow.lighten(70%)", NSColor(srgbRed: 1, green: 0.96, blue: 0.70, alpha: 1)),
-        ("Green", "green.lighten(70%)", NSColor(srgbRed: 0.78, green: 0.94, blue: 0.80, alpha: 1)),
-        ("Blue", "blue.lighten(70%)", NSColor(srgbRed: 0.70, green: 0.84, blue: 0.96, alpha: 1)),
-        ("Purple", "purple.lighten(70%)", NSColor(srgbRed: 0.91, green: 0.73, blue: 0.94, alpha: 1)),
+        (String(localized: "Grey"), "luma(235)", NSColor(white: 0.92, alpha: 1)),
+        (String(localized: "Red"), "red.lighten(70%)", NSColor(srgbRed: 1, green: 0.78, blue: 0.76, alpha: 1)),
+        (String(localized: "Orange"), "orange.lighten(70%)", NSColor(srgbRed: 1, green: 0.86, blue: 0.73, alpha: 1)),
+        (String(localized: "Yellow"), "yellow.lighten(70%)", NSColor(srgbRed: 1, green: 0.96, blue: 0.70, alpha: 1)),
+        (String(localized: "Green"), "green.lighten(70%)", NSColor(srgbRed: 0.78, green: 0.94, blue: 0.80, alpha: 1)),
+        (String(localized: "Blue"), "blue.lighten(70%)", NSColor(srgbRed: 0.70, green: 0.84, blue: 0.96, alpha: 1)),
+        (String(localized: "Purple"), "purple.lighten(70%)", NSColor(srgbRed: 0.91, green: 0.73, blue: 0.94, alpha: 1)),
     ]
 
     private var fillMenu: some View {
@@ -459,7 +459,7 @@ private struct AnyLabelStyle: LabelStyle {
 
 /// A dashed "+" target that adds a row or a column.
 private struct AddTarget: View {
-    let title: String
+    let title: LocalizedStringKey
     let vertical: Bool
     let action: () -> Void
 
@@ -482,8 +482,8 @@ private struct AddTarget: View {
 
 /// A key name drawn as a small keycap.
 private struct Keycap: View {
-    let key: String
-    init(_ key: String) { self.key = key }
+    let key: LocalizedStringKey
+    init(_ key: LocalizedStringKey) { self.key = key }
     var body: some View {
         Text(key)
             .font(.caption2.weight(.medium))

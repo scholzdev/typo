@@ -22,7 +22,7 @@ struct AboutCommands: Commands {
 }
 
 struct AcknowledgementsView: View {
-    private let text = Bundle.main.url(forResource: "Acknowledgements", withExtension: "txt").flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? "Acknowledgements.txt is missing from the app bundle."
+    private let text = Bundle.main.url(forResource: "Acknowledgements", withExtension: "txt").flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? String(localized: "Acknowledgements.txt is missing from the app bundle.")
 
     var body: some View {
         ScrollView { Text(text).font(.system(.caption, design: .monospaced)).textSelection(.enabled).padding().frame(maxWidth: .infinity, alignment: .leading) }

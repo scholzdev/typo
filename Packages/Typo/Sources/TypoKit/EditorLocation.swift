@@ -68,7 +68,7 @@ public enum EditorLocation {
         let loc = min(max(selection.location, 0), ns.length)
         guard selection.length > 0 else {
             let p = position(of: loc, in: text)
-            return "Line \(p.line), Col \(p.column)"
+            return String(localized: "Line \(p.line), Col \(p.column)", bundle: .module)
         }
         let end = min(NSMaxRange(selection), ns.length)
         let first = line(at: loc, in: text).line
@@ -76,7 +76,8 @@ public enum EditorLocation {
         // A selection that ends at the start of a line does not include that line.
         let lines = last.line - first + (last.start == end && last.line > first ? 0 : 1)
         let chars = ns.substring(with: NSRange(location: loc, length: end - loc)).count
-        return "\(lines) \(lines == 1 ? "line" : "lines"), \(chars) \(chars == 1 ? "character" : "characters") selected"
+        let l = String(localized: "\(lines) lines", bundle: .module), c = String(localized: "\(chars) characters", bundle: .module)
+        return String(localized: "\(l), \(c) selected", bundle: .module)
     }
 
     /// The UTF-16 offset of the start of 1-based `line`, clamped to the first and last line.

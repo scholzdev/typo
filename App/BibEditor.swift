@@ -129,7 +129,7 @@ struct BibEditorView: View {
         var entries = BibTeX.entries(in: buffer.storage.string)
         guard entries.indices.contains(index) else { return }
         change(&entries[index])
-        buffer.apply([BibTeX.update(entries[index])], actionName: "Edit Reference")
+        buffer.apply([BibTeX.update(entries[index])], actionName: String(localized: "Edit Reference"))
     }
 
     /// Deletes the entries at `indices` as one undo step, from the last so the earlier ranges stay valid.
@@ -144,7 +144,7 @@ struct BibEditorView: View {
             let text = buffer.storage.string
             buffer.apply([BibTeX.removal(BibTeX.entries(in: text)[i], in: text)])
         }
-        um.setActionName(doomed.count == 1 ? "Delete Reference" : "Delete References")
+        um.setActionName(doomed.count == 1 ? String(localized: "Delete Reference") : String(localized: "Delete References"))
         um.endUndoGrouping()
         let left = count - doomed.count
         selection = left > 0 ? min(first, left - 1) : nil
@@ -154,7 +154,7 @@ struct BibEditorView: View {
         guard !readOnly else { return }
         let text = buffer.storage.string
         let index = BibTeX.entries(in: text).count
-        buffer.apply([BibTeX.append(entry, to: text)], actionName: "New Reference")
+        buffer.apply([BibTeX.append(entry, to: text)], actionName: String(localized: "New Reference"))
         query = ""
         selection = index
     }
@@ -187,7 +187,7 @@ private struct BibListRow: View {
             Image(systemName: bibKindSymbol(entry.type)).foregroundStyle(.secondary).frame(width: 18).padding(.top, 2)
                 .help("@\(entry.type.lowercased())")
             VStack(alignment: .leading, spacing: 2) {
-                Text(s.title.isEmpty ? "Untitled" : s.title).lineLimit(2)
+                Text(s.title.isEmpty ? String(localized: "Untitled") : s.title).lineLimit(2)
                     .foregroundStyle(s.title.isEmpty ? .secondary : .primary)
                 if !byline.isEmpty { Text(byline).font(.callout).foregroundStyle(.secondary).lineLimit(1) }
                 HStack(spacing: 4) {
@@ -228,7 +228,7 @@ struct BibEntryForm: View {
                 }
                 Section("Fields") {
                     let missing = BibTeX.missingRequired(type: entry.type, present: Set(required.filter { !$0.value.isEmpty }.map(\.name) + optional.filter { !$0.value.isEmpty }.map { $0.name.lowercased() }))
-                    ForEach(required, id: \.name) { row in fieldRow(row, hint: missing.contains(row.name) ? "Required" : nil) }
+                    ForEach(required, id: \.name) { row in fieldRow(row, hint: missing.contains(row.name) ? String(localized: "Required") : nil) }
                 }
                 Section("More Fields") {
                     ForEach(optional, id: \.index) { fieldRow($0, hint: nil) }
@@ -253,7 +253,7 @@ struct BibEntryForm: View {
             Image(systemName: bibKindSymbol(entry.type)).font(.system(size: 34)).foregroundStyle(.secondary)
                 .frame(width: 48).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 4) {
-                Text(s.title.isEmpty ? "Untitled" : s.title).font(.title2.bold()).lineLimit(3)
+                Text(s.title.isEmpty ? String(localized: "Untitled") : s.title).font(.title2.bold()).lineLimit(3)
                     .foregroundStyle(s.title.isEmpty ? .secondary : .primary).textSelection(.enabled)
                 if !sub.isEmpty { Text(sub).foregroundStyle(.secondary).lineLimit(1) }
                 HStack(spacing: 8) {
@@ -301,8 +301,8 @@ struct BibEntryForm: View {
 
     private func fieldRow(_ row: Row, hint: String?) -> some View {
         let valid: (String) -> Bool = row.isRaw ? { !$0.isEmpty } : { BibTeX.isBalanced($0) }
-        let tip = row.isRaw ? "Written without braces: a number, @string macro or # concatenation" : ""
-        return FieldEditor(label: row.name, value: row.value, hint: hint, multiline: ["abstract", "note"].contains(row.name.lowercased()), remove: row.index.map { i in { remove(i) } }, isValid: valid) { v in
+        let tip = row.isRaw ? String(localized: "Written without braces: a number, @string macro or # concatenation") : ""
+        return FieldEditor(label: LocalizedStringKey(row.name), value: row.value, hint: hint, multiline: ["abstract", "note"].contains(row.name.lowercased()), remove: row.index.map { i in { remove(i) } }, isValid: valid) { v in
             change { e in
                 if let i = row.index, e.fields.indices.contains(i) { e.fields[i].value = v }
                 else if !v.isEmpty { e.fields.append(.init(name: row.name, value: v)) }
@@ -349,7 +349,7 @@ struct BibEntryForm: View {
 /// A text field that writes through only valid values: an unbalanced `{` stays in the field, outlined in red, until
 /// its `}` is typed, and doesn't break the file in between.
 private struct FieldEditor: View {
-    let label: String
+    let label: LocalizedStringKey
     let value: String
     var hint: String? = nil
     var monospaced = false
@@ -457,9 +457,9 @@ private struct NewBibEntrySheet: View {
     }
 
     private var keyProblem: String? {
-        if key.isEmpty { return "Every entry needs a key." }
-        if key.contains(where: { $0.isWhitespace || ",{}".contains($0) }) { return "A key can't contain spaces, commas or braces." }
-        if usedKeys.contains(key) { return "“\(key)” is already used in this file." }
+        if key.isEmpty { return String(localized: "Every entry needs a key.") }
+        if key.contains(where: { $0.isWhitespace || ",{}".contains($0) }) { return String(localized: "A key can't contain spaces, commas or braces.") }
+        if usedKeys.contains(key) { return String(localized: "“\(key)” is already used in this file.") }
         return nil
     }
 

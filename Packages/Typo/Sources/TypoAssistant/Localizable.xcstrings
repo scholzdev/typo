@@ -1,0 +1,830 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ already exists, so it cannot be created." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ist bereits vorhanden und kann nicht erstellt werden."
+          }
+        }
+      }
+    },
+    "%@ does not exist in the project." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ existiert im Projekt nicht."
+          }
+        }
+      }
+    },
+    "%@ is not a text file." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ist keine Textdatei."
+          }
+        }
+      }
+    },
+    "A model server on this Mac with an OpenAI-compatible API." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Modellserver auf diesem Mac mit OpenAI-kompatibler API."
+          }
+        }
+      }
+    },
+    "Agents answer in the assistant panel only." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agents antworten nur im Assistentenbereich."
+          }
+        }
+      }
+    },
+    "Allow" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben"
+          }
+        }
+      }
+    },
+    "Allow: changes are applied right away and can be reverted. Ask: they are shown and applied when you press Accept. Never: the assistant does not change files." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben: Änderungen werden sofort angewendet und lassen sich rückgängig machen. Fragen: Sie werden angezeigt und mit „Akzeptieren“ angewendet. Nie: Der Assistent ändert keine Dateien."
+          }
+        }
+      }
+    },
+    "Allow: new files are created right away and can be reverted. Ask: they are created when you press Accept. Never: the assistant does not create files." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben: Neue Dateien werden sofort erstellt und lassen sich rückgängig machen. Fragen: Sie werden mit „Akzeptieren“ erstellt. Nie: Der Assistent erstellt keine Dateien."
+          }
+        }
+      }
+    },
+    "Any agent that speaks the Agent Client Protocol over stdio. Enter the command line that starts it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeder Agent, der das Agent Client Protocol über stdio spricht. Die Befehlszeile zum Starten eingeben."
+          }
+        }
+      }
+    },
+    "Any server with an OpenAI-compatible chat completions API." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeder Server mit OpenAI-kompatibler Chat-Completions-API."
+          }
+        }
+      }
+    },
+    "Apple's model on this Mac. Nothing leaves the Mac; it sees a passage, not whole files." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell von Apple auf diesem Mac. Nichts verlässt den Mac; es sieht eine Passage, nicht ganze Dateien."
+          }
+        }
+      }
+    },
+    "Ask" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragen"
+          }
+        }
+      }
+    },
+    "Change files" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien ändern"
+          }
+        }
+      }
+    },
+    "Claude Code as an agent on this Mac, with your Claude Code login. It reads and changes the project's files itself. Needs Node.js." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude Code als Agent auf diesem Mac, mit der Claude-Code-Anmeldung. Er liest und ändert die Dateien des Projekts selbst. Benötigt Node.js."
+          }
+        }
+      }
+    },
+    "Create new files" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue Dateien erstellen"
+          }
+        }
+      }
+    },
+    "Enter your workspace's base URL, such as https://<workspace>.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1 (cn-beijing in mainland China). Keys only work in their own region. Type the model id." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basis-URL des Workspace eingeben, etwa https://<workspace>.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1 (cn-beijing auf dem chinesischen Festland). Schlüssel funktionieren nur in ihrer eigenen Region. Modell-ID eingeben."
+          }
+        }
+      }
+    },
+    "Files go to the provider only when you attach them. This cannot be turned off." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien gehen nur an den Anbieter, wenn sie angehängt werden. Dies lässt sich nicht abschalten."
+          }
+        }
+      }
+    },
+    "Google's Gemini CLI as an agent on this Mac. Install it first, for example with Homebrew." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Googles Gemini CLI als Agent auf diesem Mac. Zuerst installieren, zum Beispiel mit Homebrew."
+          }
+        }
+      }
+    },
+    "Include compiler errors" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compilerfehler einbeziehen"
+          }
+        }
+      }
+    },
+    "Log in first: run `claude` in Terminal and use /login, then try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuerst anmelden: `claude` im Terminal ausführen und /login verwenden, dann erneut versuchen."
+          }
+        }
+      }
+    },
+    "Log in first: run `codex` in Terminal and sign in, then try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuerst anmelden: `codex` im Terminal ausführen und anmelden, dann erneut versuchen."
+          }
+        }
+      }
+    },
+    "Log in first: run `gemini` in Terminal and sign in, then try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuerst anmelden: `gemini` im Terminal ausführen und anmelden, dann erneut versuchen."
+          }
+        }
+      }
+    },
+    "Log in first: run `opencode auth login` in Terminal, then try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuerst anmelden: `opencode auth login` im Terminal ausführen, dann erneut versuchen."
+          }
+        }
+      }
+    },
+    "Many models from many providers with one OpenRouter API key. Model ids look like anthropic/claude-sonnet-5.5." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viele Modelle vieler Anbieter mit einem OpenRouter-API-Schlüssel. Modell-IDs sehen so aus: anthropic/claude-sonnet-5.5."
+          }
+        }
+      }
+    },
+    "Never" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie"
+          }
+        }
+      }
+    },
+    "No model list." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Modellliste."
+          }
+        }
+      }
+    },
+    "OpenAI's Codex as an agent on this Mac, with your Codex login. It reads and changes the project's files itself. Needs Node.js." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAIs Codex als Agent auf diesem Mac, mit dem Codex-Login. Er liest und ändert die Dateien des Projekts selbst. Benötigt Node.js."
+          }
+        }
+      }
+    },
+    "Pay-as-you-go access to Claude, GPT, Gemini, DeepSeek, Kimi, GLM, Qwen and more with your OpenCode Zen API key." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzungsbasierter Zugriff auf Claude, GPT, Gemini, DeepSeek, Kimi, GLM, Qwen und mehr mit dem OpenCode-Zen-API-Schlüssel."
+          }
+        }
+      }
+    },
+    "Read project files" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Projektdateien lesen"
+          }
+        }
+      }
+    },
+    "Read the attached files" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angehängte Dateien lesen"
+          }
+        }
+      }
+    },
+    "Runs models on this Mac. No API key needed by default." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Führt Modelle auf diesem Mac aus. Standardmäßig kein API-Schlüssel nötig."
+          }
+        }
+      }
+    },
+    "Runs models on this Mac. No API key needed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Führt Modelle auf diesem Mac aus. Kein API-Schlüssel nötig."
+          }
+        }
+      }
+    },
+    "Runs on this Mac" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Läuft auf diesem Mac"
+          }
+        }
+      }
+    },
+    "Search the project" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Projekt suchen"
+          }
+        }
+      }
+    },
+    "Search the web" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Web suchen"
+          }
+        }
+      }
+    },
+    "Set up Goose first: run `goose configure` in Terminal, then try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuerst Goose einrichten: `goose configure` im Terminal ausführen, dann erneut versuchen."
+          }
+        }
+      }
+    },
+    "The API key was rejected. Check it in Settings › Intelligence." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der API-Schlüssel wurde abgelehnt. In Einstellungen › Intelligenz prüfen."
+          }
+        }
+      }
+    },
+    "The Goose agent on this Mac. Install it and set up its model provider first." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Goose-Agent auf diesem Mac. Zuerst installieren und den Modellanbieter einrichten."
+          }
+        }
+      }
+    },
+    "The OpenCode Go subscription's models (Kimi, GLM, DeepSeek, Qwen, MiniMax, GPT Luna, Claude Haiku and more) with your OpenCode API key." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Modelle des OpenCode-Go-Abos (Kimi, GLM, DeepSeek, Qwen, MiniMax, GPT Luna, Claude Haiku und mehr) mit dem eigenen OpenCode-API-Schlüssel."
+          }
+        }
+      }
+    },
+    "The OpenCode agent on this Mac. Install it first." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der OpenCode-Agent auf diesem Mac. Zuerst installieren."
+          }
+        }
+      }
+    },
+    "The answer ended early." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Antwort endete vorzeitig."
+          }
+        }
+      }
+    },
+    "The answer failed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Antwort ist fehlgeschlagen."
+          }
+        }
+      }
+    },
+    "The assistant may list the project's files and search them. Matching lines go to the provider." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Assistent darf die Dateien des Projekts auflisten und durchsuchen. Treffer-Zeilen gehen an den Anbieter."
+          }
+        }
+      }
+    },
+    "The assistant may read any file of the project, and its outline, to answer. The text goes to the provider." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Assistent darf jede Datei des Projekts samt Gliederung lesen, um zu antworten. Der Text geht an den Anbieter."
+          }
+        }
+      }
+    },
+    "The assistant may render a page of the preview as an image to check the layout. The image goes to the provider." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Assistent darf eine Seite der Vorschau als Bild darstellen, um das Layout zu prüfen. Das Bild geht an den Anbieter."
+          }
+        }
+      }
+    },
+    "The attached files hold %@ characters, more than can be sent at once. Detach some files, for example %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The attached files hold %1$@ characters, more than can be sent at once. Detach some files, for example %2$@."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die angehängten Dateien enthalten %@ Zeichen, mehr als auf einmal gesendet werden können. Einige Dateien entfernen, zum Beispiel %@."
+          }
+        }
+      }
+    },
+    "The international platform. Keys of the China platform (moonshot.cn) do not work here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die internationale Plattform. Schlüssel der China-Plattform (moonshot.cn) funktionieren hier nicht."
+          }
+        }
+      }
+    },
+    "The international platform. Type the model id, such as one listed in the Z.ai documentation." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die internationale Plattform. Die Modell-ID eingeben, etwa eine aus der Z.ai-Dokumentation."
+          }
+        }
+      }
+    },
+    "The key could not be saved in the Keychain: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Schlüssel konnte nicht im Schlüsselbund gesichert werden: %@"
+          }
+        }
+      }
+    },
+    "The mainland China platform. Type the model id." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Plattform für Festlandchina. Die Modell-ID eingeben."
+          }
+        }
+      }
+    },
+    "The model declined to answer this request." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell hat die Beantwortung dieser Anfrage abgelehnt."
+          }
+        }
+      }
+    },
+    "The model is still downloading. Try again later." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell wird noch geladen. Später erneut versuchen."
+          }
+        }
+      }
+    },
+    "The model list could not be loaded." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Modellliste konnte nicht geladen werden."
+          }
+        }
+      }
+    },
+    "The model “%@” is not known to this provider or not available to your account." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell „%@“ ist diesem Anbieter nicht bekannt oder für das Konto nicht verfügbar."
+          }
+        }
+      }
+    },
+    "The on-device model does not support this language." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell auf dem Gerät unterstützt diese Sprache nicht."
+          }
+        }
+      }
+    },
+    "The on-device model is still downloading or not available on this Mac." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell auf dem Gerät wird noch geladen oder ist auf diesem Mac nicht verfügbar."
+          }
+        }
+      }
+    },
+    "The provider answered with HTTP %lld. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The provider answered with HTTP %1$lld. %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Anbieter antwortete mit HTTP %lld. %@"
+          }
+        }
+      }
+    },
+    "The provider could not be reached. %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Anbieter ist nicht erreichbar. %@"
+          }
+        }
+      }
+    },
+    "The provider is unavailable (HTTP %lld). %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The provider is unavailable (HTTP %1$lld). %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Anbieter ist nicht verfügbar (HTTP %lld). %@"
+          }
+        }
+      }
+    },
+    "The provider rejected the request: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Anbieter hat die Anfrage abgelehnt: %@"
+          }
+        }
+      }
+    },
+    "The provider runs web searches for the answer. Your search queries go to the provider." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Anbieter führt für die Antwort Websuchen durch. Die Suchanfragen gehen an den Anbieter."
+          }
+        }
+      }
+    },
+    "The provider's answer could not be read. %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Antwort des Anbieters konnte nicht gelesen werden. %@"
+          }
+        }
+      }
+    },
+    "The provider's rate limit or spending limit was reached." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Anfrage- oder Ausgabenlimit des Anbieters wurde erreicht."
+          }
+        }
+      }
+    },
+    "The provider's rate limit was reached. Try again in %lld seconds." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The provider's rate limit was reached. Try again in %lld second."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The provider's rate limit was reached. Try again in %lld seconds."
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Das Limit des Anbieters wurde erreicht. In %lld Sekunde erneut versuchen."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Das Limit des Anbieters wurde erreicht. In %lld Sekunden erneut versuchen."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "The text to replace occurs %lld times in %@, so the change is ambiguous." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The text to replace occurs %1$lld times in %2$@, so the change is ambiguous."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der zu ersetzende Text kommt %1$lld-mal in %2$@ vor, die Änderung ist daher mehrdeutig."
+          }
+        }
+      }
+    },
+    "The text to replace was not found in %@. The file may have changed since the answer." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der zu ersetzende Text wurde in %@ nicht gefunden. Die Datei hat sich seit der Antwort möglicherweise geändert."
+          }
+        }
+      }
+    },
+    "This Mac does not support Apple Intelligence" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac unterstützt Apple Intelligence nicht"
+          }
+        }
+      }
+    },
+    "This is too long for the on-device model. Select a smaller passage and ask again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist zu lang für das Modell auf dem Gerät. Eine kürzere Passage auswählen und erneut fragen."
+          }
+        }
+      }
+    },
+    "This provider does not list its models." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Anbieter listet seine Modelle nicht auf."
+          }
+        }
+      }
+    },
+    "This provider has no base URL. Enter it in Settings › Intelligence." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für diesen Anbieter ist keine Basis-URL angegeben. In Einstellungen › Intelligenz eintragen."
+          }
+        }
+      }
+    },
+    "Turn on Apple Intelligence in System Settings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence in den Systemeinstellungen einschalten"
+          }
+        }
+      }
+    },
+    "Uses the Anthropic API with your API key." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwendet die Anthropic-API mit dem eigenen API-Schlüssel."
+          }
+        }
+      }
+    },
+    "Uses the DeepSeek API with your API key." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwendet die DeepSeek-API mit dem eigenen API-Schlüssel."
+          }
+        }
+      }
+    },
+    "Uses the OpenAI API with your API key." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwendet die OpenAI-API mit dem eigenen API-Schlüssel."
+          }
+        }
+      }
+    },
+    "View the preview" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau anzeigen"
+          }
+        }
+      }
+    },
+    "“%@” is not a path inside the project." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ist kein Pfad innerhalb des Projekts."
+          }
+        }
+      }
+    },
+    "“Fix the compile errors” sends the current errors with your message." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„Fix the compile errors“ sendet die aktuellen Fehler mit der Nachricht."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

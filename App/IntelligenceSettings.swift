@@ -101,8 +101,8 @@ struct IntelligenceSettings: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Agents in Typo") {
-                SettingsPageRow(title: "Permissions", subtitle: "Control what the assistant and agents may do in your projects.") { go(.permissions, "Permissions") }
-                SettingsPageRow(title: "Workflows", subtitle: "Commands you start with /, for any model.") { go(.workflows, "Workflows") }
+                SettingsPageRow(title: "Permissions", subtitle: "Control what the assistant and agents may do in your projects.") { go(.permissions, String(localized: "Permissions")) }
+                SettingsPageRow(title: "Workflows", subtitle: "Commands you start with /, for any model.") { go(.workflows, String(localized: "Workflows")) }
             }
             MCPServerSection()
         }
@@ -199,11 +199,11 @@ private struct MCPServerSection: View {
         busy = true
         defer { busy = false }
         guard let r = await Task.detached(operation: { ACPProcess.claude(["mcp", "add", "--scope", "user", "typo", "--", path]) }).value else {
-            result = (false, "Claude Code was not found. Install it, or add the command above to it yourself.")
+            result = (false, String(localized: "Claude Code was not found. Install it, or add the command above to it yourself."))
             return
         }
         inCode = r.ok
-        result = r.ok ? (true, "Added to Claude Code for all your projects.") : (false, r.text.isEmpty ? "claude mcp add failed." : r.text)
+        result = r.ok ? (true, String(localized: "Added to Claude Code for all your projects.")) : (false, r.text.isEmpty ? "claude mcp add failed." : r.text)
     }
 
     private func addToDesktop(_ path: String) {
@@ -308,7 +308,7 @@ private struct ProviderSettings: View {
             }
             Section {
                 SettingsPageRow(title: "Skills", subtitle: "The skills from ~/.claude/skills that Claude loads.") {
-                    nav.page = SettingsSubpage(tab: .intelligence, id: IntelligenceSettings.Page.claudeSkills.rawValue, title: "Skills")
+                    nav.page = SettingsSubpage(tab: .intelligence, id: IntelligenceSettings.Page.claudeSkills.rawValue, title: String(localized: "Skills"))
                 }
             }
         }
@@ -329,13 +329,13 @@ private struct ProviderSettings: View {
 
     /// Where the agent's requests go, with its vendor's policies where Typo knows them.
     private var accountNote: AttributedString {
-        var text = "Sign in with the agent's own command line tool; Typo never sees your login."
+        var text = String(localized: "Sign in with the agent's own command line tool; Typo never sees your login.")
         if let links = VendorPolicy.links(provider.organization) {
-            text += " Your requests go to \(provider.organization) and are subject to its [Privacy Policy](\(links.privacy)) and [Terms of Use](\(links.terms))."
+            text += " " + String(localized: "Your requests go to \(provider.organization) and are subject to its [Privacy Policy](\(links.privacy)) and [Terms of Use](\(links.terms)).")
         } else {
-            text += " Your requests go to the agent's own provider, under its terms."
+            text += " " + String(localized: "Your requests go to the agent's own provider, under its terms.")
         }
-        text += " Typo sends no usage data. [About Intelligence in Typo & Privacy…](typo-settings:privacy)"
+        text += " " + String(localized: "Typo sends no usage data. [About Intelligence in Typo & Privacy…](typo-settings:privacy)")
         return (try? AttributedString(markdown: text)) ?? AttributedString(text)
     }
 
@@ -343,8 +343,8 @@ private struct ProviderSettings: View {
     private static func lookup(_ command: String) async -> (ok: Bool, text: String)? {
         guard let name = ACPProcess.words(command).first else { return nil }
         let path = await Task.detached { ACPProcess.userPATH() }.value
-        if let found = ACPProcess.locate(name, path: path) { return (true, "Found \(found).") }
-        return (false, name == "npx" ? "npx was not found. Install Node.js, which brings npx." : "\(name) was not found. Install it, or enter its full path.")
+        if let found = ACPProcess.locate(name, path: path) { return (true, String(localized: "Found \(found).")) }
+        return (false, name == "npx" ? String(localized: "npx was not found. Install Node.js, which brings npx.") : String(localized: "\(name) was not found. Install it, or enter its full path."))
     }
 
     /// Starts the agent in the home folder, opens a session and stops it.
@@ -352,7 +352,7 @@ private struct ProviderSettings: View {
         do {
             let (agent, info) = try await ACPAgent.launch(command: provider.command ?? "", cwd: FileManager.default.homeDirectoryForCurrentUser, host: nil)
             agent.close()
-            return "Connected to \(info)."
+            return String(localized: "Connected to \(info).")
         } catch {
             throw ACPClient.failure(error, preset: preset)
         }
@@ -416,12 +416,13 @@ private struct ProviderSettings: View {
     /// Lists the models where possible, else asks for a one-word answer.
     private func test() async throws -> String {
         let client = store.client(for: provider)
-        if preset.modelsPath != nil { return "Connected. \(try await client.models().count) models available." }
+        if preset.modelsPath != nil { let count = try await client.models().count
+            return String(localized: "Connected. \(count) models available.") }
         var reply = ""
         for try await e in client.stream(AssistantRequest(model: provider.model, system: "Reply with the single word OK.", files: nil, messages: [.init(role: .user, text: "Test")])) {
             if case .text(let t) = e { reply += t }
         }
-        return "Connected. The model answered “\(reply.prefix(40))”."
+        return String(localized: "Connected. The model answered “\(reply.prefix(40))”.")
     }
 
     private func run(_ work: @escaping @MainActor () async throws -> String) {
@@ -480,7 +481,7 @@ private struct AddModelProviderSheet: View {
 
     private func save() {
         let name = description.trimmingCharacters(in: .whitespaces)
-        let p = local ? AssistantProvider.local(port: port, description: name.isEmpty ? "Local Model (\(port))" : name)
+        let p = local ? AssistantProvider.local(port: port, description: name.isEmpty ? String(localized: "Local Model (\(port))") : name)
             : AssistantProvider(preset: .customInternet, name: name.isEmpty ? (URL(string: url)?.host() ?? url) : name, baseURL: url, keyHeader: header)
         if !local, !key.isEmpty {
             do { try AssistantProviderStore.shared.setKey(key, for: p) } catch { self.error = (error as? AssistantError)?.message ?? error.localizedDescription; return }

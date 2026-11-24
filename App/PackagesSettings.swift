@@ -16,7 +16,7 @@ struct PackagesSettings: View {
         let isLocal: Bool
         var id: String { (isLocal ? "local|" : "dl|") + package.id }
         var title: String { "@\(package.namespace)/\(package.name)" }
-        var source: String { isLocal ? "Local" : "Downloaded" }
+        var source: String { isLocal ? String(localized: "Local") : String(localized: "Downloaded") }
     }
 
     private var chosen: [PackageRow] { rows.filter { selection.contains($0.id) } }
@@ -39,7 +39,7 @@ struct PackagesSettings: View {
                     TableColumn("Package", value: \.title)
                     TableColumn("Version") { Text($0.package.version) }.width(70)
                     TableColumn("Size") { Text($0.package.bytes.formatted(.byteCount(style: .file))).monospacedDigit() }.width(70)
-                    TableColumn("Source", value: \.source).width(90)
+                    TableColumn("Origin", value: \.source).width(90)
                 }
                 .contextMenu(forSelectionType: PackageRow.ID.self) { ids in
                     actions(for: rows.filter { ids.contains($0.id) })
@@ -107,7 +107,7 @@ struct PackagesSettings: View {
         VStack(alignment: .leading, spacing: 6) {
             LabeledContent("Local packages folder") {
                 HStack {
-                    Text(packages.url?.path ?? "Not set")
+                    Text(packages.url?.path ?? String(localized: "Not set"))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .truncationMode(.middle)
@@ -159,8 +159,8 @@ struct PackagesSettings: View {
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.allowsMultipleSelection = false
-        panel.prompt = "Choose"
-        panel.message = "Choose the folder that holds your local packages (namespace/name/version). Typst's default is Library/Application Support/typst/packages."
+        panel.prompt = String(localized: "Choose")
+        panel.message = String(localized: "Choose the folder that holds your local packages (namespace/name/version). Typst's default is Library/Application Support/typst/packages.")
         // The sandbox home is the app container, so ask the user database for the real one.
         if let pw = getpwuid(getuid()) {
             panel.directoryURL = URL(fileURLWithPath: String(cString: pw.pointee.pw_dir))

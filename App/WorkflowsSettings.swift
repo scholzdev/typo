@@ -89,7 +89,7 @@ struct WorkflowsSettings: View {
                 .frame(width: 28, height: 28).background(Color.orange.gradient, in: RoundedRectangle(cornerRadius: 7))
             VStack(alignment: .leading, spacing: 2) {
                 Text("/" + workflow.name)
-                Text(workflow.description.isEmpty ? "No description" : workflow.description).font(.callout).foregroundStyle(.secondary).lineLimit(2)
+                Text(workflow.description.isEmpty ? String(localized: "No description") : workflow.description).font(.callout).foregroundStyle(.secondary).lineLimit(2)
             }
             Spacer()
             trailing()
@@ -142,9 +142,9 @@ struct WorkflowEditorSheet: View {
 
     /// Why the name cannot be saved, or nil.
     private var nameProblem: String? {
-        if name.isEmpty { return "Enter a name." }
-        if !Workflow.isValidName(name) { return "Use lowercase letters, digits and single hyphens." }
-        if name != original.name || draft.isNew, store.names.contains(name) { return "A workflow named “\(name)” exists already." }
+        if name.isEmpty { return String(localized: "Enter a name.") }
+        if !Workflow.isValidName(name) { return String(localized: "Use lowercase letters, digits and single hyphens.") }
+        if name != original.name || draft.isNew, store.names.contains(name) { return String(localized: "A workflow named “\(name)” exists already.") }
         return nil
     }
 

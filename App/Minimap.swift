@@ -60,7 +60,7 @@ final class MinimapView: NSView {
         map.clipsToBounds = true                     // long lines and labels near the edges stay inside
         map.setAccessibilityElement(true)
         map.setAccessibilityRole(.group)
-        map.setAccessibilityLabel("Minimap")
+        map.setAccessibilityLabel(String(localized: "Minimap"))
     }
 
     override var isFlipped: Bool { true }
@@ -150,7 +150,7 @@ final class MinimapView: NSView {
         visible = max(b - top, 1)
         let first = model.lines[min(Int(top), model.lines.count - 1)].number + 1
         let last = model.lines[min(max(Int(b.rounded(.up)) - 1, 0), model.lines.count - 1)].number + 1
-        setAccessibilityValue("Lines \(first) to \(last)")
+        setAccessibilityValue(String(localized: "Lines \(first) to \(last)"))
         needsDisplay = true
     }
 

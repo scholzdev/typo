@@ -5,9 +5,9 @@ import TypoAssistant
 struct SettingsHeaderCard: View {
     let symbol: String
     var fill: AnyShapeStyle = AnyShapeStyle(Color.blue.gradient)
-    let title: String
-    let text: String
-    var link: (title: String, action: () -> Void)? = nil
+    let title: LocalizedStringKey
+    let text: LocalizedStringKey
+    var link: (title: LocalizedStringKey, action: () -> Void)? = nil
 
     var body: some View {
         Section {
@@ -31,8 +31,8 @@ struct SettingsHeaderCard: View {
 
 /// A row that opens a sub-page: a title, a secondary line and a chevron.
 struct SettingsPageRow: View {
-    let title: String
-    let subtitle: String
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
     let open: () -> Void
 
     var body: some View {

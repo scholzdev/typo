@@ -86,11 +86,11 @@ import TypoKit
             let config = NSImage.SymbolConfiguration(pointSize: font.pointSize, weight: .regular)
                 .applying(.init(paletteColors: [error ? .systemRed : .systemOrange]))
             symbol.image = NSImage(systemSymbolName: error ? "xmark.octagon.fill" : "exclamationmark.triangle.fill",
-                                   accessibilityDescription: error ? "Error" : "Warning")?.withSymbolConfiguration(config)
+                                   accessibilityDescription: error ? String(localized: "Error") : String(localized: "Warning"))?.withSymbolConfiguration(config)
             line.append(NSAttributedString(attachment: symbol))
             line.append(NSAttributedString(string: " " + d.message, attributes: [.font: font, .foregroundColor: NSColor.labelColor]))
             for h in d.hints {
-                line.append(NSAttributedString(string: "\nhint: " + h, attributes: [.font: font, .foregroundColor: NSColor.secondaryLabelColor]))
+                line.append(NSAttributedString(string: "\n" + String(localized: "hint: \(h)"), attributes: [.font: font, .foregroundColor: NSColor.secondaryLabelColor]))
             }
             block(line)
         }
@@ -99,7 +99,7 @@ import TypoKit
         case nil: break
         }
         if let jumpHint {
-            block(NSAttributedString(string: "Follow with " + jumpHint, attributes: [
+            block(NSAttributedString(string: String(localized: "Follow with \(jumpHint)"), attributes: [
                 .font: NSFont.systemFont(ofSize: max(font.pointSize - 3, 9)), .foregroundColor: NSColor.tertiaryLabelColor]))
         }
         return out

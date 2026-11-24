@@ -12,11 +12,11 @@ extension SettingsKey {
 extension TextEncoding {
     var title: String {
         switch self {
-        case .utf8: "Unicode (UTF-8)"
-        case .latin1: "Western (ISO Latin 1)"
-        case .windows1252: "Western (Windows-1252)"
-        case .macRoman: "Western (Mac OS Roman)"
-        case .utf16: "Unicode (UTF-16)"
+        case .utf8: String(localized: "Unicode (UTF-8)")
+        case .latin1: String(localized: "Western (ISO Latin 1)")
+        case .windows1252: String(localized: "Western (Windows-1252)")
+        case .macRoman: String(localized: "Western (Mac OS Roman)")
+        case .utf16: String(localized: "Unicode (UTF-16)")
         }
     }
 }
@@ -24,9 +24,9 @@ extension TextEncoding {
 extension LineEnding {
     var title: String {
         switch self {
-        case .lf: "macOS / Unix (LF)"
-        case .crlf: "Windows (CRLF)"
-        case .cr: "Classic Mac OS (CR)"
+        case .lf: String(localized: "macOS / Unix (LF)")
+        case .crlf: String(localized: "Windows (CRLF)")
+        case .cr: String(localized: "Classic Mac OS (CR)")
         }
     }
 }

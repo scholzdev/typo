@@ -99,7 +99,7 @@ extension Project {
 
     /// Moves into `folder` (nil = root), under `name` when given (Keep Both, and undo of it).
     @discardableResult public func move(_ path: RelPath, into folder: RelPath?, named name: String? = nil) async throws(ProjectError) -> RelPath {
-        if let folder, folder.isAtOrUnder(path) { throw .invalidMove("\u{201C}\(path.name)\u{201D} cannot be moved into itself.") }
+        if let folder, folder.isAtOrUnder(path) { throw .invalidMove(String(localized: "\u{201C}\(path.name)\u{201D} cannot be moved into itself.", bundle: .module)) }
         guard let new = RelPath.make(name ?? path.name, in: folder) else { throw .invalidName(name ?? path.name) }
         if new == path { return path }
         try await relocate(path, to: new)
@@ -171,7 +171,7 @@ extension Project {
                 try fm.moveItem(at: src, to: dst)
             }
         } catch {
-            throw .operationFailed("\u{201C}\(old.name)\u{201D} could not be moved: \(error.localizedDescription)")
+            throw .operationFailed(String(localized: "\u{201C}\(old.name)\u{201D} could not be moved: \(error.localizedDescription)", bundle: .module))
         }
 
         rekeyOpenItems(from: old, to: new)
@@ -258,7 +258,7 @@ extension Project {
 
         let trashed: URL
         do { trashed = try trash(url(for: path)) } catch {
-            throw .operationFailed("\u{201C}\(path.name)\u{201D} could not be moved to the Trash: \(error.localizedDescription)")
+            throw .operationFailed(String(localized: "\u{201C}\(path.name)\u{201D} could not be moved to the Trash: \(error.localizedDescription)", bundle: .module))
         }
         forget(path)
         return trashed
@@ -267,7 +267,7 @@ extension Project {
     /// A drop's Replace: the item at `dest` goes to the Trash (as Move to Trash does it), then `path` moves there.
     /// Returns the Trash location of the old item, for `undoReplacing`.
     public func replacing(_ dest: RelPath, with path: RelPath) async throws(ProjectError) -> URL {
-        if dest.isAtOrUnder(path) || path.isAtOrUnder(dest) { throw .invalidMove("\u{201C}\(path.name)\u{201D} cannot replace an item that contains it or is inside it.") }
+        if dest.isAtOrUnder(path) || path.isAtOrUnder(dest) { throw .invalidMove(String(localized: "\u{201C}\(path.name)\u{201D} cannot replace an item that contains it or is inside it.", bundle: .module)) }
         let trashed = try await moveToTrash(dest)
         do { try await relocate(path, to: dest) } catch { try? await restore(fromTrash: trashed, to: dest); throw error }
         return trashed
@@ -318,7 +318,7 @@ extension Project {
         for u in urls {
             let source = u.standardizedFileURL
             if rootPath == source.path || rootPath.hasPrefix(source.path + "/") {
-                throw .invalidMove("\u{201C}\(source.lastPathComponent)\u{201D} contains this project and cannot be copied into it.")
+                throw .invalidMove(String(localized: "\u{201C}\(source.lastPathComponent)\u{201D} contains this project and cannot be copied into it.", bundle: .module))
             }
             let base = source.lastPathComponent
             guard (try? Self.checked(base)) != nil else { continue }       // hidden files would not show up

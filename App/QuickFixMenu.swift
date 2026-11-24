@@ -40,14 +40,14 @@ import TypstEngine
         }
         if let applyRefactoring, !refactorings.isEmpty {
             if !fixes.isEmpty { menu.addItem(.separator()) }
-            let head = NSMenuItem(title: "Refactor", action: nil, keyEquivalent: "")
+            let head = NSMenuItem(title: String(localized: "Refactor"), action: nil, keyEquivalent: "")
             head.isEnabled = false
             menu.addItem(head)
             for r in refactorings { menu.addItem(item(r.title, symbol: "wand.and.stars", tint: nil) { applyRefactoring(r) }) }
         }
         if let details {
             menu.addItem(.separator())
-            menu.addItem(item("Show Details", symbol: "info.circle", tint: nil) { details() })
+            menu.addItem(item(String(localized: "Show Details"), symbol: "info.circle", tint: nil) { details() })
         }
         menu.popUp(positioning: nil, at: point, in: view)
     }
@@ -66,10 +66,10 @@ import TypstEngine
     static func apply(_ fix: QuickFix, project: Project) {
         Task {
             do {
-                for (file, edits) in fix.edits { try await project.edit(file, edits, actionName: "Quick Fix") }
+                for (file, edits) in fix.edits { try await project.edit(file, edits, actionName: String(localized: "Quick Fix")) }
                 if let selection = fix.selection, let file = fix.edits.keys.first { project.show(file, range: selection) }
             } catch {
-                showAlert("Couldn’t Apply Fix", "\(error)")
+                showAlert("Couldn’t Apply Fix", error)
             }
         }
     }

@@ -126,14 +126,13 @@ struct SnapshotsView: View {
     private func summary(_ n: Int?) -> String {
         switch n {
         case nil: ""
-        case 0: "Same as now"
-        case 1: "1 file differs"
-        case let n?: "\(n) files differ"
+        case 0: String(localized: "Same as now")
+        case let n?: String(localized: "\(n) files differ")
         }
     }
 
     private static func title(_ s: SnapshotFile.State) -> String {
-        switch s { case .changed: "Changed"; case .unchanged: "Unchanged"; case .missing: "Missing" }
+        switch s { case .changed: String(localized: "Changed"); case .unchanged: String(localized: "Unchanged"); case .missing: String(localized: "Missing") }
     }
 
     private static func symbol(_ s: SnapshotFile.State) -> String {
@@ -161,7 +160,7 @@ struct SnapshotsView: View {
     private func restore(_ targets: [SnapshotFile]) {
         Task {
             for f in targets {
-                do { try await project.restore(f) } catch { showAlert("Couldn\u{2019}t Restore \u{201C}\(f.path.name)\u{201D}", error.localizedDescription) }
+                do { try await project.restore(f) } catch { showAlert("Couldn\u{2019}t Restore \u{201C}\(f.path.name)\u{201D}", error) }
             }
             await reload()
         }

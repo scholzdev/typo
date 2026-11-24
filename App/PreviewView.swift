@@ -280,7 +280,7 @@ struct PresenterID: Hashable, Codable { let project: ProjectID }
         window.isReleasedWhenClosed = false
         window.backgroundColor = .black
         window.collectionBehavior = [.fullScreenAuxiliary]
-        window.title = "Presentation – \(project.main.raw)"
+        window.title = String(localized: "Presentation – \(project.main.raw)")
         // On the menu bar's screen presentationOptions hide menu bar and Dock; elsewhere the window covers its menu bar.
         if screen != NSScreen.screens.first { window.level = .mainMenu + 1 }
         let host = NSHostingView(rootView: PresentationWindow(session: self))

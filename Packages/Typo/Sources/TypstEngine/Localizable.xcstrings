@@ -1,0 +1,148 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ could not be read." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ konnte nicht gelesen werden."
+          }
+        }
+      }
+    },
+    "%@ could not be saved: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ could not be saved: %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ konnte nicht gespeichert werden: %@"
+          }
+        }
+      }
+    },
+    "An item named “%@” already exists in this location." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An diesem Ort ist bereits ein Objekt namens „%@“ vorhanden."
+          }
+        }
+      }
+    },
+    "Could not download the package: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Paket konnte nicht geladen werden: %@"
+          }
+        }
+      }
+    },
+    "PDF/UA-1 (Accessible)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF/UA-1 (barrierefrei)"
+          }
+        }
+      }
+    },
+    "The document could not be compiled." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Dokument konnte nicht kompiliert werden."
+          }
+        }
+      }
+    },
+    "The main file %@ is missing." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Hauptdatei %@ fehlt."
+          }
+        }
+      }
+    },
+    "The project folder is not accessible." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf den Projektordner kann nicht zugegriffen werden."
+          }
+        }
+      }
+    },
+    "The result is out of date." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Ergebnis ist veraltet."
+          }
+        }
+      }
+    },
+    "Update All Imports of %@ to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update All Imports of %1$@ to %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Importe von %1$@ auf %2$@ aktualisieren"
+          }
+        }
+      }
+    },
+    "Update to %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf %@ aktualisieren"
+          }
+        }
+      }
+    },
+    "“%@” is not a valid name. A name cannot be empty, contain “/” or “:”, or start with a period." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ist kein gültiger Name. Ein Name darf nicht leer sein, nicht „/“ oder „:“ enthalten und nicht mit einem Punkt beginnen."
+          }
+        }
+      }
+    },
+    "“%@” no longer exists." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ existiert nicht mehr."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

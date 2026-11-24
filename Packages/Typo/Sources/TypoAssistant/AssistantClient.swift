@@ -28,21 +28,21 @@ public enum AssistantError: Error, Equatable, Sendable {
 
     public var message: String {
         switch self {
-        case .invalidKey: "The API key was rejected. Check it in Settings › Intelligence."
-        case .unknownModel(let m): "The model “\(m)” is not known to this provider or not available to your account."
-        case .rateLimited(let after?): "The provider's rate limit was reached. Try again in \(Int(after.rounded(.up))) seconds."
-        case .rateLimited(nil): "The provider's rate limit or spending limit was reached."
-        case .server(let status, let m): "The provider is unavailable (HTTP \(status)). \(m)".trimmingCharacters(in: .whitespaces)
-        case .badRequest(let m): "The provider rejected the request: \(m)"
-        case .http(let status, let m): "The provider answered with HTTP \(status). \(m)".trimmingCharacters(in: .whitespaces)
-        case .offline(let m): "The provider could not be reached. \(m)"
-        case .unreadable(let m): "The provider's answer could not be read. \(m)"
-        case .keychain(let m): "The key could not be saved in the Keychain: \(m)"
-        case .missingBaseURL: "This provider has no base URL. Enter it in Settings › Intelligence."
+        case .invalidKey: String(localized: "The API key was rejected. Check it in Settings › Intelligence.", bundle: .module)
+        case .unknownModel(let m): String(localized: "The model “\(m)” is not known to this provider or not available to your account.", bundle: .module)
+        case .rateLimited(let after?): String(localized: "The provider's rate limit was reached. Try again in \(Int(after.rounded(.up))) seconds.", bundle: .module)
+        case .rateLimited(nil): String(localized: "The provider's rate limit or spending limit was reached.", bundle: .module)
+        case .server(let status, let m): String(localized: "The provider is unavailable (HTTP \(status)). \(m)", bundle: .module).trimmingCharacters(in: .whitespaces)
+        case .badRequest(let m): String(localized: "The provider rejected the request: \(m)", bundle: .module)
+        case .http(let status, let m): String(localized: "The provider answered with HTTP \(status). \(m)", bundle: .module).trimmingCharacters(in: .whitespaces)
+        case .offline(let m): String(localized: "The provider could not be reached. \(m)", bundle: .module)
+        case .unreadable(let m): String(localized: "The provider's answer could not be read. \(m)", bundle: .module)
+        case .keychain(let m): String(localized: "The key could not be saved in the Keychain: \(m)", bundle: .module)
+        case .missingBaseURL: String(localized: "This provider has no base URL. Enter it in Settings › Intelligence.", bundle: .module)
         case .contextTooLarge(let n, let largest):
-            "The attached files hold \(n.formatted()) characters, more than can be sent at once. Detach some files, for example \(largest.prefix(3).joined(separator: ", "))."
-        case .passageTooLarge: "This is too long for the on-device model. Select a smaller passage and ask again."
-        case .declined: "The model declined to answer this request."
+            String(localized: "The attached files hold \(n.formatted()) characters, more than can be sent at once. Detach some files, for example \(largest.prefix(3).joined(separator: ", ")).", bundle: .module)
+        case .passageTooLarge: String(localized: "This is too long for the on-device model. Select a smaller passage and ask again.", bundle: .module)
+        case .declined: String(localized: "The model declined to answer this request.", bundle: .module)
         case .onDevice(let m), .agent(let m): m
         }
     }
@@ -282,7 +282,7 @@ public enum AssistantClients {
 
 struct AgentOutsidePanel: AssistantClient {
     func stream(_ request: AssistantRequest) -> AsyncThrowingStream<AssistantEvent, Error> {
-        AsyncThrowingStream { $0.finish(throwing: AssistantError.agent("Agents answer in the assistant panel only.")) }
+        AsyncThrowingStream { $0.finish(throwing: AssistantError.agent(String(localized: "Agents answer in the assistant panel only.", bundle: .module))) }
     }
 
     func models() async throws -> [String] { [] }
@@ -310,7 +310,7 @@ extension AssistantClient {
                     if !state.finished { for e in parser.finish() { for out in try handle(&state, e) { c.yield(out) } } }
                     if !state.finished {
                         // Some servers close without a final marker; a stream that got a stop reason still counts.
-                        guard let reason = state.stopReason else { throw AssistantError.unreadable("The answer ended early.") }
+                        guard let reason = state.stopReason else { throw AssistantError.unreadable(String(localized: "The answer ended early.", bundle: .module)) }
                         c.yield(.done(reason, state.usage))
                     }
                     c.finish()
@@ -335,7 +335,7 @@ extension AssistantClient {
         let body = try await AssistantHTTP.collect(resp.body)
         guard (200..<300).contains(resp.status) else { throw AssistantHTTP.error(status: resp.status, headers: resp.headers, body: body, model: "", key: key) }
         guard let obj = try? JSONSerialization.jsonObject(with: body) as? [String: Any], let data = obj["data"] as? [[String: Any]] else {
-            throw AssistantError.unreadable("No model list.")
+            throw AssistantError.unreadable(String(localized: "No model list.", bundle: .module))
         }
         return data.compactMap { $0["id"] as? String }
     }
@@ -578,7 +578,7 @@ public struct OpenAICompatibleClient: AssistantClient {
     }
 
     public func models() async throws -> [String] {
-        guard let path = provider.preset.modelsPath else { throw AssistantError.unreadable("This provider does not list its models.") }
+        guard let path = provider.preset.modelsPath else { throw AssistantError.unreadable(String(localized: "This provider does not list its models.", bundle: .module)) }
         var req = URLRequest(url: try AssistantHTTP.url(provider.baseURL, path))
         auth(&req)
         return try await getModels(req, transport: transport, key: key)

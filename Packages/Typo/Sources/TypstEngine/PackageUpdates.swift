@@ -95,11 +95,11 @@ public enum PackageUpdates {
         let all: [(RelPath, ImportSite)] = sources.filter { FileKind.isTypst($0.file.raw) }.flatMap { f in imports(in: f.text).map { (f.file, $0) } }
         guard let here = all.first(where: { $0.0 == loc.file && $0.1.literal == loc.range && $0.1.name == name }) else { return [] }
         let same = all.filter { $0.1.name == name && $0.1.version == here.1.version }
-        var fixes = [QuickFix(title: "Update to \(new)", edits: [loc.file: [Replacement(range: here.1.versionRange, text: new)]])]
+        var fixes = [QuickFix(title: String(localized: "Update to \(new)", bundle: .module), edits: [loc.file: [Replacement(range: here.1.versionRange, text: new)]])]
         if same.count > 1 {
             var edits: [RelPath: [Replacement]] = [:]
             for (f, s) in same { edits[f, default: []].append(Replacement(range: s.versionRange, text: new)) }
-            fixes.append(QuickFix(title: "Update All Imports of \(name) to \(new)", edits: edits))
+            fixes.append(QuickFix(title: String(localized: "Update All Imports of \(name) to \(new)", bundle: .module), edits: edits))
         }
         return fixes
     }

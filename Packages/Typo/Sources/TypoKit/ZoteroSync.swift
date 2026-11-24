@@ -118,7 +118,7 @@ extension Project {
         let b = try await open(path)
         guard !b.isDirty, !changedOnDisk.contains(path) else { throw ZoteroError.unsavedChanges(path.name) }
         guard b.storage.string != text else { return }
-        b.apply([Self.middleEdit(b.storage.string, text)], actionName: "Sync from Zotero")
+        b.apply([Self.middleEdit(b.storage.string, text)], actionName: String(localized: "Sync from Zotero", bundle: .module))
         try await save(under: path)
     }
 }

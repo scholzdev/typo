@@ -19,12 +19,12 @@ enum SidebarTab: CaseIterable, Identifiable {
     }
     var title: String {
         switch self {
-        case .files: "Files"
-        case .search: "Search"
-        case .outline: "Outline"
-        case .issues: "Issues"
-        case .bookmarks: "Bookmarks"
-        case .changes: "Changes"
+        case .files: String(localized: "Files")
+        case .search: String(localized: "Search")
+        case .outline: String(localized: "Outline")
+        case .issues: String(localized: "Issues")
+        case .bookmarks: String(localized: "Bookmarks")
+        case .changes: String(localized: "Changes")
         }
     }
 }
@@ -395,9 +395,9 @@ private struct SearchTab: View {
     }
 
     private func summary(_ o: SearchOutcome) -> String {
-        let results = o.matchCount == 1 ? "1 result" : "\(o.matchCount) results"
-        let files = o.files.count == 1 ? "1 file" : "\(o.files.count) files"
-        return o.truncated ? "First \(results) in \(files)" : "\(results) in \(files)"
+        let results = String(localized: "\(o.matchCount) results")
+        let files = String(localized: "\(o.files.count) files")
+        return o.truncated ? String(localized: "First \(results) in \(files)") : String(localized: "\(results) in \(files)")
     }
 
     private func expanded(_ file: RelPath) -> Binding<Bool> {
@@ -416,7 +416,7 @@ private struct SearchTab: View {
         })
     }
 
-    private func title(of m: Matching) -> String {
+    private func title(of m: Matching) -> LocalizedStringKey {
         switch m {
         case .containing: "Containing"
         case .word: "Matching Word"
@@ -425,7 +425,7 @@ private struct SearchTab: View {
     }
 
     /// A borderless pull-down showing its current value, like the segments of Xcode's find path.
-    private func pathMenu<V: Hashable, Items: View>(_ title: String, selection: Binding<V>, @ViewBuilder items: () -> Items) -> some View {
+    private func pathMenu<V: Hashable, Items: View>(_ title: LocalizedStringKey, selection: Binding<V>, @ViewBuilder items: () -> Items) -> some View {
         Menu {
             Picker(title, selection: selection, content: items).pickerStyle(.inline).labelsHidden()
         } label: {
@@ -471,7 +471,7 @@ private struct SearchTab: View {
 /// `NSSearchField`, for the native rounded look with magnifying glass and clear button.
 private struct NativeSearchField: NSViewRepresentable {
     @Binding var text: String
-    let prompt: String
+    let prompt: LocalizedStringResource
     /// Bumped by the caller to move keyboard focus into the field.
     let focusRequest: Int
 
@@ -490,7 +490,7 @@ private struct NativeSearchField: NSViewRepresentable {
     func updateNSView(_ f: NSSearchField, context: Context) {
         context.coordinator.parent = self
         if f.stringValue != text { f.stringValue = text }
-        f.placeholderString = prompt
+        f.placeholderString = String(localized: prompt)
         if context.coordinator.focused != focusRequest {
             context.coordinator.focused = focusRequest
             DispatchQueue.main.async { f.window?.makeFirstResponder(f) }
@@ -566,13 +566,13 @@ private struct OutlineTab: View {
         HStack(spacing: 10) {
             if let first = broken.first {
                 Button { project.reveal(first) } label: {
-                    Label("\(broken.count) broken reference\(broken.count == 1 ? "" : "s")", systemImage: "exclamationmark.triangle.fill")
+                    Label("\(broken.count) broken references", systemImage: "exclamationmark.triangle.fill")
                 }
                 .buttonStyle(.plain).foregroundStyle(.orange)
                 .help("References to a label or bibliography key that does not exist; click to show the first")
             }
             if unused > 0 {
-                Label("\(unused) unused label\(unused == 1 ? "" : "s")", systemImage: "circle.fill").foregroundStyle(.secondary)
+                Label("\(unused) unused labels", systemImage: "circle.fill").foregroundStyle(.secondary)
                     .help("Headings whose label is never referenced")
             }
             Spacer(minLength: 0)
@@ -585,7 +585,7 @@ private struct OutlineTab: View {
         RowButton { project.reveal(item) } label: {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 if !item.numbering.isEmpty { Text(item.numbering).foregroundStyle(.secondary).monospacedDigit() }
-                Text(item.title.isEmpty ? "Untitled" : item.title).lineLimit(1)
+                Text(item.title.isEmpty ? String(localized: "Untitled") : item.title).lineLimit(1)
                 if unused {
                     Circle().fill(.tertiary).frame(width: 6, height: 6)
                         .help("Its label is never referenced").accessibilityLabel("Unused label")

@@ -161,7 +161,7 @@ extension Buffer {
         let blocks = foldRegions.filter { $0.kind == .bracket }
         guard ![s.location, NSMaxRange(s), boundary].contains(where: { x in blocks.contains { $0.heading < x && x < $0.end } }),
               let m = Sections.move(line, to: boundary, level: level, in: storage.string, headings: heads) else { return nil }
-        apply(m.edits, actionName: "Move Section", carry: m.carry)
+        apply(m.edits, actionName: String(localized: "Move Section", bundle: .module), carry: m.carry)
         return m.heading
     }
 
@@ -226,7 +226,7 @@ extension Project {
         let text = b.storage.string as NSString, heads = b.sectionHeadings
         func line(_ o: Int) -> Int? { o <= text.length ? text.lineRange(for: NSRange(location: o, length: 0)).location : nil }
         guard let from = line(item.offset), heads.contains(where: { $0.line == from }), let to = line(target.offset),
-              let t = Sections.range(of: to, in: heads, length: text.length) else { return "Only headings written with `=` can be moved." }
+              let t = Sections.range(of: to, in: heads, length: text.length) else { return String(localized: "Only headings written with `=` can be moved.", bundle: .module) }
         let level = adoptLevel ? heads.first { $0.line == to }?.level : nil
         guard let new = b.moveSection(from, to: drop == .before ? to : NSMaxRange(t), level: level) else { return nil }
         show(item.file, range: NSRange(location: new, length: 0))
@@ -236,7 +236,7 @@ extension Project {
     /// The section lands in `target`'s file first, then leaves `item`'s: each file gets one undo step of its own, and
     /// a failure in between leaves a copy rather than losing the text. Marks inside it (bookmarks, folds) stay behind.
     private func moveSectionAcrossFiles(_ item: OutlineItem, _ drop: SectionDrop, _ target: OutlineItem, adoptLevel: Bool) async -> String? {
-        let refusal = "Only headings written with `=` can be moved."
+        let refusal = String(localized: "Only headings written with `=` can be moved.", bundle: .module)
         guard let src = try? await open(item.file), let dst = try? await open(target.file), src.isTypst, dst.isTypst else { return refusal }
         let from = src.storage.string as NSString, into = dst.storage.string as NSString
         func line(_ o: Int, _ t: NSString) -> Int? { o <= t.length ? t.lineRange(for: NSRange(location: o, length: 0)).location : nil }
@@ -247,12 +247,12 @@ extension Project {
         let boundary = drop == .before ? to : NSMaxRange(t)
         // A heading inside a content block (`#[ … ]`) has no section that can leave or enter the block whole.
         func inBlock(_ b: Buffer, _ xs: [Int]) -> Bool { xs.contains { x in b.foldRegions.contains { $0.kind == .bracket && $0.heading < x && x < $0.end } } }
-        guard !inBlock(src, [s.location, NSMaxRange(s)]), !inBlock(dst, [boundary]) else { return "This section is inside a content block and can't leave it." }
+        guard !inBlock(src, [s.location, NSMaxRange(s)]), !inBlock(dst, [boundary]) else { return String(localized: "This section is inside a content block and can't leave it.", bundle: .module) }
         let level = adoptLevel ? dstHeads.first { $0.line == to }?.level : nil
         guard let c = Sections.cut(start, level: level, in: src.storage.string, headings: srcHeads) else { return refusal }
         let p = Sections.paste(c.block, at: boundary, in: dst.storage.string)
-        dst.apply([p.insertion], actionName: "Move Section")
-        src.apply([c.removal], actionName: "Move Section")
+        dst.apply([p.insertion], actionName: String(localized: "Move Section", bundle: .module))
+        src.apply([c.removal], actionName: String(localized: "Move Section", bundle: .module))
         show(target.file, range: NSRange(location: p.heading, length: 0))
         return nil
     }
@@ -284,7 +284,13 @@ extension Project {
 
 extension Lint {
     /// Whether `d` is the "never referenced" hint of a label.
-    public static func isUnusedLabel(_ d: Diagnostic) -> Bool { d.severity == .hint && d.message.hasPrefix("Label <") && d.message.hasSuffix("> is never referenced") }
+    public static func isUnusedLabel(_ d: Diagnostic) -> Bool {
+        guard d.severity == .hint else { return false }
+        let parts = unusedLabelMessage("\u{1}").components(separatedBy: "\u{1}")      // the message in the user's language, around the name
+        return parts.count == 2 && d.message.hasPrefix(parts[0]) && d.message.hasSuffix(parts[1])
+    }
+
+    static func unusedLabelMessage(_ name: String) -> String { String(localized: "Label <\(name)> is never referenced", bundle: .module) }
 }
 
 extension QuickFixes {

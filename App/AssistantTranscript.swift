@@ -37,7 +37,7 @@ struct AssistantTurnView: View {
         let shown = Set(turn.answers.flatMap { $0.toolCalls ?? [] }.map(\.call.id))
         let pending = model.liveTools.filter { !shown.contains($0.id) }
         ForEach(pending, id: \.id) { c in
-            AssistantToolRow(kind: c.kind, title: c.title.isEmpty ? "Tool" : c.title, status: AssistantToolStatus(acp: c.status), detail: Self.detail(c))
+            AssistantToolRow(kind: c.kind, title: c.title.isEmpty ? String(localized: "Tool") : c.title, status: AssistantToolStatus(acp: c.status), detail: Self.detail(c))
                 .assistantEntrance()
         }
         let current = turn.answers.last
@@ -52,7 +52,7 @@ struct AssistantTurnView: View {
 
     /// What a running call shows under its title: its command, else its text.
     static func detail(_ c: ACPToolCall) -> String? {
-        if let cmd = c.rawInput?["command"]?.string { return "Running \(cmd)" }
+        if let cmd = c.rawInput?["command"]?.string { return String(localized: "Running \(cmd)") }
         return c.content.compactMap { $0["content"]?["text"]?.string }.first
     }
 }
@@ -166,7 +166,7 @@ struct AssistantWorkingRow: View {
 
 /// Text at 30% opacity with a full-opacity band sweeping diagonally across it every 1.5 s; plain with Reduce Motion.
 struct AssistantShimmer: View {
-    let text: String
+    let text: LocalizedStringKey
     @State private var start = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.layoutDirection) private var direction

@@ -29,7 +29,7 @@ public struct LocalHistory {
     static let maxCount = 200
 
     public static var retentionDescription: String {
-        "Every snapshot of the last \(Int(keepAllFor / 3600)) hours is kept, then the newest of each day for \(keepDailyDays) days, never more than \(maxCount) per project."
+        String(localized: "Every snapshot of the last \(Int(keepAllFor / 3600)) hours is kept, then the newest of each day for \(keepDailyDays) days, never more than \(maxCount) per project.", bundle: .module)
     }
 
     /// Which snapshots go: see `retentionDescription`.
@@ -133,6 +133,6 @@ extension Project {
         }
         let b = try await open(file.path)
         guard b.storage.string != file.text else { return }
-        b.apply([Replacement(range: NSRange(location: 0, length: b.storage.length), text: file.text)], actionName: "Restore File")
+        b.apply([Replacement(range: NSRange(location: 0, length: b.storage.length), text: file.text)], actionName: String(localized: "Restore File", bundle: .module))
     }
 }

@@ -1,0 +1,26 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Added. Restart Claude Desktop to use it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzugefügt. Claude Desktop neu starten, um es zu verwenden."
+          }
+        }
+      }
+    },
+    "The Claude Desktop settings could not be written: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Einstellungen von Claude Desktop konnten nicht geschrieben werden: %@"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

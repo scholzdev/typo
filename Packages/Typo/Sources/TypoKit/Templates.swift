@@ -22,9 +22,9 @@ public enum TemplateError: LocalizedError, Equatable {
 
     public var errorDescription: String? {
         switch self {
-        case .destinationExists(let n): "A folder named \"\(n)\" already exists."
-        case .fetchFailed(let m): "Could not get the template package: \(m)"
-        case .invalidTemplate(let m): "The template package is invalid: \(m)"
+        case .destinationExists(let n): String(localized: "A folder named \"\(n)\" already exists.", bundle: .module)
+        case .fetchFailed(let m): String(localized: "Could not get the template package: \(m)", bundle: .module)
+        case .invalidTemplate(let m): String(localized: "The template package is invalid: \(m)", bundle: .module)
         }
     }
 }

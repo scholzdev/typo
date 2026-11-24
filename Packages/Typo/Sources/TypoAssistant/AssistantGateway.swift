@@ -134,7 +134,7 @@ public struct OpenCodeClient: AssistantClient {
 
     public func models() async throws -> [String] {
         let list = await catalog()
-        guard !list.isEmpty else { throw AssistantError.unreadable("The model list could not be loaded.") }
+        guard !list.isEmpty else { throw AssistantError.unreadable(String(localized: "The model list could not be loaded.", bundle: .module)) }
         return list.keys.sorted()
     }
 }
@@ -196,7 +196,7 @@ enum ResponsesWire {
             s.finished = true
             return [.done(reason == "max_output_tokens" ? .maxTokens : reason == "content_filter" ? .refusal : .other(reason), s.usage)]
         case "response.failed":
-            let message = (response?["error"] as? [String: Any])?["message"] as? String ?? "The answer failed."
+            let message = (response?["error"] as? [String: Any])?["message"] as? String ?? String(localized: "The answer failed.", bundle: .module)
             throw AssistantError.server(status: 500, message: message)
         case "error":
             throw AssistantError.badRequest(obj["message"] as? String ?? (obj["error"] as? [String: Any])?["message"] as? String ?? "")

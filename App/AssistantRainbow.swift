@@ -158,7 +158,7 @@ extension LineNumberRuler: NSViewToolTipOwner {
     }
 
     func view(_ view: NSView, stringForToolTip tag: NSView.ToolTipTag, point: NSPoint, userData data: UnsafeMutableRawPointer?) -> String {
-        rainbowHits.first { $0.rect.insetBy(dx: -2, dy: 0).contains(point) }?.previous == true ? "Previous changes" : "Generated change"
+        rainbowHits.first { $0.rect.insetBy(dx: -2, dy: 0).contains(point) }?.previous == true ? String(localized: "Previous changes") : String(localized: "Generated change")
     }
 
     /// A click on an assistant bar: Dismiss (the bar goes, the text stays) or Discard Change (the text goes back).
@@ -166,8 +166,8 @@ extension LineNumberRuler: NSViewToolTipOwner {
         let p = convert(event.locationInWindow, from: nil)
         guard let hit = rainbowHits.first(where: { $0.rect.insetBy(dx: -2, dy: 0).contains(p) }), let buffer = editor?.buffer else { return false }
         let menu = NSMenu()
-        menu.addItem(RainbowMenuItem("Dismiss") { buffer.dismissAIMark(hit.range) })
-        let discard = RainbowMenuItem("Discard Change") {
+        menu.addItem(RainbowMenuItem(String(localized: "Dismiss")) { buffer.dismissAIMark(hit.range) })
+        let discard = RainbowMenuItem(String(localized: "Discard Change")) {
             NotificationCenter.default.post(name: .assistantDiscardChange, object: buffer, userInfo: ["range": NSValue(range: hit.range)])
         }
         discard.isEnabled = buffer.aiChanges(in: hit.range).contains { buffer.canRevert($0.id) }

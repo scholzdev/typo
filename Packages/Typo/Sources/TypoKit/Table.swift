@@ -533,11 +533,11 @@ public enum TableStyle: String, CaseIterable, Sendable, Identifiable {
 
     public var title: String {
         switch self {
-        case .plain: "Plain"
-        case .grid: "Grid"
-        case .headerLine: "Header Line"
-        case .booktabs: "Booktabs"
-        case .striped: "Striped"
+        case .plain: String(localized: "Plain", bundle: .module)
+        case .grid: String(localized: "Grid", bundle: .module)
+        case .headerLine: String(localized: "Header Line", bundle: .module)
+        case .booktabs: String(localized: "Booktabs", bundle: .module)
+        case .striped: String(localized: "Striped", bundle: .module)
         }
     }
 

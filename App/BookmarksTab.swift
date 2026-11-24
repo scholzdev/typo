@@ -66,18 +66,18 @@ struct BookmarksTab: View {
 
     private var alertTitle: String {
         switch editing {
-        case .note: "Edit Note"
-        case .renameGroup: "Rename Group"
-        case .newGroup: "New Group"
-        case .title, nil: "Rename Bookmark"
+        case .note: String(localized: "Edit Note")
+        case .renameGroup: String(localized: "Rename Group")
+        case .newGroup: String(localized: "New Group")
+        case .title, nil: String(localized: "Rename Bookmark")
         }
     }
 
     private var alertField: String {
         switch editing {
-        case .note: "Note"
-        case .renameGroup, .newGroup: "Name"
-        case .title, nil: "Title"
+        case .note: String(localized: "Note")
+        case .renameGroup, .newGroup: String(localized: "Name")
+        case .title, nil: String(localized: "Title")
         }
     }
 

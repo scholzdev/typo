@@ -177,15 +177,15 @@ public final class ACPAgent: Sendable {
     /// `environment`: variables set on top of the app's own for the agent process.
     public static func launch(command: String, cwd: URL, host: (any ACPHost)?, mcp: String? = nil, meta: JSONValue? = nil, resume: String? = nil, environment: [String: String] = [:]) async throws -> (agent: ACPAgent, info: String) {
         let words = ACPProcess.words(command)
-        guard let name = words.first else { throw ACPError(ACPError.closed, "The agent has no command. Enter it in Settings › Intelligence.") }
+        guard let name = words.first else { throw ACPError(ACPError.closed, String(localized: "The agent has no command. Enter it in Settings › Intelligence.", bundle: .module)) }
         let env = ACPProcess.environment().merging(environment) { _, new in new }
         guard let executable = ACPProcess.locate(name, path: env["PATH"] ?? "") else {
-            throw ACPError(ACPError.closed, "“\(name)” was not found. " + (name == "npx" ? "Install Node.js, which brings npx." : "Install it, or enter its full path in Settings › Intelligence."))
+            throw ACPError(ACPError.closed, name == "npx" ? String(localized: "“\(name)” was not found. Install Node.js, which brings npx.", bundle: .module) : String(localized: "“\(name)” was not found. Install it, or enter its full path in Settings › Intelligence.", bundle: .module))
         }
         let process = try ACPProcess(executable: executable, arguments: Array(words.dropFirst()), environment: env, cwd: cwd)
         let connection = ACPConnection(input: process.stdout, output: process.stdin) { [process] in
             let tail = process.lastError
-            return tail.isEmpty ? "The agent stopped." : "The agent stopped:\n\(tail)"
+            return tail.isEmpty ? String(localized: "The agent stopped.", bundle: .module) : String(localized: "The agent stopped:\n\(tail)", bundle: .module)
         }
         let agent = ACPAgent(connection: connection, process: process, host: host)
         do {
@@ -207,7 +207,7 @@ public final class ACPAgent: Sendable {
             "clientInfo": ["name": "typo", "title": "Typo", "version": .string(version)],
         ])
         if let v = info["protocolVersion"]?.int, v != ACPProtocolInfo.protocolVersion {
-            throw ACPError(ACPError.internalError, "The agent speaks protocol version \(v); Typo speaks version \(ACPProtocolInfo.protocolVersion).")
+            throw ACPError(ACPError.internalError, String(localized: "The agent speaks protocol version \(v); Typo speaks version \(ACPProtocolInfo.protocolVersion).", bundle: .module))
         }
         var params: JSONValue = ["cwd": .string(cwd.path), "mcpServers": .array(mcp.map { [["name": "typo", "command": .string($0), "args": ["--project", .string(cwd.path)], "env": []]] } ?? [])]
         if let meta, case .object(var o) = params { o["_meta"] = meta; params = .object(o) }
@@ -216,14 +216,14 @@ public final class ACPAgent: Sendable {
             options = reattached
         } else {
             let session = try await connection.request("session/new", params)
-            guard let id = session["sessionId"]?.string else { throw ACPError(ACPError.internalError, "The agent opened no session.") }
+            guard let id = session["sessionId"]?.string else { throw ACPError(ACPError.internalError, String(localized: "The agent opened no session.", bundle: .module)) }
             options = ACPSessionOptions.parse(session)
             state.withLock { $0.sessionID = id; $0.resumed = false }
         }
         state.withLock { $0.options = options }
         Task { @MainActor [host] in host.value?.optionsChanged(options) }
         let a = info["agentInfo"]
-        return [a?["title"]?.string ?? a?["name"]?.string ?? "The agent", a?["version"]?.string].compactMap { $0 }.joined(separator: " ")
+        return [a?["title"]?.string ?? a?["name"]?.string ?? String(localized: "The agent", bundle: .module), a?["version"]?.string].compactMap { $0 }.joined(separator: " ")
     }
 
     /// How the agent can reattach a stored session, from its `initialize` result: `session/resume` (no replay) over
@@ -526,9 +526,9 @@ public struct ACPClient: AssistantClient {
     public static func failure(_ e: Error, preset: AssistantPreset) -> Error {
         guard let e = e as? ACPError else { return e }
         switch e.code {
-        case ACPError.authRequired: return AssistantError.agent(preset.loginHint ?? "The agent asks you to log in first. Log in with its own command line tool, then try again.")
+        case ACPError.authRequired: return AssistantError.agent(preset.loginHint ?? String(localized: "The agent asks you to log in first. Log in with its own command line tool, then try again.", bundle: .module))
         case ACPError.closed: return AssistantError.agent(e.message)
-        default: return AssistantError.agent("The agent reported an error: \(e.message)")
+        default: return AssistantError.agent(String(localized: "The agent reported an error: \(e.message)", bundle: .module))
         }
     }
 
@@ -537,7 +537,7 @@ public struct ACPClient: AssistantClient {
         return AsyncThrowingStream { c in
             let task = Task {
                 do {
-                    guard let sessions else { throw AssistantError.agent("Agents answer in the assistant panel only.") }
+                    guard let sessions else { throw AssistantError.agent(String(localized: "Agents answer in the assistant panel only.", bundle: .module)) }
                     let (agent, fresh) = try await sessions.agent(for: request.session ?? "", command: command, start: start)
                     try Task.checkCancellation()    // stopped while the agent was starting
                     // Every turn, not once: the agent may change its mode by itself.
@@ -565,7 +565,7 @@ public struct ACPClient: AssistantClient {
     /// Starts the agent of `session` before its first prompt, in the conversation's mode and model, without prompting;
     /// the first turn then finds it running.
     public func warm(session: String, model: String) async throws -> ACPAgent {
-        guard let sessions else { throw AssistantError.agent("Agents answer in the assistant panel only.") }
+        guard let sessions else { throw AssistantError.agent(String(localized: "Agents answer in the assistant panel only.", bundle: .module)) }
         let agent = try await sessions.agent(for: session, command: provider.command ?? "", start: start).agent
         try Task.checkCancellation()
         if let mode { await agent.select(mode: mode) } else if let changeFiles { await agent.apply(changeFiles) }
