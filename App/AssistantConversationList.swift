@@ -27,7 +27,7 @@ struct AssistantConversationList: View {
                 } label: {
                     groupLabel(g)
                 }
-                .dropDestination(for: String.self) { items, _ in drop(items, into: g.id) }
+                .dropDestination(for: String.self) { items, _ in _ = drop(items, into: g.id) }
             }
             ForEach(live(model.layout.order)) { row($0) }
                 .onMove { from, to in move(live(model.layout.order), from, to, group: nil) }

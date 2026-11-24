@@ -31,6 +31,7 @@ public struct FoldRegion: Equatable, Sendable {
 public struct HiddenRange: Equatable, Sendable {
     public let range: NSRange
     public let heading: Int
+    public init(range: NSRange, heading: Int) { self.range = range; self.heading = heading }
 }
 
 /// A region drawn on the gutter's ribbon: `depth` counts the regions around it (0 = outermost).
@@ -373,6 +374,11 @@ extension Buffer {
     /// The fold animation's placeholder: extra height under the line starting at `line`.
     public private(set) var pad: (line: Int, extra: CGFloat)?
 
+    /// Presenter note cards: the line starting at each key lays out as a card of that height (see `FoldFragment.card`).
+    public private(set) var cards: [Int: CGFloat] = [:]
+    /// The card lines laid out, wherever an edit has moved them since: a card that went must be laid out again too.
+    private let cardFragments = NSHashTable<FoldFragment>.weakObjects()
+
     public override init() {
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(edited), name: NSTextStorage.didProcessEditingNotification, object: nil)
@@ -417,6 +423,32 @@ extension Buffer {
         return carried
     }
 
+    /// Sets the note cards and lays out again the lines whose card appeared, went or changed height.
+    public func setCards(_ new: [Int: CGFloat]) {
+        guard new != cards, let tlm = textLayoutManager else { return }
+        let changed = Set(new.keys).union(cards.keys).filter { new[$0] != cards[$0] }
+        cards = new
+        // Invalidating keeps the fragment object, so its card height is set here; TextKit does not ask the delegate again.
+        for line in changed {
+            guard let loc = textRange(NSRange(location: line, length: 0))?.location,
+                  let f = tlm.textLayoutFragment(for: loc) else { continue }
+            if let fold = f as? FoldFragment {
+                fold.card = new[line] ?? 0
+                if fold.card != 0 { cardFragments.add(fold) }
+            }
+            tlm.invalidateLayout(for: f.rangeInElement)
+        }
+        if let tcs = tlm.textContentManager as? NSTextContentStorage {
+            for f in cardFragments.allObjects {
+                let height = new[tcs.offset(from: tcs.documentRange.location, to: f.rangeInElement.location)] ?? 0
+                guard height != f.card else { continue }
+                f.card = height
+                tlm.invalidateLayout(for: f.rangeInElement)
+            }
+        }
+        tlm.textViewportLayoutController.layoutViewport()
+    }
+
     private func textRange(_ r: NSRange) -> NSTextRange? {
         guard let tcs = textLayoutManager?.textContentManager as? NSTextContentStorage,
               let start = tcs.location(tcs.documentRange.location, offsetBy: r.location) else { return nil }
@@ -455,9 +487,16 @@ extension Buffer {
     public nonisolated func textLayoutManager(_ m: NSTextLayoutManager, textLayoutFragmentFor location: any NSTextLocation,
                                               in element: NSTextElement) -> NSTextLayoutFragment {
         let f = FoldFragment(textElement: element, range: element.elementRange)
-        if let start = element.elementRange?.location, let tcs = m.textContentManager as? NSTextContentStorage {
-            let p = tcs.offset(from: tcs.documentRange.location, to: start)
-            f.extra = MainActor.assumeIsolated { pad.flatMap { $0.line == p ? $0.extra : nil } ?? 0 }
+        guard let start = element.elementRange?.location, let tcs = m.textContentManager as? NSTextContentStorage else { return f }
+        let p = tcs.offset(from: tcs.documentRange.location, to: start)
+        // The text check keeps a card off a line that the map's offsets, a step behind an edit, now point at.
+        let line = (element as? NSTextParagraph)?.attributedString.string.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Made from TextKit's element, so the checker keeps it in that element's region; it reaches TextKit only after this returns.
+        nonisolated(unsafe) let fragment: AnyObject = f
+        (f.card, f.extra) = MainActor.assumeIsolated {
+            let card = cards[p].flatMap { h in line.flatMap(PresenterNotes.unwritten) != nil ? h : nil } ?? 0
+            if card != 0 { cardFragments.add(fragment as? FoldFragment) }
+            return (card, pad.flatMap { $0.line == p ? $0.extra : nil } ?? 0)
         }
         return f
     }
@@ -467,9 +506,17 @@ extension Buffer {
 /// below `layoutFragmentFrame`, so growing it moves the real text after it without touching the text storage.
 public final class FoldFragment: NSTextLayoutFragment, @unchecked Sendable {
     public var extra: CGFloat = 0
+    /// A presenter note line shown as a card: the code is not drawn, and the line is as tall as the card the app puts over it.
+    /// Negative: the note is hidden, and the line takes no height.
+    public var card: CGFloat = 0
     public override var layoutFragmentFrame: CGRect {
         var f = super.layoutFragmentFrame
-        f.size.height += extra
+        f.size.height = (card < 0 ? 0 : max(f.size.height, card)) + extra
         return f
     }
+
+    public override func draw(at point: CGPoint, in context: CGContext) {
+        if card == 0 { super.draw(at: point, in: context) }
+    }
 }
+

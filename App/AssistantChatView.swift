@@ -449,7 +449,7 @@ struct AssistantPromptBox: View {
 
     private func menuLabel(_ title: String) -> some View {
         // One Text: a menu label keeps only a text and an icon, and puts the icon first.
-        (Text(title + " ") + Text(Image(systemName: "chevron.up.chevron.down")).font(.system(size: 8, weight: .semibold)).foregroundStyle(.secondary))
+        Text("\(title) \(Text(Image(systemName: "chevron.up.chevron.down")).font(.system(size: 8, weight: .semibold)).foregroundStyle(.secondary))")
             .font(.system(size: 12)).lineLimit(1)
     }
 

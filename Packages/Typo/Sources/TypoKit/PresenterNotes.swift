@@ -87,8 +87,63 @@ public enum PresenterNotes {
         return "#metadata(\"\(s)\") <note>"
     }
 
-    /// Where the caret goes in an empty note, counted from the note's `#`: between its quotes.
-    public static let emptyCaretOffset = "#metadata(\"".utf16.count
+    /// The text a card shows for a note call: the string a line written by `written` holds, exactly, or the content
+    /// of a one-line `#metadata[…] <note>` as written (a card edit writes it back in the string form); nil otherwise.
+    static func unwritten(_ call: String) -> String? {
+        if call.hasPrefix("#metadata["), call.hasSuffix("] <note>"), !call.contains("\n") {
+            return String(call.dropFirst("#metadata[".count).dropLast("] <note>".count))
+        }
+        let head = "#metadata(\"", tail = "\") <note>"
+        guard call.hasPrefix(head), call.hasSuffix(tail), call.count >= head.count + tail.count else { return nil }
+        var out = "", escaped = false
+        for c in call.dropFirst(head.count).dropLast(tail.count) {
+            if escaped {
+                switch c {
+                case "n": out.append("\n")
+                case "\\", "\"": out.append(c)
+                default: return nil
+                }
+                escaped = false
+            } else if c == "\\" { escaped = true } else { out.append(c) }
+        }
+        return escaped || written(out) != call ? nil : out
+    }
+
+    /// A line the editor shows as a note card: only Typo's `#metadata("…") <note>` on it, besides spaces and tabs.
+    public struct CardLine: Equatable, Sendable {
+        /// The whole line, with its line break.
+        public let line: NSRange
+        public let call: NSRange
+        public let text: String
+    }
+
+    /// A note the editor shows as a pill over its call: Typo's note sharing its line with other text.
+    public struct InlineNote: Equatable, Sendable {
+        public var call: NSRange
+        public var lineStart: Int
+        public let text: String
+    }
+
+    /// Card lines and inline notes of `text` from one parse, in source order. Only calls `unwritten` reads count, so a
+    /// call split over lines stays code, and notes in comments, strings and raw text are neither.
+    @MainActor public static func noteLines(in text: String) -> (cards: [CardLine], inline: [InlineNote]) {
+        guard text.contains("<note>") else { return ([], []) }
+        let ns = text as NSString
+        var cards: [CardLine] = [], inline: [InlineNote] = []
+        for n in extract(text) where n.kind == .typo {
+            let call = ns.substring(with: n.range), line = ns.lineRange(for: n.range)
+            guard let note = unwritten(call) else { continue }
+            if ns.substring(with: line).trimmingCharacters(in: .whitespacesAndNewlines) == call {
+                cards.append(CardLine(line: line, call: n.range, text: note))
+            } else {
+                inline.append(InlineNote(call: n.range, lineStart: line.location, text: note))
+            }
+        }
+        return (cards, inline)
+    }
+
+    @MainActor public static func cardLines(in text: String) -> [CardLine] { noteLines(in: text).cards }
+    @MainActor public static func inlineNotes(in text: String) -> [InlineNote] { noteLines(in: text).inline }
 
     /// `text` with `marker` before each note, and the cursor inside each note's marker.
     static func marked(_ text: String, _ notes: [Found]) -> (text: String, cursors: [Int]) {
@@ -117,13 +172,19 @@ public enum PresenterNotes {
         return Replacement(range: NSRange(location: atBreak ? end - 1 : end, length: 0), text: "\n" + note)
     }
 
-    /// Writes `text` over `note`'s call; empty text removes the call, and its line when nothing else is on it.
-    static func replacement(for note: NSRange, in text: String, writing newText: String) -> Replacement {
+    /// Writes `text` over `note`'s call; empty text removes the call, and its line when nothing else is on it, else one
+    /// space or tab next to it (after it, else before), so no double space is left.
+    public static func replacement(for note: NSRange, in text: String, writing newText: String) -> Replacement {
         guard newText.isEmpty else { return Replacement(range: note, text: written(newText)) }
         let ns = text as NSString
         let line = ns.lineRange(for: note)
         let rest = ns.substring(with: line).replacingOccurrences(of: ns.substring(with: note), with: "")
-        guard rest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return Replacement(range: note, text: "") }
+        guard rest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            let blank = { (i: Int) in ns.character(at: i) == 0x20 || ns.character(at: i) == 0x09 }
+            if NSMaxRange(note) < ns.length, blank(NSMaxRange(note)) { return Replacement(range: NSRange(location: note.location, length: note.length + 1), text: "") }
+            if note.location > line.location, blank(note.location - 1) { return Replacement(range: NSRange(location: note.location - 1, length: note.length + 1), text: "") }
+            return Replacement(range: note, text: "")
+        }
         // Alone on its line: take the line break with it; on the last line, the break before it.
         if NSMaxRange(line) < ns.length || line.location == 0 { return Replacement(range: line, text: "") }
         return Replacement(range: NSRange(location: line.location - 1, length: line.length + 1), text: "")

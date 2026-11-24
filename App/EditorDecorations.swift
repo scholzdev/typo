@@ -39,6 +39,10 @@ import TypstEngine
     var colorLiterals: (() -> [ColorLiteral])?
     var onSwatchClick: ((ColorLiteral, NSRect) -> Void)?
     private var swatchHits: [(rect: NSRect, literal: ColorLiteral)] = []
+    /// Presenter notes sharing their line, drawn as pills over their calls (App/EditorNoteCards.swift), and the click on one.
+    var notePills: (() -> [PresenterNotes.InlineNote])?
+    var onNotePillClick: ((PresenterNotes.InlineNote, NSRect) -> Void)?
+    var notePillHits: [(rect: NSRect, note: PresenterNotes.InlineNote)] = []
     /// Parameter names drawn in the kern gap before positional arguments; display only, they take no clicks.
     var inlayHints: (() -> [InlayHint])?
     var display = DisplayDecor() { didSet { if display != oldValue { needsDisplay = true } } }
@@ -77,16 +81,20 @@ import TypstEngine
     /// Only the pills and fold badges take clicks; everything else reaches the text view.
     override func hitTest(_ point: NSPoint) -> NSView? {
         let p = convert(point, from: superview)
-        return pillHits.contains { $0.rect.contains(p) } || badgeHits.contains { $0.rect.contains(p) } || swatchHits.contains { $0.rect.contains(p) } ? self : nil
+        return pillHits.contains { $0.rect.contains(p) } || badgeHits.contains { $0.rect.contains(p) } || swatchHits.contains { $0.rect.contains(p) }
+            || notePillHits.contains { $0.rect.contains(p) } ? self : nil
     }
 
-    override func resetCursorRects() { for h in swatchHits { addCursorRect(h.rect, cursor: .pointingHand) } }
+    override func resetCursorRects() { for r in swatchHits.map(\.rect) + notePillHits.map(\.rect) { addCursorRect(r, cursor: .pointingHand) } }
 
     override func accessibilityChildren() -> [Any]? {
         swatchHits.map { hit in
             let e = NSAccessibilityElement.element(withRole: .button, frame: window?.convertToScreen(convert(hit.rect, to: nil)) ?? hit.rect,
                                                    label: String(localized: "Pick color"), parent: self)
             return e
+        } + notePillHits.map { hit in
+            NSAccessibilityElement.element(withRole: .button, frame: window?.convertToScreen(convert(hit.rect, to: nil)) ?? hit.rect,
+                                           label: String(localized: "Presenter Note"), parent: self)
         }
     }
 
@@ -94,6 +102,7 @@ import TypstEngine
         let p = convert(event.locationInWindow, from: nil)
         if let badge = badgeHits.first(where: { $0.rect.contains(p) }) { return onBadgeClick?(badge.heading) ?? () }
         if let swatch = swatchHits.first(where: { $0.rect.contains(p) }) { return onSwatchClick?(swatch.literal, swatch.rect) ?? () }
+        if let pill = notePillHits.first(where: { $0.rect.contains(p) }) { return onNotePillClick?(pill.note, pill.rect) ?? () }
         if let hit = pillHits.first(where: { $0.rect.contains(p) }) {
             if hit.fixable, let onFixablePillClick { onFixablePillClick(hit.range, hit.rect) } else { onPillClick?(hit.range) }
         }
@@ -246,9 +255,10 @@ import TypstEngine
         let sel = tv.selectedRange()
         pillHits = []
         badgeHits = []
-        let hadSwatches = swatchHits.map(\.rect)
+        let hadHits = swatchHits.map(\.rect) + notePillHits.map(\.rect)
         swatchHits = []
-        defer { if swatchHits.map(\.rect) != hadSwatches { window?.invalidateCursorRects(for: self) } }
+        notePillHits = []
+        defer { if swatchHits.map(\.rect) + notePillHits.map(\.rect) != hadHits { window?.invalidateCursorRects(for: self) } }
 
         if sel.length > 0 { drawSelection(sel, tv: tv, tlm: tlm, tcs: tcs, viewport: viewport, origin: origin) }
         drawMultiCursors(tv: tv, tlm: tlm, tcs: tcs, viewport: viewport, origin: origin)
@@ -323,6 +333,8 @@ import TypstEngine
         drawOccurrences(tlm: tlm, tcs: tcs, length: text.length, origin: origin)
         // Last, so the current-line band doesn't cover the bracket on the caret's line.
         drawBrackets(tlm: tlm, tcs: tcs, length: text.length, origin: origin)
+        // Opaque, over everything drawn on the code it stands for.
+        drawNotePills(tv: tv, tlm: tlm, tcs: tcs, viewport: viewport, sel: sel)
     }
 
     /// A rounded square in the kern gap behind each literal's `)`, centered on its line.

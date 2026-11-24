@@ -157,7 +157,8 @@ extension EditorView.Coordinator {
     @objc func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange old: NSRange, toCharacterRange new: NSRange) -> NSRange {
         if swapping { return new }
         if !programmatic { foldAnimator.finish() }   // the user moving the caret ends a fold's motion
-        return folds.selection(new, from: old, keyboard: !programmatic && NSApp.currentEvent?.type == .keyDown)
+        let keyboard = !programmatic && NSApp.currentEvent?.type == .keyDown
+        return noteCards.selection(folds.selection(new, from: old, keyboard: keyboard), from: old, keyboard: keyboard)
     }
 
     /// After a new layout: a caret or selection end that a fold now hides moves to the end of the heading line.
@@ -254,7 +255,7 @@ extension LineNumberRuler {
         return (top, top + f.layoutFragmentFrame.height)
     }
 
-    /// A click on a row that starts a fold folds or unfolds it.
+    /// A click on a row that starts a fold folds or unfolds it; on a presenter note's row it shows the card or its code.
     override func mouseDown(with event: NSEvent) {
         if clickRainbow(event) { return }                          // an assistant change bar
         if editor?.gitGutter.click(event) == true { return }      // a git change bar at the left edge
@@ -262,9 +263,11 @@ extension LineNumberRuler {
         let p = tv.convert(event.locationInWindow, from: nil)
         guard let frag = tlm.textLayoutFragment(for: CGPoint(x: 0, y: p.y - tv.textContainerOrigin.y)) else { return super.mouseDown(with: event) }
         let start = tcs.offset(of: frag.rangeInElement.location)
+        let inRibbon = convert(event.locationInWindow, from: nil).x >= ruleThickness - 13
+        if editor?.noteCards.mark(at: start) != nil, !(inRibbon && editor?.foldMark(at: start) != nil) { return editor?.noteCards.toggle(at: start) ?? () }
         guard editor?.foldMark(at: start) != nil else {
             // Left of the fold ribbon, a click bookmarks the line (heading rows keep folding on any click).
-            if convert(event.locationInWindow, from: nil).x < ruleThickness - 13 { editor?.toggleBookmark(at: start) } else { super.mouseDown(with: event) }
+            if !inRibbon { editor?.toggleBookmark(at: start) } else { super.mouseDown(with: event) }
             return
         }
         editor?.toggleFold(at: start)

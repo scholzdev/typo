@@ -191,7 +191,7 @@ struct AppCommand: Identifiable {
              AppCommand(menu: "View", title: "Two Pages", systemImage: "book.pages", shortcut: KeyboardShortcut("8"), isEnabled: project != nil, isOn: project.map { $0.preview.fit == .twoPages }) { project?.preview.fit = .twoPages }],
             [AppCommand(menu: "View", title: "Page Thumbnails", systemImage: "sidebar.squares.left", isEnabled: project != nil, isOn: project?.preview.showsThumbnails ?? false,
                         help: "Shows a strip of small pages beside the preview.") { project?.preview.showsThumbnails.toggle() },
-             AppCommand(menu: "View", title: project?.preview.notesShown == true ? "Hide Presenter Notes" : "Show Presenter Notes", idTitle: "Presenter Notes", systemImage: "note.text",
+             AppCommand(menu: "View", title: project?.preview.notesShown == true ? "Hide Notes Strip" : "Show Notes Strip", idTitle: "Presenter Notes", systemImage: "note.text",
                         isEnabled: project != nil, help: "Shows the notes of the slide in view under the preview.") {
                  if let preview = project?.preview { preview.showsNotes = !preview.notesShown }
              },

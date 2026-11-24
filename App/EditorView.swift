@@ -24,6 +24,7 @@ final class EditorTextView: NSTextView {
     var bookmarkedAt: (@MainActor (Int) -> Bool?)?
     var onToggleBookmark: (@MainActor (Int) -> Void)?
     var multi = MultiCursorState()      // multiple cursors: see MultiCursor.swift
+    var onViewportLayout: (@MainActor () -> Void)?
     private var hoverArea: NSTrackingArea?
 
     override func updateTrackingAreas() {
@@ -34,9 +35,20 @@ final class EditorTextView: NSTextView {
         hoverArea = a
     }
 
+    override func textViewportLayoutControllerDidLayout(_ controller: NSTextViewportLayoutController) {
+        super.textViewportLayoutControllerDidLayout(controller)
+        onViewportLayout?()
+    }
+
     override func mouseMoved(with event: NSEvent) {
         super.mouseMoved(with: event)
-        onMouseMoved?(convert(event.locationInWindow, from: nil))
+        let p = convert(event.locationInWindow, from: nil)
+        // Over a note card the code under it is hidden: no hover card, no ⌘-hover link.
+        if subviews.contains(where: { $0 is PresenterNoteCard && !$0.isHidden && $0.frame.contains(p) }) {
+            onMouseLeft?()
+            return setCommandHover(nil)
+        }
+        onMouseMoved?(p)
         updateCommandHover(event.modifierFlags, at: event.locationInWindow)
     }
 
@@ -342,6 +354,7 @@ struct EditorView: NSViewRepresentable {
         tv.onExplainSelection = { [actions] in actions.explainSelection?() }
         tv.canAddPresenterNote = { [weak c] in c?.buffer?.isTypst == true && c?.readOnly == false }
         tv.onAddPresenterNote = { [weak c] in c?.addPresenterNote() }
+        tv.onViewportLayout = { [weak c] in c?.noteCards.place() }
         tv.bookmarkedAt = { [weak c] i in c?.isBookmarked(at: i) }
         tv.onToggleBookmark = { [weak c] i in c?.toggleBookmark(at: i) }
         tv.multi.buffer = { [weak c] in c?.readOnly == true ? nil : c?.buffer }
@@ -389,6 +402,8 @@ struct EditorView: NSViewRepresentable {
         decor.colorLiterals = { [weak c] in c?.buffer?.colorLiterals ?? [] }
         decor.onSwatchClick = { [weak c] in c?.pickColor($0, anchor: $1) }
         decor.inlayHints = { [weak c] in c?.buffer?.inlayHints ?? [] }
+        decor.notePills = { [weak c] in c?.noteCards.shownPills ?? [] }
+        decor.onNotePillClick = { [weak c] in c?.noteCards.edit($0, anchor: $1) }
         tv.addSubview(decor)
         c.decor = decor
         let diff = InlineDiffOverlay(textView: tv)
@@ -463,6 +478,7 @@ struct EditorView: NSViewRepresentable {
         c.applyIndentationSettings(tv)
         c.applyNavigationSettings(tv)
         c.updateMinimap(scroll)
+        c.noteCards.refresh()
     }
 
     @MainActor final class Coordinator: NSObject, NSTextViewDelegate {
@@ -483,6 +499,7 @@ struct EditorView: NSViewRepresentable {
         let folds = FoldController()
         let foldAnimator = FoldAnimator()
         let gitGutter = GitGutter()
+        lazy var noteCards = NoteCards(editor: self)
         private var hoverPinned = false                 // a pill click opened the card: it stays until a key, click or scroll
 
         weak var textView: NSTextView?
@@ -543,7 +560,7 @@ struct EditorView: NSViewRepresentable {
         @objc private func windowKeyChanged(_ n: Notification) {
             if (n.object as? NSWindow) === textView?.window { decor?.refresh() }
         }
-        @objc private func refreshDecor() { decor?.refresh(); fitColumn() }
+        @objc private func refreshDecor() { decor?.refresh(); fitColumn(); noteCards.refresh() }
 
         func setAnimatedCaret(_ on: Bool, in tv: NSTextView) {
             // The system insertion point is hidden by its public color; with the setting off it is restored.
@@ -857,6 +874,7 @@ struct EditorView: NSViewRepresentable {
             if popup.isVisible && !accepting { refresh() }
             checkSnippetSelection()
             typewriterScroll()
+            noteCards.refresh()
             guard let tv = textView, let file = buffer?.path else { return }
             let sel = tv.selectedRange()
             if !swapping { remember(sel) }
@@ -1100,6 +1118,9 @@ final class LineNumberRuler: NSRulerView {
         return lo + 1
     }
 
+    /// NSRulerView answers an accessibility press with its "Ruler marker type" dialog, which means nothing in a gutter.
+    override func accessibilityPerformPress() -> Bool { true }
+
     override func drawHashMarksAndLabels(in rect: NSRect) {
         // A theme paints the gutter like its editor, only within the ruler's own width: the rect and the ruler's
         // layer reach over the text, so a wider fill (or any draw(_:) override, which fills via super) hides it.
@@ -1124,7 +1145,13 @@ final class LineNumberRuler: NSRulerView {
             let line = self.lineNumber(at: min(start, text.length), in: text)
             let y = self.convert(NSPoint(x: 0, y: fragment.layoutFragmentFrame.minY + origin.y), from: tv).y
             let lineTop = fragment.textLineFragments.first?.typographicBounds.minY ?? 0
+            // A hidden note's line has no height: only its note mark, beside the next line's number.
+            if (fragment as? FoldFragment)?.card ?? 0 < 0 {
+                self.drawNoteMark(at: start, y: y + lineTop, height: fragment.textLineFragments.first?.typographicBounds.height ?? 0)
+                return true
+            }
             self.drawFoldMark(at: start, y: y + lineTop, height: fragment.textLineFragments.first?.typographicBounds.height ?? 0)
+            self.drawNoteMark(at: start, y: y + lineTop, height: fragment.textLineFragments.first?.typographicBounds.height ?? 0)
             self.drawGitMark(line: line, start: start, end: tcs.offset(of: fragment.rangeInElement.endLocation), y: y, height: fragment.layoutFragmentFrame.height)
             guard self.showsNumbers else { return y < self.bounds.maxY }
             let shown = self.relative == .off || (line == caretLine && self.relative == .hybrid) ? line : abs(line - caretLine)

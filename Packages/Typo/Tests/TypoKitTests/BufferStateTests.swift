@@ -48,6 +48,16 @@ import TypoTestSupport
         #expect(data.starts(with: Data("%PDF".utf8)))
     }
 
+    @Test func savingTheFirstPresenterNoteTurnsTheNotesStripOn() async throws {
+        let (p, _) = try await TestEnv.project(files: ["main.typ": "= Slide\n"])
+        let b = try await p.open(RelPath("main.typ")!)
+        p.detectPresenterContent()
+        #expect(!p.preview.automaticNotes)
+        type(b, "#metadata(\"Say hi\") <note>\n")
+        try await p.saveAll()
+        #expect(p.preview.automaticNotes)
+    }
+
     @Test func readOnlyFolderSurfacesSaveErrorUntilNextSuccess() async throws {
         let (p, root) = try await TestEnv.project(files: ["main.typ": "hello"])
         let fm = FileManager.default

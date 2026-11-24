@@ -54,6 +54,34 @@ import TypoTestSupport
         }
     }
 
+    @Test func cardLinesRoundTripTheirText() {
+        for text in ["", "He said \"hi\" \\ $5", "two\nlines", "  leading and trailing  ", "back\\nslash n"] {
+            let source = "= S\n  " + PresenterNotes.written(text) + " \t\nafter"
+            let cards = PresenterNotes.cardLines(in: source)
+            #expect(cards.map(\.text) == [text])
+            let ns = source as NSString
+            #expect(ns.substring(with: cards[0].call) == PresenterNotes.written(text))
+            #expect(ns.substring(with: cards[0].line) == "  " + PresenterNotes.written(text) + " \t\n")
+        }
+    }
+
+    @Test func onlyLinesHoldingJustAStringNoteAreCards() {
+        let text = """
+        #metadata("card") <note>
+        // #metadata("commented") <note>
+        #raw("#metadata(\\"raw\\") <note>")
+        #metadata[content form] <note>
+        Text #metadata("not alone") <note>
+        #metadata("tab \\t escape") <note>
+        #metadata("split")
+        <note>
+        #speaker-note[touying]
+        #metadata("last") <note>
+        """
+        #expect(PresenterNotes.cardLines(in: text).map(\.text) == ["card", "content form", "last"])
+        #expect(PresenterNotes.cardLines(in: "#metadata(\"x\") <note>").first?.line == NSRange(location: 0, length: 21))
+    }
+
     @Test func markersPointIntoTheirMarker() {
         let text = "a #speaker-note[x] b #speaker-note[y]"
         let notes = PresenterNotes.extract(text)
@@ -84,7 +112,37 @@ import TypoTestSupport
         #expect((last as NSString).replacingCharacters(in: r.range, with: r.text) == "Body")
         let shared = "Say it #metadata(\"old\") <note> now\n"
         let s = PresenterNotes.replacement(for: (shared as NSString).range(of: "#metadata(\"old\") <note>"), in: shared, writing: "")
-        #expect((shared as NSString).replacingCharacters(in: s.range, with: s.text) == "Say it  now\n")
+        #expect((shared as NSString).replacingCharacters(in: s.range, with: s.text) == "Say it now\n")
+    }
+
+    @Test func removingASharedNoteTakesOneSpaceWithIt() {
+        let call = "#metadata(\"x\") <note>"
+        for (text, expected) in [("Say \(call) now", "Say now"), ("\(call) first", "first"), ("Last \(call)\nnext", "Last\nnext"), ("tight\(call)end", "tightend")] {
+            let r = PresenterNotes.replacement(for: (text as NSString).range(of: call), in: text, writing: "")
+            #expect((text as NSString).replacingCharacters(in: r.range, with: r.text) == expected)
+        }
+    }
+
+    @Test func notesSharingTheirLineAreInline() {
+        let text = """
+        #metadata("card") <note>
+        Text #metadata("explain this") <note> more
+        Two #metadata[say hi] <note> and #metadata("bye") <note>
+        // Text #metadata("commented") <note>
+        Text #raw("#metadata(\\"raw\\") <note>")
+        #let s = "#metadata(\\"string\\") <note>"
+        Text #metadata("split")
+        <note>
+        Text #metadata("tab \\t escape") <note>
+        Text #speaker-note[touying]
+        """
+        let ns = text as NSString
+        let inline = PresenterNotes.inlineNotes(in: text)
+        #expect(inline.map(\.text) == ["explain this", "say hi", "bye"])
+        #expect(inline.map { ns.substring(with: $0.call) } == ["#metadata(\"explain this\") <note>", "#metadata[say hi] <note>", "#metadata(\"bye\") <note>"])
+        let second = ns.range(of: "Text #metadata(\"explain").location, third = ns.range(of: "Two ").location
+        #expect(inline.map(\.lineStart) == [second, third, third])
+        #expect(PresenterNotes.cardLines(in: text).map(\.text) == ["card"])
     }
 
     @Test func insertionKeepsTheLineBreakAfterTheNote() {

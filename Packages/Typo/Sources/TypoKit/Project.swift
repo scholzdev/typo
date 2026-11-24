@@ -739,6 +739,7 @@ public struct FileNode: Identifiable, Sendable, Equatable {
             if !work.isEmpty { snapshotIfDue() }
             if !compilesWhileTyping { engine.send(.recompile) }
             if exportsPDFOnSave, work.contains(where: { FileKind.isTypst($0.3.raw) }) { writePDFBeside() }
+            if !preview.automaticNotes, work.contains(where: { FileKind.isTypst($0.3.raw) }) { detectPresenterContent() }   // a first note typed by hand
         }
         if let err { throw err }
     }

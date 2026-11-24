@@ -35,6 +35,7 @@ struct ProjectCommands: Commands {
         }
         CommandGroup(after: .toolbar) {
             AppCommands.items(AppCommands.preview(ctx))
+            NoteDisplayMenu()
         }
     }
 }
@@ -53,5 +54,21 @@ extension Project {
         showAlert("Could Not Export", verbatim: message + pointer)
     } else {
         showAlert("Could Not Export", error)
+    }
+}
+
+/// View › Presenter Notes in Editor: cards, compact or hidden, as a submenu with a check mark.
+private struct NoteDisplayMenu: View {
+    @AppStorage(NoteDisplay.key) private var display = NoteDisplay.cards.rawValue
+
+    var body: some View {
+        Picker("Presenter Notes in Editor", selection: Binding(get: { display }, set: {
+            display = $0
+            NotificationCenter.default.post(name: NoteDisplay.changed, object: nil)
+        })) {
+            Text("Cards").tag(NoteDisplay.cards.rawValue)
+            Text("Compact").tag(NoteDisplay.compact.rawValue)
+            Text("Hidden").tag(NoteDisplay.hidden.rawValue)
+        }
     }
 }

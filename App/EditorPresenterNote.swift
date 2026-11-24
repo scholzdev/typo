@@ -2,15 +2,12 @@ import AppKit
 import TypoKit
 
 extension EditorView.Coordinator {
-    /// Add Presenter Note: an empty note on a line of its own after the caret's line, the caret between its quotes.
+    /// Add Presenter Note: an empty note card on a line of its own after the caret's line, ready to type in.
     func addPresenterNote() {
-        guard let tv = textView, let buffer, buffer.isTypst, !readOnly else { return NSSound.beep() }
-        let edit = PresenterNotes.insertion(of: PresenterNotes.written(""), afterLineAt: tv.selectedRange().location, in: tv.string)
-        buffer.apply([edit], actionName: String(localized: "Add Presenter Note"))
-        let caret = NSRange(location: edit.range.location + 1 + PresenterNotes.emptyCaretOffset, length: 0)
-        tv.window?.makeFirstResponder(tv)
-        tv.setSelectedRange(caret)
-        tv.scrollRangeToVisible(caret)
-        project?.preview.showsNotes = true
+        guard let buffer, buffer.isTypst, !readOnly else { return NSSound.beep() }
+        noteCards.add()
+        // The strip comes with the first note; a deck's own Hide choice turns back to automatic, not to always on.
+        project?.preview.automaticNotes = true
+        if project?.preview.showsNotes == false { project?.preview.showsNotes = nil }
     }
 }
