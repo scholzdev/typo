@@ -359,6 +359,11 @@ public final class ACPAgent: Sendable {
             Task { @MainActor [host] in host.value?.commandsChanged(commands) }
             return
         }
+        if let plan = ACPPlan.parse(u) {
+            // Like the other updates, a plan outside a turn has no answer to join.
+            if state.withLock({ $0.emit != nil }) { Task { @MainActor [host] in host.value?.planChanged(plan) } }
+            return
+        }
         if let options = state.withLock({ s in s.options.apply(update: u) ? s.options : nil }) {
             Task { @MainActor [host] in host.value?.optionsChanged(options) }
             return

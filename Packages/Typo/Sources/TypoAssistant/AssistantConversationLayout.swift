@@ -108,12 +108,12 @@ public struct AssistantConversationLayoutStore: Sendable {
 /// What a conversation is doing, for its row in the sidebar. Only the running turn's conversation is ever more than idle,
 /// failed or stopped.
 public enum AssistantConversationStatus: Equatable, Sendable {
-    case idle, working, responding, blocked, failed, stopped
+    case idle, working, planning, responding, blocked, failed, stopped
 
-    /// `running`: its turn streams; `blocked`: a permission waits; `answering`: answer text arrives; `failed` / `stopped`:
-    /// how its last turn ended.
-    public static func of(running: Bool, blocked: Bool, answering: Bool, failed: Bool, stopped: Bool) -> Self {
-        if running { return blocked ? .blocked : answering ? .responding : .working }
+    /// `running`: its turn streams; `blocked`: a permission waits; `planning`: see `AssistantPlan.isPlanning`;
+    /// `answering`: answer text arrives; `failed` / `stopped`: how its last turn ended.
+    public static func of(running: Bool, blocked: Bool, planning: Bool = false, answering: Bool, failed: Bool, stopped: Bool) -> Self {
+        if running { return blocked ? .blocked : planning ? .planning : answering ? .responding : .working }
         return failed ? .failed : stopped ? .stopped : .idle
     }
 }

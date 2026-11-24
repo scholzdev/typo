@@ -18,12 +18,15 @@ import JSONRPC
     func optionsChanged(_ options: ACPSessionOptions)
     /// A tool call of the running turn started or changed, for its live row.
     func toolCallChanged(_ call: ACPToolCall)
+    /// The running turn's agent sent its plan; it replaces the one before.
+    func planChanged(_ plan: ACPPlan)
 }
 
 extension ACPHost {
     public func commandsChanged(_ commands: [ACPCommand]) {}
     public func optionsChanged(_ options: ACPSessionOptions) {}
     public func toolCallChanged(_ call: ACPToolCall) {}
+    public func planChanged(_ plan: ACPPlan) {}
 }
 
 public struct ACPOption: Sendable, Equatable, Identifiable {

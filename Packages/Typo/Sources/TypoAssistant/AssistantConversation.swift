@@ -38,6 +38,8 @@ public struct AssistantMessage: Codable, Identifiable, Hashable, Sendable {
     public var created: Date?
     /// User turns: the project paths "@"-mentioned in `text` by file name; nil in files saved before mentions.
     public var mentions: [String]?
+    /// An agent's answer: its latest plan; nil without one and in files saved before plans.
+    public var plan: AssistantPlan?
 
     public init(role: Role, text: String, context: String? = nil) {
         self.role = role; self.text = text; self.context = context

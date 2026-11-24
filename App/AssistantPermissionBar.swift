@@ -13,17 +13,27 @@ struct AssistantPermissionBar: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(question).fixedSize(horizontal: false, vertical: true)
+            if let plan {
+                Label("Ready to code?", systemImage: "checklist").font(.headline)
+                ScrollView {
+                    AssistantMarkdown(text: plan).padding(10)
+                }
+                .frame(maxHeight: 240)
+                .fixedSize(horizontal: false, vertical: true)
+                .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            } else {
+                Text(question).fixedSize(horizontal: false, vertical: true)
+            }
             HStack(spacing: 10) {
                 if let reject = option("reject_once") ?? option("reject_always") {
                     Button { model.answerPermission(reject.id) } label: {
-                        Text("Don't Allow").frame(maxWidth: .infinity).padding(.vertical, 6)
+                        Text(plan == nil ? "Don't Allow" : "Keep Planning").frame(maxWidth: .infinity).padding(.vertical, 6)
                             .background(.quaternary, in: Capsule())
                     }
                     .buttonStyle(.plain)
                     .keyboardShortcut(.cancelAction)
                 }
-                allowButton
+                if plan == nil { allowButton } else { approveButton }
                 Button { model.stop() } label: {
                     Image(systemName: "stop.fill").font(.system(size: 10, weight: .bold)).frame(width: 28, height: 28)
                         .background(.quaternary, in: Circle())
@@ -57,24 +67,46 @@ struct AssistantPermissionBar: View {
         return (try? AttributedString(markdown: text)) ?? AttributedString(text)
     }
 
+    /// Claude Code's ExitPlanMode request: the plan to approve, which it adds to the tool's input.
+    private var plan: String? {
+        guard pending.call.kind == "switch_mode", let p = pending.call.rawInput?["plan"]?.string?.trimmingCharacters(in: .whitespacesAndNewlines), !p.isEmpty else { return nil }
+        return p
+    }
+
     @ViewBuilder private var allowButton: some View {
         let once = option("allow_once") ?? option("allow_always")
+        splitButton("Allow", disabled: once == nil, action: { if let once { once.kind == "allow_always" ? (confirmsAlways = true) : model.answerPermission(once.id) } }) {
+            if let o = option("allow_once") { Button("Allow Once") { model.answerPermission(o.id) } }
+            if option("allow_always") != nil { Button(model.isFileRequest(pending.call) ? "Always Allow for This Folder…" : "Always Allow…") { confirmsAlways = true } }
+            Divider()
+            Button("Permissions Settings…") {
+                UserDefaults.standard.set("intelligence", forKey: SettingsKey.tab)
+                openSettings()
+            }
+        }
+    }
+
+    /// Approve goes on with the edits still asked about; the menu has the agent's other ways to go on, by its names.
+    /// Not through the Always Allow alert: they change the agent's mode, not Settings › Permissions.
+    @ViewBuilder private var approveButton: some View {
+        let allows = pending.options.filter { $0.kind.hasPrefix("allow") }
+        let main = option("allow_once") ?? allows.first
+        splitButton("Approve", disabled: main == nil, action: { if let main { model.answerPermission(main.id) } }) {
+            ForEach(allows) { o in Button(o.name) { model.answerPermission(o.id) } }
+        }
+    }
+
+    private func splitButton<M: View>(_ title: String, disabled: Bool, action: @escaping () -> Void, @ViewBuilder menu: () -> M) -> some View {
         HStack(spacing: 0) {
-            Button { if let once { once.kind == "allow_always" ? (confirmsAlways = true) : model.answerPermission(once.id) } } label: {
-                Text("Allow").frame(maxWidth: .infinity).padding(.vertical, 6).contentShape(Rectangle())
+            Button(action: action) {
+                Text(title).frame(maxWidth: .infinity).padding(.vertical, 6).contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .keyboardShortcut(.defaultAction)
-            .disabled(once == nil)
+            .disabled(disabled)
             Divider().frame(height: 16).overlay(.white.opacity(0.5))
             Menu {
-                if let o = option("allow_once") { Button("Allow Once") { model.answerPermission(o.id) } }
-                if option("allow_always") != nil { Button(model.isFileRequest(pending.call) ? "Always Allow for This Folder…" : "Always Allow…") { confirmsAlways = true } }
-                Divider()
-                Button("Permissions Settings…") {
-                    UserDefaults.standard.set("intelligence", forKey: SettingsKey.tab)
-                    openSettings()
-                }
+                menu()
             } label: {
                 Image(systemName: "chevron.down").font(.system(size: 10, weight: .semibold))
             }

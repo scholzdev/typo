@@ -173,10 +173,10 @@ struct AssistantConversationRow: View {
                     .background(.yellow, in: Capsule())
                 Text("Permission Required")
             }
-        case .working, .responding:
+        case .working, .planning, .responding:
             HStack(spacing: 5) {
                 ProgressView().controlSize(.mini)
-                Text(status == .working ? "Working" : "Responding")
+                Text(status == .working ? "Working" : status == .planning ? "Planning" : "Responding")
             }
         case .failed:
             Text("Failed").foregroundStyle(.red)
