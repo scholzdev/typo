@@ -6,6 +6,8 @@ import TypstEngine
 /// What the Changes tab and the toolbar label share; design/14j-git.md.
 @MainActor @Observable final class GitModel {
     var isRepository = false
+    /// False until the first refresh, so the Changes tab does not claim "Not a Git Repository" while git is still read.
+    var loaded = false
     var status: GitStatus?
     var hasRemote = false
     var busy = false
@@ -33,7 +35,7 @@ import TypstEngine
     func refresh(_ project: Project) async {
         generation += 1
         let mine = generation
-        guard project.isRepository else { isRepository = false; status = nil; return }
+        guard project.isRepository else { isRepository = false; status = nil; loaded = true; return }
         let s = try? await project.gitStatus()
         let r = (try? await project.hasRemote()) ?? false
         let b = (try? await project.branches()) ?? []
@@ -41,6 +43,7 @@ import TypstEngine
         let st = (try? await project.stashes()) ?? []
         guard mine == generation, pendingStages == 0 else { return }       // a newer refresh is on its way
         isRepository = true
+        loaded = true
         status = s
         hasRemote = r
         branches = b
@@ -163,7 +166,9 @@ struct GitTab: View {
     var body: some View {
         @Bindable var model = model
         Group {
-            if !model.isRepository {
+            if !model.loaded {
+                ProgressView().controlSize(.small).frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if !model.isRepository {
                 ContentUnavailableView {
                     Label("Not a Git Repository", systemImage: "arrow.triangle.branch")
                 } description: {

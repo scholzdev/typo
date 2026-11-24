@@ -30,8 +30,9 @@ struct PreviewView: View {
 
     private var pages: some View {
         GeometryReader { geo in
-            // Zoom 1 fits the column; the margin also leaves room for a legacy scroller.
-            let fit = max(1, geo.size.width - 48)
+            // Zoom 1 fits the column; the margin also leaves room for a legacy scroller (always shown with a mouse),
+            // which is 16 pt or more: with exactly 16 the page was a point too wide and a horizontal scroller appeared.
+            let fit = max(1, geo.size.width - 2 * Self.inset - 20)
             ScrollView([.vertical, .horizontal]) {
                 LazyVStack(alignment: .leading, spacing: Self.inset) {
                     ForEach(PreviewMath.rows(count: preview.pages.count, columns: preview.columns), id: \.lowerBound) { row in
