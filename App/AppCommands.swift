@@ -191,10 +191,9 @@ struct AppCommand: Identifiable {
              AppCommand(menu: "View", title: "Two Pages", systemImage: "book.pages", shortcut: KeyboardShortcut("8"), isEnabled: project != nil, isOn: project.map { $0.preview.fit == .twoPages }) { project?.preview.fit = .twoPages }],
             [AppCommand(menu: "View", title: "Page Thumbnails", systemImage: "sidebar.squares.left", isEnabled: project != nil, isOn: project?.preview.showsThumbnails ?? false,
                         help: "Shows a strip of small pages beside the preview.") { project?.preview.showsThumbnails.toggle() },
-             // In the project window the notes strip is the preview's half of the bottom area.
-             AppCommand(menu: "View", title: (ctx.layout?.bottom.isShown ?? project?.preview.notesShown) == true ? "Hide Notes Strip" : "Show Notes Strip", idTitle: "Presenter Notes", systemImage: "note.text",
+             AppCommand(menu: "View", title: project?.preview.notesShown == true ? "Hide Notes Strip" : "Show Notes Strip", idTitle: "Presenter Notes", systemImage: "note.text",
                         isEnabled: project != nil, help: "Shows the notes of the slide in view under the preview.") {
-                 if let bottom = ctx.layout?.bottom { bottom.isShown.toggle() } else if let preview = project?.preview { preview.showsNotes = !preview.notesShown }
+                 if let preview = project?.preview { preview.showsNotes = !preview.notesShown }
              },
              AppCommand(menu: "View", title: "Dark Preview Pages", systemImage: "circle.lefthalf.filled", isEnabled: project != nil, isOn: project?.preview.darkPages ?? false,
                         help: "Darkens the pages on screen only; exports keep their colors.") { project?.preview.darkPages.toggle() },

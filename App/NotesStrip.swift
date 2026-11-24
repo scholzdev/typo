@@ -28,7 +28,7 @@ struct NotesStrip: View {
 
     private var page: Int { min(max(preview.visiblePage, 0), max(preview.pages.count - 1, 0)) }
     private var slideNotes: [PresenterNote] { notes.filter { $0.pages.contains(page) } }
-    /// Beside an open bottom area, the strip shares its top edge, and dragging either one resizes both.
+    /// The strip and the editor's bottom area share one height, so open side by side they line up; dragging either resizes both.
     private var linked: BottomAreaModel? { editorBottom }
     private var height: Double { linked.map { Double($0.clamped) } ?? min(max(storedHeight, Self.minHeight), Self.maxHeight) }
 

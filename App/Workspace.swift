@@ -154,17 +154,16 @@ struct PreviewPane: View {
     let project: Project
     /// Moves the preview to its own window or back; the caller owns the window environment.
     let popOut: () -> Void
-    /// The editor's bottom area beside the preview in the project window. There the notes strip is its other half,
-    /// shown and hidden with it, so both bars and both panes always line up; a popped-out preview has its own toggle.
+    /// The editor's bottom area beside the preview in the project window; the notes strip takes its height.
     var editorBottom: BottomAreaModel?
 
-    private var stripShown: Bool { editorBottom?.isShown ?? project.preview.notesShown }
+    private var stripShown: Bool { project.preview.notesShown }
 
     var body: some View {
         VStack(spacing: 0) {
             PreviewView(project: project).safeAreaInset(edge: .top, spacing: 0) { PreviewToolbar(project: project, popOut: popOut) }
             PreviewBottomBar(isOn: stripShown) {
-                if let editorBottom { editorBottom.isShown.toggle() } else { project.preview.showsNotes = !project.preview.notesShown }
+                project.preview.showsNotes = !project.preview.notesShown
             }
             if stripShown { NotesStrip(project: project, editorBottom: editorBottom) }
         }
