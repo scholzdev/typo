@@ -3,16 +3,16 @@
   "strings" : {
     "%@ / %@ words" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ / %2$@ words"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ / %2$@ Wörter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@ words"
           }
         }
       }
@@ -51,32 +51,32 @@
     },
     "%@ of %@ word" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ of %2$@ word"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ von %2$@ Wort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@ word"
           }
         }
       }
     },
     "%@ of %@ words" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ of %2$@ words"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ von %2$@ Wörtern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@ words"
           }
         }
       }
@@ -1159,66 +1159,6 @@
         }
       }
     },
-    "The document has %lld pages, so there is no page %lld." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Dokument hat %#@pages@, daher gibt es keine Seite %2$lld."
-          },
-          "substitutions" : {
-            "pages" : {
-              "argNum" : 1,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg Seite"
-                    }
-                  },
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg Seiten"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The document has %#@pages@, so there is no page %2$lld."
-          },
-          "substitutions" : {
-            "pages" : {
-              "argNum" : 1,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg page"
-                    }
-                  },
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg pages"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "The key “%@” is already used in this project." : {
       "localizations" : {
         "de" : {
@@ -1581,16 +1521,6 @@
         }
       }
     },
-    "“%@” is not a page or a range of pages." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "„%@“ ist keine Seite und kein Seitenbereich."
-          }
-        }
-      }
-    },
     "“%@” is not a valid branch name." : {
       "localizations" : {
         "de" : {
@@ -1607,16 +1537,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "„%@“ ist kein gültiger Schlüssel: Buchstaben, Ziffern und _ - : . verwenden, beginnend mit einem Buchstaben."
-          }
-        }
-      }
-    },
-    "“%@” runs backwards." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "„%@“ verläuft rückwärts."
           }
         }
       }

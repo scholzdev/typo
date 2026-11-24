@@ -11,17 +11,6 @@
         }
       }
     },
-    " " : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " "
-          }
-        }
-      }
-    },
     "\"%@\" contains no .typ file at its top level." : {
       "localizations" : {
         "de" : {
@@ -2000,12 +1989,12 @@
         }
       }
     },
-    "All %lld pages, or e.g. 1-3, 7, 9-" : {
+    "All %lld Pages" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle %lld Seiten oder z. B. 1-3, 7, 9-"
+            "value" : "Alle %lld Seiten"
           }
         }
       }
@@ -3328,16 +3317,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zitate prüfen"
-          }
-        }
-      }
-    },
-    "Check the Pages" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seiten prüfen"
           }
         }
       }
@@ -11062,26 +11041,6 @@
         }
       }
     },
-    "Pages to export" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu exportierende Seiten"
-          }
-        }
-      }
-    },
-    "Pages:" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seiten:"
-          }
-        }
-      }
-    },
     "Partly staged: check to stage the rest" : {
       "localizations" : {
         "de" : {
@@ -11714,6 +11673,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Regenbogenklammern"
+          }
+        }
+      }
+    },
+    "Range from" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereich von"
           }
         }
       }
@@ -13174,6 +13143,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Snippet auswählen oder hinzufügen."
+          }
+        }
+      }
+    },
+    "Select pages in the sidebar" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seiten in der Seitenleiste auswählen"
           }
         }
       }
@@ -17480,6 +17459,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "diesem Anbieter"
+          }
+        }
+      }
+    },
+    "to" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bis"
           }
         }
       }
