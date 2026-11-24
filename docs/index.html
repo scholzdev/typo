@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
   <link rel="stylesheet" href="fold-demo.css">
   <link rel="alternate" hreflang="en" href="https://scholzdev.github.io/typo/">
   <link rel="alternate" hreflang="de" href="https://scholzdev.github.io/typo/de/">
@@ -288,8 +288,31 @@
       </div>
     </section>
 
+    <!-- Agents and MCP -->
+    <section class="section feature" id="agents">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Agents and MCP</p>
+          <h2>Your agent, <em>inside Typo.</em></h2>
+          <p>Run Claude Code, Codex, Gemini CLI, Goose or OpenCode right in the sidebar through the Agent Client Protocol. The agent works in your project folder with your own login, and every change shows up in the editor with a revert bar.</p>
+          <p>Going the other way, <code>typo-mcp</code> gives any MCP client Typo’s Typst tools. One click adds it to Claude Code or Claude Desktop.</p>
+          <ul class="ticks">
+            <li>Compile and read the errors</li>
+            <li>See a page of the preview as an image</li>
+            <li>Search the Typst reference instead of guessing</li>
+            <li>List the packages and fonts the project can use</li>
+          </ul>
+          <p class="more"><a href="guide/assistant.html#mcp">Set up agents and MCP ›</a></p>
+        </div>
+        <figure class="shot feature-shot" data-scene data-start="1">
+          <img src="assets/agents.webp" width="1800" height="1371" loading="lazy"
+               alt="Claude Code in Typo’s sidebar through the Agent Client Protocol, after renaming a heading in main.typ, with “1 Change in 1 File” and a Revert button.">
+        </figure>
+      </div>
+    </section>
+
     <!-- Bibliography -->
-    <section class="section feature" id="bibliography">
+    <section class="section feature feature-flip" id="bibliography">
       <div class="wrap feature-grid">
         <div class="feature-copy reveal">
           <p class="eyebrow">Bibliography and packages</p>
@@ -305,7 +328,7 @@
     </section>
 
     <!-- Settings -->
-    <section class="section feature feature-flip">
+    <section class="section feature">
       <div class="wrap feature-grid">
         <div class="feature-copy reveal">
           <p class="eyebrow">Make it yours</p>

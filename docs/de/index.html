@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../style.css?v=8">
+  <link rel="stylesheet" href="../style.css?v=9">
   <link rel="stylesheet" href="../fold-demo.css">
   <link rel="alternate" hreflang="en" href="https://scholzdev.github.io/typo/">
   <link rel="alternate" hreflang="de" href="https://scholzdev.github.io/typo/de/">
@@ -280,8 +280,31 @@
       </div>
     </section>
 
+    <!-- Agents and MCP -->
+    <section class="section feature" id="agents">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Agenten und MCP</p>
+          <h2>Dein Agent, <em>direkt in Typo.</em></h2>
+          <p>Nutze Claude Code, Codex, Gemini CLI, Goose oder OpenCode direkt in der Seitenleiste, über das Agent Client Protocol. Der Agent arbeitet in deinem Projektordner mit deiner eigenen Anmeldung, und jede Änderung erscheint im Editor mit einer Leiste zum Zurücksetzen.</p>
+          <p>Umgekehrt gibt <code>typo-mcp</code> jedem MCP-Client die Typst-Werkzeuge von Typo. Ein Klick trägt ihn in Claude Code oder Claude Desktop ein.</p>
+          <ul class="ticks">
+            <li>Kompilieren und die Fehler lesen</li>
+            <li>Eine Seite der Vorschau als Bild ansehen</li>
+            <li>In der Typst-Referenz suchen statt raten</li>
+            <li>Die Pakete und Schriften des Projekts auflisten</li>
+          </ul>
+          <p class="more"><a href="../guide/assistant.html#mcp">Agenten und MCP einrichten (Handbuch, Englisch) ›</a></p>
+        </div>
+        <figure class="shot feature-shot" data-scene data-start="1">
+          <img src="../assets/agents.webp" width="1800" height="1371" loading="lazy"
+               alt="Claude Code in der Seitenleiste von Typo über das Agent Client Protocol, nach dem Umbenennen einer Überschrift in main.typ, mit „1 Change in 1 File“ und einer Revert-Taste.">
+        </figure>
+      </div>
+    </section>
+
     <!-- Bibliography -->
-    <section class="section feature" id="bibliography">
+    <section class="section feature feature-flip" id="bibliography">
       <div class="wrap feature-grid">
         <div class="feature-copy reveal">
           <p class="eyebrow">Literatur und Pakete</p>
@@ -297,7 +320,7 @@
     </section>
 
     <!-- Settings -->
-    <section class="section feature feature-flip">
+    <section class="section feature">
       <div class="wrap feature-grid">
         <div class="feature-copy reveal">
           <p class="eyebrow">Ganz nach deinem Geschmack</p>
