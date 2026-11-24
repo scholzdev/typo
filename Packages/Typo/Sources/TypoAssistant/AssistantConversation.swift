@@ -57,6 +57,8 @@ public struct AssistantConversation: Codable, Identifiable, Hashable, Sendable {
     public var permissions: AssistantPermissions?
     /// The agent mode picked in the prompt's mode menu; nil follows the "Change files" permission.
     public var agentMode: String?
+    /// The agent's session id, which the next start of the agent reattaches; nil in files saved before.
+    public var agentSession: String?
 
     public init(providerID: UUID?, model: String, now: Date = .now) {
         title = "New Conversation"

@@ -716,4 +716,13 @@ private func provider(_ id: String, baseURL: String? = nil, keyHeader: String = 
         #expect(back.permissions?.policy(.webSearch) == .allow)
         #expect(try JSONDecoder().decode(AssistantConversation.self, from: old).permissions == nil)
     }
+
+    @Test func conversationsKeepTheAgentSessionAndOldFilesDecodeWithout() throws {
+        var c = AssistantConversation(providerID: nil, model: "m")
+        let old = try JSONEncoder().encode(c)
+        #expect(!String(decoding: old, as: UTF8.self).contains("agentSession"))
+        #expect(try JSONDecoder().decode(AssistantConversation.self, from: old).agentSession == nil)
+        c.agentSession = "s9"
+        #expect(try JSONDecoder().decode(AssistantConversation.self, from: JSONEncoder().encode(c)).agentSession == "s9")
+    }
 }

@@ -126,6 +126,8 @@ public final class ACPAgent: Sendable {
         var turnNumber = 0
         /// The modes and models the session offers.
         var options = ACPSessionOptions()
+        /// The session was reattached by `session/resume` or `session/load`, so the agent remembers the conversation.
+        var resumed = false
         /// The host's edit steps run one after another, so a call's end never overtakes its start.
         var hostWork: Task<Void, Never>?
 
@@ -158,11 +160,15 @@ public final class ACPAgent: Sendable {
     }
 
     public var isAlive: Bool { !connection.isClosed }
+    /// The agent's id of the session, which a later `launch(resume:)` reattaches.
+    public var sessionID: String { state.withLock { $0.sessionID } }
+    var resumed: Bool { state.withLock { $0.resumed } }
 
     /// Starts the agent of `command` in `cwd` and opens a session; returns it with the agent's name and version.
     /// `mcp`: the path of the bundled typo-mcp, which the session gets as an MCP server for `cwd`.
     /// `meta`: the `_meta` of `session/new`, such as `claudeCodeMeta(plugins:)`.
-    public static func launch(command: String, cwd: URL, host: (any ACPHost)?, mcp: String? = nil, meta: JSONValue? = nil) async throws -> (agent: ACPAgent, info: String) {
+    /// `resume`: a session id from an earlier launch to reattach (see `connect`).
+    public static func launch(command: String, cwd: URL, host: (any ACPHost)?, mcp: String? = nil, meta: JSONValue? = nil, resume: String? = nil) async throws -> (agent: ACPAgent, info: String) {
         let words = ACPProcess.words(command)
         guard let name = words.first else { throw ACPError(ACPError.closed, "The agent has no command. Enter it in Settings › Intelligence.") }
         let env = ACPProcess.environment()
@@ -176,15 +182,17 @@ public final class ACPAgent: Sendable {
         }
         let agent = ACPAgent(connection: connection, process: process, host: host)
         do {
-            return (agent, try await agent.connect(cwd: cwd, mcp: mcp, meta: meta))
+            return (agent, try await agent.connect(cwd: cwd, mcp: mcp, meta: meta, resume: resume))
         } catch {
             agent.close()
             throw error
         }
     }
 
-    /// `initialize` and `session/new`; returns the agent's name and version.
-    func connect(cwd: URL, mcp: String? = nil, meta: JSONValue? = nil) async throws -> String {
+    /// `initialize` and `session/new`; returns the agent's name and version. With `resume`, the session of that id
+    /// is reattached instead when the agent can, and a new one opens when that fails (the session is gone or its
+    /// folder changed).
+    func connect(cwd: URL, mcp: String? = nil, meta: JSONValue? = nil, resume: String? = nil) async throws -> String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
         let info = try await connection.request("initialize", [
             "protocolVersion": .int(ACPProtocolInfo.protocolVersion),
@@ -196,13 +204,39 @@ public final class ACPAgent: Sendable {
         }
         var params: JSONValue = ["cwd": .string(cwd.path), "mcpServers": .array(mcp.map { [["name": "typo", "command": .string($0), "args": ["--project", .string(cwd.path)], "env": []]] } ?? [])]
         if let meta, case .object(var o) = params { o["_meta"] = meta; params = .object(o) }
-        let session = try await connection.request("session/new", params)
-        guard let id = session["sessionId"]?.string else { throw ACPError(ACPError.internalError, "The agent opened no session.") }
-        let options = ACPSessionOptions.parse(session)
-        state.withLock { $0.sessionID = id; $0.options = options }
+        let options: ACPSessionOptions
+        if let reattached = await reattach(resume, info: info, params: params) {
+            options = reattached
+        } else {
+            let session = try await connection.request("session/new", params)
+            guard let id = session["sessionId"]?.string else { throw ACPError(ACPError.internalError, "The agent opened no session.") }
+            options = ACPSessionOptions.parse(session)
+            state.withLock { $0.sessionID = id; $0.resumed = false }
+        }
+        state.withLock { $0.options = options }
         Task { @MainActor [host] in host.value?.optionsChanged(options) }
         let a = info["agentInfo"]
         return [a?["title"]?.string ?? a?["name"]?.string ?? "The agent", a?["version"]?.string].compactMap { $0 }.joined(separator: " ")
+    }
+
+    /// How the agent can reattach a stored session, from its `initialize` result: `session/resume` (no replay) over
+    /// `session/load` (replays the history), or nil when it can do neither.
+    static func reattachMethod(_ info: JSONValue) -> String? {
+        let caps = info["agentCapabilities"]
+        if let r = caps?["sessionCapabilities"]?["resume"], r != .null { return "session/resume" }
+        return caps?["loadSession"]?.bool == true ? "session/load" : nil
+    }
+
+    /// Reattaches session `id` with the `session/new` params; the session's options, or nil when the agent can't or it
+    /// failed. A load's replay arrives before its answer, outside any turn, so `notified` drops it: the transcript has
+    /// it already. Commands and options still reach the host.
+    private func reattach(_ id: String?, info: JSONValue, params: JSONValue) async -> ACPSessionOptions? {
+        guard let id, !id.isEmpty, let method = Self.reattachMethod(info), case .object(var o) = params else { return nil }
+        o["sessionId"] = .string(id)
+        state.withLock { $0.sessionID = id }    // updates during the load name it
+        guard let result = try? await connection.request(method, .object(o)) else { return nil }
+        state.withLock { $0.resumed = true }
+        return ACPSessionOptions.parse(result)
     }
 
     /// The `session/new` `_meta` with which the Claude Code ACP adapter loads the plugin folders `plugins`
@@ -492,7 +526,8 @@ public struct ACPClient: AssistantClient {
                     if let mode { await agent.select(mode: mode) } else if let changeFiles { await agent.apply(changeFiles) }
                     // The request's model is the conversation's pick; empty keeps the agent's default.
                     if !request.model.isEmpty { await agent.select(model: request.model) }
-                    let reason = try await agent.prompt(Self.prompt(request, fresh: fresh, attachments: attachments)) { events in
+                    // A reattached session remembers the conversation: no recap.
+                    let reason = try await agent.prompt(Self.prompt(request, fresh: fresh && !agent.resumed, attachments: attachments)) { events in
                         for e in events { c.yield(e) }
                     }
                     c.yield(.done(reason, nil))
