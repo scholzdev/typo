@@ -16,7 +16,8 @@ struct NotesStrip: View {
     @Environment(\.openSettings) private var openSettings
     @AppStorage(SettingsKey.notesStripHeight) private var storedHeight = 110.0
     @State private var startHeight: Double?
-    @State private var notes: [PresenterNote] = []
+    /// Nil until the first read, so opening the strip does not flash "No notes" before the notes arrive.
+    @State private var notes: [PresenterNote]?
     /// Bumped after a write from here, so the strip rereads the notes even when the pages look the same.
     @State private var written = 0
     @State private var adding: Int?
@@ -27,7 +28,7 @@ struct NotesStrip: View {
     private static let minHeight = 70.0, maxHeight = 480.0
 
     private var page: Int { min(max(preview.visiblePage, 0), max(preview.pages.count - 1, 0)) }
-    private var slideNotes: [PresenterNote] { notes.filter { $0.pages.contains(page) } }
+    private var slideNotes: [PresenterNote] { (notes ?? []).filter { $0.pages.contains(page) } }
     /// The strip and the editor's bottom area share one height, so open side by side they line up; dragging either resizes both.
     private var linked: BottomAreaModel? { editorBottom }
     private var height: Double { linked.map { Double($0.clamped) } ?? min(max(storedHeight, Self.minHeight), Self.maxHeight) }
@@ -51,8 +52,10 @@ struct NotesStrip: View {
         .background(Color(nsColor: .textBackgroundColor))
         .modifier(FadeIn())
         .task(id: Refresh(hashes: preview.pages.map(\.hash), revision: project.compileRevision, written: written)) {
-            try? await Task.sleep(for: .milliseconds(500))
-            guard !Task.isCancelled else { return }
+            if notes != nil {   // later reads wait out typing; the first one is immediate
+                try? await Task.sleep(for: .milliseconds(500))
+                guard !Task.isCancelled else { return }
+            }
             let found = await project.presenterNotes()
             if !Task.isCancelled { notes = found }
         }
@@ -122,7 +125,9 @@ struct NotesStrip: View {
     @ViewBuilder private var slide: some View {
         let here = slideNotes
         let typo = here.filter { $0.kind == .typo }
-        if here.isEmpty && adding != page {
+        if notes == nil {
+            Color.clear
+        } else if here.isEmpty && adding != page {
             HStack(spacing: 10) {
                 Text("No notes for this slide").foregroundStyle(.secondary)
                 Button("Add Note") { adding = page }.controlSize(.small)
