@@ -6265,6 +6265,16 @@
         }
       }
     },
+    "Every save writes the previewed document as a PDF beside it, main.typ as main.pdf." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedes Sichern schreibt das angezeigte Dokument als PDF daneben, main.typ als main.pdf."
+          }
+        }
+      }
+    },
     "Every sync overwrites this file with the library’s entries. No other file is changed." : {
       "localizations" : {
         "de" : {
@@ -7503,6 +7513,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Moderatornotizen ausblenden"
+          }
+        }
+      }
+    },
+    "Hide Source" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quelltext ausblenden"
           }
         }
       }
@@ -10515,6 +10535,16 @@
         }
       }
     },
+    "Note for this slide" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz zu dieser Folie"
+          }
+        }
+      }
+    },
     "Notes" : {
       "localizations" : {
         "de" : {
@@ -11437,6 +11467,16 @@
         }
       }
     },
+    "Presenter Note" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderatornotiz"
+          }
+        }
+      }
+    },
     "Presenter Notes" : {
       "localizations" : {
         "de" : {
@@ -11503,6 +11543,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dieses Dokument in der Vorschau anzeigen"
+          }
+        }
+      }
+    },
+    "Preview and PDF" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau und PDF"
           }
         }
       }
@@ -13117,6 +13167,16 @@
         }
       }
     },
+    "Save PDF next to the document" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF neben dem Dokument sichern"
+          }
+        }
+      }
+    },
     "Saved in Keychain" : {
       "localizations" : {
         "de" : {
@@ -13703,6 +13763,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Korrekturvorschläge einblenden"
+          }
+        }
+      }
+    },
+    "Show Source" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quelltext zeigen"
           }
         }
       }
@@ -15357,16 +15427,16 @@
     },
     "The source of this slide and its neighbours will be sent to %@ (%@)." : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The source of this slide and its neighbours will be sent to %1$@ (%2$@)."
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Der Quelltext dieser Folie und der Nachbarfolien wird an %1$@ (%2$@) gesendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The source of this slide and its neighbours will be sent to %1$@ (%2$@)."
           }
         }
       }

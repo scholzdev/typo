@@ -19,6 +19,7 @@ struct ProjectView: View {
     @AppStorage(SettingsKey.sourceControl) private var sourceControl = true
     @AppStorage(SettingsKey.lintHints) private var lintHints = true
     @AppStorage(SettingsKey.compileWhileTyping) private var compileWhileTyping = true
+    @AppStorage(SettingsKey.pdfOnSave) private var pdfOnSave = false
     @AppStorage(SettingsKey.accessibilityChecks) private var accessibilityChecks = AccessibilityChecks.whenUA.rawValue
     @AppStorage(ExportTarget.key) private var exportTarget = ExportTarget.pdf
 
@@ -63,6 +64,7 @@ struct ProjectView: View {
         .onChange(of: lintHints, initial: true) { project.lintEnabled = lintHints }
         .onChange(of: AccessibilityChecks.enabled(accessibilityChecks, target: exportTarget), initial: true) { project.accessibilityChecks = $1 }
         .onChange(of: compileWhileTyping, initial: true) { project.compilesWhileTyping = compileWhileTyping }
+        .onChange(of: pdfOnSave, initial: true) { project.exportsPDFOnSave = pdfOnSave }
         .onChange(of: project.fileRevision) { sidebar.searchOutcome = nil }      // hits may name files that moved; the search tab reruns
         .task(id: project.zoteroLink?.target) { await project.runZoteroSync() }
         .sheet(isPresented: $layout.connectingZotero) { ZoteroConnectSheet(project: project, suggested: project.selectedFile.flatMap { $0.raw.lowercased().hasSuffix(".bib") ? $0 : nil }) }

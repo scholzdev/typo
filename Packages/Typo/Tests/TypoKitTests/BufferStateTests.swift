@@ -32,6 +32,22 @@ import TypoTestSupport
         #expect(!b.isDirty && p.saving == nil)
     }
 
+    @Test func saveWritesThePDFBesideTheDocumentWhenAsked() async throws {
+        let (p, root) = try await TestEnv.project(files: ["main.typ": "hello"])
+        let pdf = root.appending(path: "main.pdf")
+        let b = try await p.open(RelPath("main.typ")!)
+        type(b, "!")
+        try await p.saveAll()
+        try await Task.sleep(for: .seconds(1))
+        #expect(!FileManager.default.fileExists(atPath: pdf.path))               // off by default
+        p.exportsPDFOnSave = true
+        type(b, "?")
+        try await p.saveAll()
+        for _ in 0..<50 where !FileManager.default.fileExists(atPath: pdf.path) { try await Task.sleep(for: .milliseconds(100)) }
+        let data = try Data(contentsOf: pdf)
+        #expect(data.starts(with: Data("%PDF".utf8)))
+    }
+
     @Test func readOnlyFolderSurfacesSaveErrorUntilNextSuccess() async throws {
         let (p, root) = try await TestEnv.project(files: ["main.typ": "hello"])
         let fm = FileManager.default

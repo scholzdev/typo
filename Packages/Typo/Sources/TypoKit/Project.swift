@@ -85,6 +85,9 @@ public struct FileNode: Identifiable, Sendable, Equatable {
     /// False compiles only on save and on explicit requests (the app's "On Save" live preview).
     @ObservationIgnored public var compilesWhileTyping = true { didSet { engine.setDefersEdits(!compilesWhileTyping) } }
     @ObservationIgnored public var autosaveDelay: Duration? = .seconds(1.5)
+    /// Writes the previewed document's PDF next to its source after every save that touched a `.typ` file.
+    @ObservationIgnored public var exportsPDFOnSave = false
+    @ObservationIgnored private var pdfOnSave: Task<Void, Never>?
 
     /// Bumped by every edit to a bibliography file, so the References tab knows to reparse.
     public internal(set) var bibliographyRevision = 0
@@ -696,6 +699,17 @@ public struct FileNode: Identifiable, Sendable, Equatable {
         }
     }
 
+    /// `main.typ` → `main.pdf` in the same folder. A newer save replaces a running export; a document that does
+    /// not compile leaves the last good PDF in place.
+    private func writePDFBeside() {
+        pdfOnSave?.cancel()
+        let url = root.appending(path: (main.raw as NSString).deletingPathExtension + ".pdf")
+        pdfOnSave = Task {
+            guard let pdf = try? await exportPDF(), !Task.isCancelled else { return }
+            try? await Self.write(pdf, to: url)
+        }
+    }
+
     func save(under scope: RelPath?) async throws(ProjectError) {
         await waitForSaves()
         let work = buffers.values.filter { $0.isDirty && (scope.map($0.path.isAtOrUnder) ?? true) && isOnDisk($0.path) && !changedOnDisk.contains($0.path) && reloadHolds[$0.path] == nil }.map { ($0, $0.lastSeq, $0.storage.string, $0.path) }
@@ -724,6 +738,7 @@ public struct FileNode: Identifiable, Sendable, Equatable {
             saveError = nil
             if !work.isEmpty { snapshotIfDue() }
             if !compilesWhileTyping { engine.send(.recompile) }
+            if exportsPDFOnSave, work.contains(where: { FileKind.isTypst($0.3.raw) }) { writePDFBeside() }
         }
         if let err { throw err }
     }

@@ -9,6 +9,7 @@ extension SettingsKey {
     static let bookmarkDetail = "generalBookmarkDetail"
     static let inlineIssues = "generalInlineIssues"
     static let compileWhileTyping = "generalCompileWhileTyping"
+    static let pdfOnSave = "generalPDFOnSave"
     static let accessibilityChecks = "generalAccessibilityChecks"
 }
 
@@ -86,6 +87,7 @@ struct GeneralSettings: View {
     @AppStorage(SettingsKey.bookmarkDetail) private var bookmarkDetail = 1
     @AppStorage(SettingsKey.inlineIssues) private var inlineIssues = true
     @AppStorage(SettingsKey.compileWhileTyping) private var compileWhileTyping = true
+    @AppStorage(SettingsKey.pdfOnSave) private var pdfOnSave = false
     @AppStorage(SettingsKey.accessibilityChecks) private var accessibilityChecks = AccessibilityChecks.whenUA.rawValue
     @State private var confirmReset = false
     @State private var transferError: String?
@@ -147,11 +149,16 @@ struct GeneralSettings: View {
                 }
                 Text("Hints for missing alternative text, skipped heading levels, tables without a header, and a missing title or language.")
                     .font(.caption).foregroundStyle(.secondary)
+            }
+            Section("Preview and PDF") {
                 Picker("Live preview", selection: $compileWhileTyping) {
                     Text("While Typing").tag(true)
                     Text("On Save").tag(false)
                 }
                 Text("On Save compiles when the file is saved, which includes autosave.")
+                    .font(.caption).foregroundStyle(.secondary)
+                Toggle("Save PDF next to the document", isOn: $pdfOnSave)
+                Text("Every save writes the previewed document as a PDF beside it, main.typ as main.pdf.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Settings Import & Export") {
