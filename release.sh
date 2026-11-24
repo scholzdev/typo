@@ -33,6 +33,7 @@ item="    <item>
       <sparkle:version>$build</sparkle:version>
       <sparkle:shortVersionString>$version</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+      <sparkle:releaseNotesLink>https://scholzdev.github.io/typo/guide/release-notes.html</sparkle:releaseNotesLink>
       <enclosure url=\"$url\" $signature type=\"application/octet-stream\"/>
     </item>"
 

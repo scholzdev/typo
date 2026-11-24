@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Release Notes · Typo User Guide</title>
+  <meta name="description" content="What is new in each version of Typo, the issues it resolves and the known issues.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html">Writing</a></li>
+          <li><a href="navigating.html">Navigating</a></li>
+          <li><a href="preview-export.html">Preview and export</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="assistant.html">Assistant</a></li>
+          <li><a href="shortcuts.html">Shortcuts</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+          <li><a href="release-notes.html" aria-current="page">Release notes</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+        <main class="guide-main" id="main">
+      <h1>Typo 0.1 Release Notes</h1>
+
+      <p class="lead">The first public release of Typo, a native Typst editor for the Mac.</p>
+
+      <h2 id="overview">Overview</h2>
+      <p>Typo 0.1 includes Typst 0.15.1 and typstyle 0.15.3. It runs on macOS 27 or later on a Mac with Apple silicon. The user interface is in English and German.</p>
+      <p>Typo is free for personal, noncommercial use. See the <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">license</a> for details.</p>
+
+      <h3 id="assistant">Assistant</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>The assistant is optional and sends nothing until you agree to a provider. It runs on device with Apple Intelligence, with OpenRouter, OpenCode Zen, OpenCode Go or another OpenAI- or Anthropic-compatible provider, or as Claude Code in the project folder. API keys are stored only in the keychain.</li>
+        <li>It reads and searches the project, looks things up in a curated index of the Typst documentation, searches the web, compiles the document and views the preview.</li>
+        <li>A question is answered without changing anything. Settings › Intelligence decides what it may do on its own: change or create files, view the preview, read the project, search and read diagnostics.</li>
+        <li>Changes apply right away and show as “N Changes in M Files” with a revert bar, as an inline diff and as a ribbon in the gutter. One click reverts them.</li>
+        <li>Workflows run a prepared task by name: <code>/check</code> compiles and looks at every page, <code>/submit</code> is a checklist before you hand in, and <code>/consistency</code> settles on one spelling for every term. You can write your own.</li>
+        <li>Conversations are listed in the sidebar, with groups, an archive and multi-selection.</li>
+        <li>Explain with AI explains the selected text.</li>
+      </ul>
+
+      <h3 id="bibliography">Bibliography</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>A BibTeX editor with all fields, More Fields and a check of the required fields.</li>
+        <li>Insert Citation (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd>) and completion of bibliography keys.</li>
+        <li>Add Reference looks up a DOI, arXiv ID or ISBN and appends the entry to a .bib file of the project.</li>
+        <li>File › Connect Zotero… fills a .bib file from the Zotero app or a Zotero account and keeps it in sync.</li>
+      </ul>
+
+      <h3 id="editor">Editor</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>Syntax highlighting with themes, fonts and cursor styles.</li>
+        <li>Completion comes from the Typst engine: variables, functions from imports, built-ins, and only the labels and bibliography keys you can reach. Names from other files are imported for you. A label on an equation shows the rendered equation.</li>
+        <li>Jump to definition, find references, rename a symbol, Go Back and Go Forward, hover documentation, signature help and quick fixes.</li>
+        <li>Spell checking in the language from <code>#set text(lang:)</code>, with no red underline in math.</li>
+        <li>Multi-cursor editing (<kbd>⌘</kbd><kbd>D</kbd>, <kbd>⌃</kbd><kbd>⌘</kbd><kbd>G</kbd>, <kbd>⌃</kbd><kbd>⇧</kbd><kbd>↑</kbd> and <kbd>⌃</kbd><kbd>⇧</kbd><kbd>↓</kbd>) and a Vim mode with a mode capsule and key hints.</li>
+        <li>A minimap, sticky headings, scope guides, rainbow brackets, bracket highlighting, highlighting of matching symbols and inlay hints.</li>
+        <li>Colour swatches next to <code>rgb(…)</code> and similar. One click opens a colour picker with sliders, value fields for every channel and an optional wheel.</li>
+        <li>Snippets, line wrapping with indentation, overscroll, an animated caret and typewriter scrolling in focus mode.</li>
+        <li>Formatting with typstyle, with a line width and guide line, optionally on save.</li>
+        <li>Lint hints and diagnostics inline, which you can turn off. Accessibility checks hint at missing alternative text, skipped heading levels, tables without a header, and a missing title or language.</li>
+        <li>A word count that counts only your words, across included files, with a writing goal.</li>
+        <li>Drag or paste an image, and it becomes a figure.</li>
+      </ul>
+
+      <h3 id="export">Export and Printing</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>One export dialog for PDF, PDF/A-2b, PDF/A-3b, accessible PDF/UA-1, PNG at 72 to 600 ppi, SVG and a project ZIP. The items in File › Export open it with their format chosen.</li>
+        <li>Choose the pages like in the print dialog: all pages, a range, or the pages you tick in the sidebar. (<a href="https://github.com/scholzdev/typo/issues/5">#5</a>)</li>
+        <li>Settings › General › Preview and PDF can save the PDF next to the document every time you save.</li>
+        <li>Print from File › Print… and share the PDF from the Export button in the toolbar.</li>
+        <li>A document that uses a font which is not installed shows a warning before you export or print, with quick fixes that suggest installed fonts.</li>
+      </ul>
+      <h4>Known Issues</h4>
+      <ul>
+        <li><p>A page range or a selection exports an untagged PDF. PDF/UA-1 always contains every page, because Typst tags only whole documents. (<a href="https://github.com/scholzdev/typo/issues/7">#7</a>)</p><p class="workaround"><strong>Workaround:</strong> Export all pages when the PDF needs tags, for example for accessibility.</p></li>
+        <li><p>Many PDF/UA-1 errors from Typst carry no position, so the issue does not point to a line. (<a href="https://github.com/scholzdev/typo/issues/8">#8</a>)</p><p class="workaround"><strong>Workaround:</strong> Turn on accessibility checks in Settings › General to see the usual causes in the editor.</p></li>
+      </ul>
+
+      <h3 id="folding">Folding</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>Fold headings, brackets, figures, tables, math, raw blocks, comments and lists.</li>
+        <li>A fold ribbon with nested capsules, a <code>{ ··· }</code> badge and arrow tips, as in Xcode.</li>
+        <li>The fold animates like a sheet of paper while the text below reflows every frame, at up to 120 Hz. Its duration is set in Settings › Editing › Display.</li>
+        <li>Fold and Unfold Section and Fold and Unfold All in the View menu.</li>
+        <li>Move sections up and down, or drag them in the outline, even into another file.</li>
+      </ul>
+
+      <h3 id="installation">Installation and Updates</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>Typo checks for new versions once a day and shows the release notes. You choose Install Update, Remind Me Later or Skip This Version. To check right away, choose Typo › Check for Updates…</li>
+      </ul>
+      <h4>Known Issues</h4>
+      <ul>
+        <li><p>Typo is not notarized, so macOS blocks the first launch. (<a href="https://github.com/scholzdev/typo/issues/9">#9</a>)</p><p class="workaround"><strong>Workaround:</strong> Control-click Typo in the Applications folder and choose Open, or click Open Anyway in System Settings › Privacy &amp; Security.</p></li>
+        <li><p>Typo runs only on Macs with Apple silicon. (<a href="https://github.com/scholzdev/typo/issues/10">#10</a>)</p><p class="workaround"><strong>Workaround:</strong> None.</p></li>
+      </ul>
+
+      <h3 id="localization">Localization</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>The user interface is available in English and German. (<a href="https://github.com/scholzdev/typo/issues/3">#3</a>)</li>
+        <li>Settings › General › Language chooses the language of Typo independently of the system. The change applies after Typo restarts.</li>
+      </ul>
+
+      <h3 id="packages">Packages</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>A Typst Universe browser with a detail view for every package.</li>
+        <li>An index of <code>@preview</code> packages with an offline cache. A package downloaded once works offline.</li>
+        <li>A local packages folder for <code>@local</code> and your own namespaces.</li>
+      </ul>
+
+      <h3 id="notes">Presenter Notes</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>Add a note to a slide with Format › Add Presenter Note (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>P</kbd>) or from the editor’s context menu. Typo stores it in the source as <code>#metadata("…") &lt;note&gt;</code>, so it never appears in the PDF and needs no package.</li>
+        <li>A note on a line of its own shows as a small card in the editor that you can write in directly. A note that shares its line with other text shows as a small note you click to edit. The note mark in the gutter switches the line between the note and its code.</li>
+        <li>The notes strip under the preview shows the notes of the visible slide, from every file of the project. Notes from Touying and Polylux are included. It turns on by itself in a project with notes or a slide package, and with the first note you add.</li>
+        <li>The AI button in the notes strip drafts a note for the visible slide. You choose whether to use it.</li>
+        <li>Present full screen, or with the presenter view: the current and the next slide, your notes, the time and a timer.</li>
+      </ul>
+
+      <h3 id="preview">Preview</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>The preview updates as you type, or only when you save. Click anywhere in it to jump to the line that made it.</li>
+        <li>Zoom, Fit Width and Fit Page, two-page spreads, page thumbnails and dark pages.</li>
+        <li>The preview can follow the cursor, stay locked to the main file, or show the .typ file selected in the sidebar. It can also move to its own window.</li>
+      </ul>
+
+      <h3 id="projects">Projects and Files</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>A welcome window, recent projects and a template gallery.</li>
+        <li>Autosave, snapshots and per-file history.</li>
+        <li>Encoding, line endings and whitespace cleanup for every file.</li>
+        <li>Open Quickly (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>O</kbd>) finds files, headings and labels. Go to Line with <kbd>⌘</kbd><kbd>L</kbd>, bookmarks with <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd>, and find and replace across the whole project with regular expressions.</li>
+      </ul>
+
+      <h3 id="settings">Settings</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>Settings like Xcode’s, with back and forward, opening on General.</li>
+        <li>General: language, restoring open projects, file extensions, navigator detail, inline issues, accessibility checks, live preview, the PDF next to the document, and export, import and reset of all settings.</li>
+        <li>Appearance: theme, font, styles, cursor, light and dark.</li>
+        <li>Shortcuts like Xcode’s: sets you can duplicate and rename, Adapt to Current Keyboard, filters for menu, text, customized and conflicting shortcuts, and a new binding with a double-click.</li>
+        <li>Navigation, Editing, Snippets, Packages, Source Control, Intelligence and Components.</li>
+      </ul>
+
+      <h3 id="git">Source Control</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>Git changes in the gutter, with blame, a log and a Changes navigator.</li>
+        <li>Commit, pull, push, branches and stashes, with accounts for GitHub, GitLab and Bitbucket.</li>
+      </ul>
+
+      <h3 id="tables">Tables</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>Edit <code>table(…)</code> and <code>grid(…)</code> in a grid like Numbers, from Format › Edit Table…, the context menu or the inspector. Typst typesets every cell, with your math, references and <code>#set</code> rules.</li>
+        <li>Spreadsheet keys: arrows, Shift-arrows, Return, Tab, Escape, copy and paste, bold and italic. Paste from Numbers or Excel, and the table grows to fit.</li>
+        <li>Insert, delete, duplicate and drag rows and columns. Merge and split cells.</li>
+        <li>Alignment per column, style presets (Plain, Grid, Header Line, Booktabs, Striped) and column widths by dragging or from the column menu.</li>
+        <li>Caption, label and placement of the figure.</li>
+        <li>The Intelligence popover sorts, adds a totals row, transposes, fills empty cells, translates, fixes capitalisation, fills sample data or formats numbers, as one undo step with a summary.</li>
+        <li>Done writes the table back as one undoable edit and adds missing imports.</li>
+      </ul>
+
+      <h3 id="window">Window and Layout</h3>
+      <h4>New Features</h4>
+      <ul>
+        <li>A toolbar like Xcode’s, with navigator and assistant toggles, a scheme capsule for the main file and export format, and toggles for the preview and the inspector.</li>
+        <li>Navigators for files, search, outline, issues, bookmarks and changes.</li>
+        <li>Editor tabs with pinning, a jump bar, a split editor and focus mode.</li>
+        <li>An inspector for the file, the document and the figure, table, colour, label or function call under the caret.</li>
+        <li>A bottom area with the issues.</li>
+        <li>VoiceOver support for the navigators, the editor and the table grid.</li>
+      </ul>
+
+      <nav class="pager" aria-label="Previous and next page">
+        <a class="prev" href="troubleshooting.html" rel="prev">‹ Previous: Troubleshooting</a>
+        
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>

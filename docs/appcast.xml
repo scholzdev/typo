@@ -8,6 +8,7 @@
       <sparkle:version>1</sparkle:version>
       <sparkle:shortVersionString>0.1</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+      <sparkle:releaseNotesLink>https://scholzdev.github.io/typo/guide/release-notes.html</sparkle:releaseNotesLink>
       <enclosure url="https://github.com/scholzdev/typo/releases/download/v0.1/Typo-0.1.zip" sparkle:edSignature="HoamVmUEUy2O/8KiXnVrfFoqWSSgDYqCgOm105kniBEuGQKbGB/WdJ8dTDyIidjSwIatKHGtc4yO6ERJIs8BBw==" length="41846320" type="application/octet-stream"/>
     </item>
   </channel>

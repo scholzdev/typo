@@ -125,3 +125,7 @@ kbd { display: inline-block; min-width: 1.5em; margin: 0 1px; padding: 0 5px; bo
 }
 :root[data-theme="dark"] .shot-light { display: none !important; }
 :root[data-theme="dark"] .shot-dark { display: block !important; }
+
+/* Release notes: a known issue's workaround sits under it, set off like Apple's. */
+.guide-main li > p { margin: 0; }
+.guide-main li > p.workaround { margin-top: 6px; padding: 8px 12px; border-radius: 8px; background: var(--surface); }
