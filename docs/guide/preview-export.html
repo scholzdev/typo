@@ -81,15 +81,53 @@
       </figure>
 
       <h2 id="presentation">Presentation mode</h2>
+      <p><span class="path">View › Start Presentation</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>Return</kbd>), or the Play button in the toolbar, shows the pages full screen, one at a time. With a second display, such as an iPad with Sidecar, the slides go to that display and the presenter view opens on the display of your project window, as in Keynote. With one display, the slides fill it. <span class="path">View › Start Presentation with Presenter View</span> (<kbd>⌥</kbd><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Return</kbd>) also opens the presenter view on a single display, so you can rehearse.</p>
+      <figure class="shot">
+        <img width="1100" height="700" src="images/presenter-view.webp" alt="The presenter view: a green bar at the top, the clock and a timer, the current slide on the left, the next slide on the right, and the presenter notes in a white panel below" loading="lazy" decoding="async">
+        <figcaption>The presenter view shows the current and the next slide, your notes, the time and a timer.</figcaption>
+      </figure>
+      <p>The presenter view works like Keynote’s presenter display:</p>
       <ul>
-        <li><span class="path">View › Start Presentation</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>Return</kbd>) shows the pages full screen, one at a time. The arrow keys move between pages and <kbd>Esc</kbd> ends it.</li>
-        <li><span class="path">View › Start Presentation with Presenter View</span> (<kbd>⌥</kbd><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Return</kbd>) shows the slides full screen on a second display. On this display it opens a window with the next slide, speaker notes, the slide number and a timer. With one display, only that window opens, so you can rehearse.</li>
+        <li>The bar at the top is green when the next slide is ready, and red while it is still being drawn.</li>
+        <li>The clock shows the time of day. The timer shows the elapsed or the remaining time. Click it to pause and resume it.</li>
+        <li>The notes panel shows the notes of the current slide. Change their size with the A buttons, swap black and white with Invert Colors, and choose Edit to jump to the note in the source.</li>
+        <li>Move the pointer to show the controls: Show Navigator for a strip of all slides, and on the right the keyboard shortcuts, the layout, Swap Displays and Close.</li>
+        <li>The layout button turns the current slide, the next slide, the notes, the ready indicator, the clock and the timer on and off. For the remaining time, enter the length of your talk.</li>
+        <li>Closing the presenter view ends the presentation.</li>
       </ul>
-      <p>Both commands need a compiled document with at least one page.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Presentation keys">
+        <table>
+          <thead><tr><th scope="col">Key</th><th scope="col">Action</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>→</kbd> <kbd>↓</kbd> <kbd>Space</kbd></td><td>Next slide</td></tr>
+            <tr><td><kbd>←</kbd> <kbd>↑</kbd></td><td>Previous slide</td></tr>
+            <tr><td><kbd>Home</kbd> <kbd>End</kbd></td><td>First or last slide</td></tr>
+            <tr><td>Number, then <kbd>Return</kbd></td><td>Go to that slide</td></tr>
+            <tr><td><kbd>B</kbd> <kbd>W</kbd></td><td>Black or white screen for the audience</td></tr>
+            <tr><td><kbd>X</kbd></td><td>Swap displays</td></tr>
+            <tr><td><kbd>+</kbd> <kbd>−</kbd></td><td>Bigger or smaller notes</td></tr>
+            <tr><td><kbd>U</kbd> <kbd>D</kbd></td><td>Scroll the notes up or down</td></tr>
+            <tr><td><kbd>R</kbd></td><td>Reset the timer</td></tr>
+            <tr><td><kbd>?</kbd></td><td>Show the keyboard shortcuts</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>End the presentation</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="notes">Presenter notes</h2>
+      <p>Typo stores a note in the source as <code>#metadata("…") &lt;note&gt;</code>. It never appears in the PDF and needs no package. Notes from Touying (<code>#speaker-note[…]</code>) and Polylux (<code>#pdfpc.speaker-note(…)</code>) work too.</p>
+      <ul>
+        <li>To add a note, choose <span class="path">Format › Add Presenter Note</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>P</kbd>) or the item at the top of the editor’s context menu. A note card opens below the line, ready to type in.</li>
+        <li>A note on a line of its own shows as a card. A note that shares its line with other text shows as a small yellow note; click it to edit it.</li>
+        <li>The note mark left of the line number switches a note between the card and its code.</li>
+        <li><span class="path">View › Presenter Notes in Editor</span> chooses Cards, Compact (one line per note) or Hidden. Hidden notes keep their mark in the gutter.</li>
+        <li>The notes strip under the preview shows the notes of the visible slide, from every file of the project. It turns on by itself in a project with notes or a slide package. <span class="path">View › Show Notes Strip</span> turns it on and off.</li>
+        <li>The AI button in the notes strip drafts a note for the visible slide. You choose whether to use it.</li>
+      </ul>
 
       <h2 id="export">Export formats</h2>
-      <p>All export commands are in the File › Export menu. Each compiles the project and opens a save panel.</p>
-      <p>To export only some pages as PDF, type them in the <strong>Pages</strong> field of the save panel, for example <code>1-3, 7, 9-</code>. Leave it empty for every page. An accessible PDF/UA-1 is always exported whole, because Typst tags only complete documents.</p>
+      <p>All export commands are in the File › Export menu and on the Export button in the toolbar, whose arrow also offers Share PDF.</p>
+      <p>Every export command opens the export dialog with its format chosen. You can change the format there, choose the resolution of PNG images, and choose the pages like in the print dialog: all pages, a range, or the pages you tick in the sidebar. An accessible PDF/UA-1 is always exported whole, because Typst tags only complete documents. <span class="path">Settings › General › Preview and PDF</span> can also save the PDF next to the document every time you save.</p>
       <div class="table-scroll" tabindex="0" role="region" aria-label="Export formats">
         <table>
           <thead><tr><th scope="col">Command</th><th scope="col">Result</th></tr></thead>
