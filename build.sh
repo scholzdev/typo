@@ -62,6 +62,13 @@ if ! xcodebuild -project Typo.xcodeproj -scheme Typo -configuration "$config" -d
     exit 1
 fi
 
+# Xcode fills the String Catalog only when it builds in the IDE; this does the same from the command line.
+stringsdata=$(find "$derived/Build/Intermediates.noindex/Typo.build/$config/Typo.build" -name '*.stringsdata' 2>/dev/null)
+if [[ -n $stringsdata ]]; then
+    args=(); while IFS= read -r f; do args+=(--stringsdata "$f"); done <<<"$stringsdata"
+    xcrun xcstringstool sync App/Localizable.xcstrings "${args[@]}"
+fi
+
 rm -rf build/Typo.app
 cp -R "$derived/Build/Products/$config/Typo.app" build/Typo.app
 step "Done: build/Typo.app"

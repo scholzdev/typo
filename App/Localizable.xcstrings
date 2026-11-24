@@ -1,5 +1,3599 @@
 {
-  "sourceLanguage": "en",
-  "strings": {},
-  "version": "1.0"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    " " : {
+
+    },
+    "%" : {
+
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ %@:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@:"
+          }
+        }
+      }
+    },
+    "%@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "%@ (%lld)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$lld)"
+          }
+        }
+      }
+    },
+    "%@ (⌘%lld)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (⌘%2$lld)"
+          }
+        }
+      }
+    },
+    "%@ Menu" : {
+
+    },
+    "%@ for conflict %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ for conflict %2$lld"
+          }
+        }
+      }
+    },
+    "%@ is always dark." : {
+
+    },
+    "%@ of %@ words (%lld %%)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@ words (%3$lld %%)"
+          }
+        }
+      }
+    },
+    "%@ runs on this Mac in the project folder. It reads and changes the project's files, and sends what it reads to its own provider." : {
+
+    },
+    "%@ value" : {
+
+    },
+    "%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%@, %lld words" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$lld words"
+          }
+        }
+      }
+    },
+    "%@. You can also add a model provider with your own API key." : {
+
+    },
+    "%@:" : {
+
+    },
+    "%@:%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@:%2$lld"
+          }
+        }
+      }
+    },
+    "%lf seconds" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld %%" : {
+
+    },
+    "%lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld %2$@"
+          }
+        }
+      }
+    },
+    "%lld / %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld"
+          }
+        }
+      }
+    },
+    "%lld broken reference%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld broken reference%2$@"
+          }
+        }
+      }
+    },
+    "%lld columns × %lld rows" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld columns × %2$lld rows"
+          }
+        }
+      }
+    },
+    "%lld entries" : {
+
+    },
+    "%lld files edited" : {
+
+    },
+    "%lld of %lld conflicts resolved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld conflicts resolved"
+          }
+        }
+      }
+    },
+    "%lld of %lld done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld done"
+          }
+        }
+      }
+    },
+    "%lld of %lld entries" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld entries"
+          }
+        }
+      }
+    },
+    "%lld of %lld packages" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld packages"
+          }
+        }
+      }
+    },
+    "%lld packages, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld packages, %2$@"
+          }
+        }
+      }
+    },
+    "%lld pt" : {
+
+    },
+    "%lld spaces" : {
+
+    },
+    "%lld unused label%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld unused label%2$@"
+          }
+        }
+      }
+    },
+    "%lld × %lld px" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld × %2$lld px"
+          }
+        }
+      }
+    },
+    "(empty)" : {
+
+    },
+    "+" : {
+
+    },
+    "+%lld" : {
+
+    },
+    "--acp" : {
+
+    },
+    "/absolute/path/to/agent" : {
+
+    },
+    "1 Line" : {
+
+    },
+    "1 file edited" : {
+
+    },
+    "10.1145/3591280, arXiv:1706.03762 or 978-0-201-03801-9" : {
+
+    },
+    "123456" : {
+
+    },
+    "2 spaces" : {
+
+    },
+    "4 spaces" : {
+
+    },
+    "8 spaces" : {
+
+    },
+    "@%@" : {
+
+    },
+    "@preview/%@" : {
+
+    },
+    "A" : {
+
+    },
+    "A model provider you add with an API key receives your messages, the conversation so far and the files you attach or allow it to read. It handles them under its own terms. The key is kept in your Keychain." : {
+
+    },
+    "API Key" : {
+
+    },
+    "API Key Header" : {
+
+    },
+    "API key" : {
+
+    },
+    "Abort Merge" : {
+
+    },
+    "About File & Folder Access" : {
+
+    },
+    "About Modes…" : {
+
+    },
+    "About Typo" : {
+
+    },
+    "Accept" : {
+
+    },
+    "Accept All" : {
+
+    },
+    "Accept completions with" : {
+
+    },
+    "Accessibility checks" : {
+
+    },
+    "Account" : {
+
+    },
+    "Account Options" : {
+
+    },
+    "Account:" : {
+
+    },
+    "Accounts" : {
+
+    },
+    "Acknowledgements" : {
+
+    },
+    "Adapt to current keyboard" : {
+
+    },
+    "Add" : {
+
+    },
+    "Add #bibliography(\"refs.bib\") to %@" : {
+
+    },
+    "Add Account…" : {
+
+    },
+    "Add Argument" : {
+
+    },
+    "Add Caret Above" : {
+
+    },
+    "Add Caret Below" : {
+
+    },
+    "Add Content from Project…" : {
+
+    },
+    "Add Field" : {
+
+    },
+    "Add File Bookmark" : {
+
+    },
+    "Add Image…" : {
+
+    },
+    "Add Reference" : {
+
+    },
+    "Add Reference…" : {
+
+    },
+    "Add Remote" : {
+
+    },
+    "Add Remote…" : {
+
+    },
+    "Add a .bib or hayagriva .yml file to the project." : {
+
+    },
+    "Add a Model Provider…" : {
+
+    },
+    "Add a Provider…" : {
+
+    },
+    "Add a reference to cite it from your document." : {
+
+    },
+    "Add a snippet" : {
+
+    },
+    "Add an Agent…" : {
+
+    },
+    "Add and remove files automatically" : {
+
+    },
+    "Add from DOI, arXiv or ISBN…" : {
+
+    },
+    "Add to" : {
+
+    },
+    "Add to Claude Code" : {
+
+    },
+    "Add to Claude Desktop" : {
+
+    },
+    "Add to Fallback List" : {
+
+    },
+    "Added" : {
+
+    },
+    "Added Lines" : {
+
+    },
+    "Added to Claude Code" : {
+
+    },
+    "Added to Claude Desktop" : {
+
+    },
+    "After editing the conflict markers away by hand" : {
+
+    },
+    "Agents" : {
+
+    },
+    "Agents in Typo" : {
+
+    },
+    "Agents that read or run things with their own tools follow their own settings for what they don't ask about." : {
+
+    },
+    "Align Center" : {
+
+    },
+    "Align Left" : {
+
+    },
+    "Align Right" : {
+
+    },
+    "Align consecutive // comments" : {
+
+    },
+    "Alignment" : {
+
+    },
+    "All Categories" : {
+
+    },
+    "All Changes" : {
+
+    },
+    "All Ours" : {
+
+    },
+    "All Templates" : {
+
+    },
+    "All Theirs" : {
+
+    },
+    "All Versions" : {
+
+    },
+    "Allow" : {
+
+    },
+    "Allow Once" : {
+
+    },
+    "Already in %@ as “%@”." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Already in %1$@ as “%2$@”."
+          }
+        }
+      }
+    },
+    "Always" : {
+
+    },
+    "Always Allow" : {
+
+    },
+    "Always Allow for This Folder…" : {
+
+    },
+    "Always Allow…" : {
+
+    },
+    "Always allow access?" : {
+
+    },
+    "Always in This Conversation" : {
+
+    },
+    "An agent such as Claude Code runs on this Mac in the project folder. It reads and changes the project's files itself and sends what it reads to its own provider, under that provider's terms and with your login there." : {
+
+    },
+    "Animated caret" : {
+
+    },
+    "Appearance" : {
+
+    },
+    "Apple Intelligence runs on this Mac. What you ask it, and the passage it reads, stay on the Mac." : {
+
+    },
+    "Applies every pending change of this answer, one after another" : {
+
+    },
+    "Applies when you save with ⌘S. Autosave never changes your text." : {
+
+    },
+    "Apply and Keep" : {
+
+    },
+    "Apply and Remove" : {
+
+    },
+    "Applying a stash ran into conflicts. The stash is still there." : {
+
+    },
+    "Archive" : {
+
+    },
+    "Archive Conversation" : {
+
+    },
+    "Are you sure you want to permanently delete these %lld conversations? This cannot be undone." : {
+
+    },
+    "Are you sure you want to permanently delete “%@”? This cannot be undone." : {
+
+    },
+    "Argument" : {
+
+    },
+    "Argument hint" : {
+
+    },
+    "Arguments" : {
+
+    },
+    "As figure with caption" : {
+
+    },
+    "Ask about your document to start one." : {
+
+    },
+    "Assist" : {
+
+    },
+    "Assistant" : {
+
+    },
+    "Attach Files" : {
+
+    },
+    "Attach files to the next message" : {
+
+    },
+    "Author" : {
+
+    },
+    "Authorization sends “Bearer <key>”; any other header sends the key as it is." : {
+
+    },
+    "Auto" : {
+
+    },
+    "Auto: columns fit their content. Full: every column 1fr, so the table spans the text width." : {
+
+    },
+    "Automatic" : {
+
+    },
+    "Automatically" : {
+
+    },
+    "Automatically adapts unmodified key bindings to the current input method." : {
+
+    },
+    "Automatically insert closing brackets and quotes" : {
+
+    },
+    "Automatically reformat when completing" : {
+
+    },
+    "Automatically trim trailing whitespace" : {
+
+    },
+    "Back" : {
+
+    },
+    "Bad answer" : {
+
+    },
+    "Base URL" : {
+
+    },
+    "BibTeX File" : {
+
+    },
+    "Bibliography" : {
+
+    },
+    "Bigger Text" : {
+
+    },
+    "Binary file changed" : {
+
+    },
+    "Blocked" : {
+
+    },
+    "Body" : {
+
+    },
+    "Bold" : {
+
+    },
+    "Bold (⌘B): wraps the cells in *…*" : {
+
+    },
+    "Bookmark Actions" : {
+
+    },
+    "Bookmark navigator detail" : {
+
+    },
+    "Bottom" : {
+
+    },
+    "Bottom Area" : {
+
+    },
+    "Branch names cannot contain spaces, backslashes, or other symbols." : {
+
+    },
+    "Bright" : {
+
+    },
+    "Brightness" : {
+
+    },
+    "Brightness value" : {
+
+    },
+    "Bring the preview back to the project window" : {
+
+    },
+    "Browse Fonts…" : {
+
+    },
+    "Bullet List" : {
+
+    },
+    "Bulleted List" : {
+
+    },
+    "Can't Move Section" : {
+
+    },
+    "Can't be empty" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Caption" : {
+
+    },
+    "Categories" : {
+
+    },
+    "Category" : {
+
+    },
+    "Cell Fill" : {
+
+    },
+    "Cell markup" : {
+
+    },
+    "Change bars and blame in the editor's gutter" : {
+
+    },
+    "Change the table with a model: sort, add totals, translate …" : {
+
+    },
+    "Changed Lines" : {
+
+    },
+    "Changes" : {
+
+    },
+    "Changes Since" : {
+
+    },
+    "Changes Since: from this snapshot to the text now. vs. Last Commit: from the last commit to this snapshot." : {
+
+    },
+    "Changes in Commit" : {
+
+    },
+    "Changing the table…" : {
+
+    },
+    "Chat" : {
+
+    },
+    "Check Now" : {
+
+    },
+    "Check for Updates…" : {
+
+    },
+    "Checking…" : {
+
+    },
+    "Choose Navigate › Toggle Bookmark or click a line number to bookmark a line." : {
+
+    },
+    "Choose a Template" : {
+
+    },
+    "Choose a size" : {
+
+    },
+    "Choose an entry to edit its fields." : {
+
+    },
+    "Choose what Typo restores at launch, how files and issues are shown, and when your document is checked." : {
+
+    },
+    "Choose…" : {
+
+    },
+    "Chosen in each conversation" : {
+
+    },
+    "Cite @%@ instead" : {
+
+    },
+    "Claude loads the skills you turn on here. With “Use my Claude Code setup” on, it loads all of them anyway." : {
+
+    },
+    "Clear" : {
+
+    },
+    "Clear Filter" : {
+
+    },
+    "Clear Recents" : {
+
+    },
+    "Click column icons to cycle alignment" : {
+
+    },
+    "Click on Code" : {
+
+    },
+    "Close" : {
+
+    },
+    "Close Other Tabs" : {
+
+    },
+    "Close Split Editor" : {
+
+    },
+    "Close Tab" : {
+
+    },
+    "Close Window" : {
+
+    },
+    "Close the second editor (⌃⌘T)" : {
+
+    },
+    "Code" : {
+
+    },
+    "Code folding ribbon" : {
+
+    },
+    "Code structure headers" : {
+
+    },
+    "Code: wraps the cells in `…` (raw text)" : {
+
+    },
+    "Collapse" : {
+
+    },
+    "Collapse %@" : {
+
+    },
+    "Collapsed" : {
+
+    },
+    "Color picker" : {
+
+    },
+    "Color swatches" : {
+
+    },
+    "Color wheel" : {
+
+    },
+    "Colors" : {
+
+    },
+    "Column Left" : {
+
+    },
+    "Column Right" : {
+
+    },
+    "Command" : {
+
+    },
+    "Command Palette…" : {
+
+    },
+    "Commits the checked files only" : {
+
+    },
+    "Commits to push (↑) and to pull (↓)" : {
+
+    },
+    "Compare with Current" : {
+
+    },
+    "Comparison view" : {
+
+    },
+    "Compile and preview this file" : {
+
+    },
+    "Compiling…" : {
+
+    },
+    "Completed" : {
+
+    },
+    "Completion trigger, optional" : {
+
+    },
+    "Configured" : {
+
+    },
+    "Conflict %lld" : {
+
+    },
+    "Connect Zotero…" : {
+
+    },
+    "Containing" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Control File & Folder Access" : {
+
+    },
+    "Conversations are stored on this Mac with Typo's data and can be deleted at any time. You can remove a provider or an agent in Settings › Intelligence; removing a provider also removes its key." : {
+
+    },
+    "Convert existing files on save" : {
+
+    },
+    "Copied" : {
+
+    },
+    "Copy" : {
+
+    },
+    "Copy @key" : {
+
+    },
+    "Copy Code" : {
+
+    },
+    "Copy Command" : {
+
+    },
+    "Copy Import" : {
+
+    },
+    "Copy Path" : {
+
+    },
+    "Copy the project-relative path" : {
+
+    },
+    "Couldn't save" : {
+
+    },
+    "Couldn’t Move to Trash" : {
+
+    },
+    "Counts lines from the caret line, folded ones included. Hybrid keeps the caret line's own number. Also :set rnu, :set nornu and :set nu rnu." : {
+
+    },
+    "Counts the words you wrote in the document and its included files; numbering, captions’ labels, references, page numbers and code do not count. With a selection: the words of the selected text. Click for your goal and the words per chapter." : {
+
+    },
+    "Create Git Repository" : {
+
+    },
+    "Create Repository" : {
+
+    },
+    "Create a %@ on %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Create a %1$@ on %2$@"
+          }
+        }
+      }
+    },
+    "Cursor" : {
+
+    },
+    "Cursor style" : {
+
+    },
+    "Custom" : {
+
+    },
+    "Custom Field…" : {
+
+    },
+    "Cut" : {
+
+    },
+    "DOI, arXiv ID or ISBN" : {
+
+    },
+    "Dark Pages" : {
+
+    },
+    "Dark Preview Pages" : {
+
+    },
+    "Decorations" : {
+
+    },
+    "Default" : {
+
+    },
+    "Default (%@)" : {
+
+    },
+    "Default Text Size" : {
+
+    },
+    "Default branch name" : {
+
+    },
+    "Default line endings" : {
+
+    },
+    "Default model" : {
+
+    },
+    "Default provider" : {
+
+    },
+    "Default text encoding" : {
+
+    },
+    "Defaults" : {
+
+    },
+    "Defaults are set in Settings › Intelligence." : {
+
+    },
+    "Definition" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Delete %lld Conversations" : {
+
+    },
+    "Delete %lld Conversations?" : {
+
+    },
+    "Delete %lld Entries" : {
+
+    },
+    "Delete All Completed" : {
+
+    },
+    "Delete Conversation" : {
+
+    },
+    "Delete Conversation?" : {
+
+    },
+    "Delete Entry" : {
+
+    },
+    "Delete Entry (undo with Edit › Undo)" : {
+
+    },
+    "Delete Group" : {
+
+    },
+    "Delete Index" : {
+
+    },
+    "Delete Provider…" : {
+
+    },
+    "Delete Reference" : {
+
+    },
+    "Delete the snippet" : {
+
+    },
+    "Delete “%@”?" : {
+
+    },
+    "Delete “%@”…" : {
+
+    },
+    "Deleted Lines" : {
+
+    },
+    "Deletes the font index cache; it is rebuilt on the next launch." : {
+
+    },
+    "Delete…" : {
+
+    },
+    "Deny" : {
+
+    },
+    "Describe a change…" : {
+
+    },
+    "Description" : {
+
+    },
+    "Destination" : {
+
+    },
+    "Detach %@" : {
+
+    },
+    "Details" : {
+
+    },
+    "Dim unfocused editor panes" : {
+
+    },
+    "Discard Changes" : {
+
+    },
+    "Discard your changes to this table?" : {
+
+    },
+    "Discard your changes to this workflow?" : {
+
+    },
+    "Disconnect" : {
+
+    },
+    "Document" : {
+
+    },
+    "Documents keep the version they import; update their imports from the editor." : {
+
+    },
+    "Does Nothing" : {
+
+    },
+    "Don't Allow" : {
+
+    },
+    "Don't Search" : {
+
+    },
+    "Done" : {
+
+    },
+    "Don’t Indent" : {
+
+    },
+    "Downloading %@" : {
+
+    },
+    "Downloading %@…" : {
+
+    },
+    "Downloads the package index again" : {
+
+    },
+    "Duplicate" : {
+
+    },
+    "Duplicate as My Workflow" : {
+
+    },
+    "Duplicate of %@" : {
+
+    },
+    "Duplicate “%@”" : {
+
+    },
+    "Duplicate “%@”…" : {
+
+    },
+    "Duplicate…" : {
+
+    },
+    "Edit" : {
+
+    },
+    "Edit Note…" : {
+
+    },
+    "Edit Table…" : {
+
+    },
+    "Edit the entries in a form" : {
+
+    },
+    "Edit this table in the table editor" : {
+
+    },
+    "Editing" : {
+
+    },
+    "Editor" : {
+
+    },
+    "Editor Keys" : {
+
+    },
+    "Editor font" : {
+
+    },
+    "Editor overscroll" : {
+
+    },
+    "Edit…" : {
+
+    },
+    "Elapsed time" : {
+
+    },
+    "Email" : {
+
+    },
+    "Empty fields are left out of the source. Placement is top, bottom, auto or none." : {
+
+    },
+    "Enable source control" : {
+
+    },
+    "End of presentation" : {
+
+    },
+    "Enter your %@" : {
+
+    },
+    "Entry" : {
+
+    },
+    "Errors and warnings stay in the Issue navigator. Lint hints follow Text Editing settings." : {
+
+    },
+    "Errors in this file" : {
+
+    },
+    "Every change you made to a shortcut in this set is discarded." : {
+
+    },
+    "Every sync overwrites this file with the library’s entries. No other file is changed." : {
+
+    },
+    "Executable" : {
+
+    },
+    "Existing File" : {
+
+    },
+    "Expand" : {
+
+    },
+    "Expand %@" : {
+
+    },
+    "Expanded" : {
+
+    },
+    "Export" : {
+
+    },
+    "Export %@" : {
+
+    },
+    "Export Format" : {
+
+    },
+    "Export as %@" : {
+
+    },
+    "Export format" : {
+
+    },
+    "Export…" : {
+
+    },
+    "F5 and ⌥Esc always request completions." : {
+
+    },
+    "Failed" : {
+
+    },
+    "Family" : {
+
+    },
+    "Fetch" : {
+
+    },
+    "Fetch and refresh server status automatically" : {
+
+    },
+    "Fetches from the remote every few minutes, so ↑ and ↓ stay current" : {
+
+    },
+    "Field name" : {
+
+    },
+    "Fields" : {
+
+    },
+    "File" : {
+
+    },
+    "File & folder access will be controlled by these settings." : {
+
+    },
+    "File extensions" : {
+
+    },
+    "Fill a .bib file from your Zotero library" : {
+
+    },
+    "Fill colour of the selected cells (table.cell(fill: …))" : {
+
+    },
+    "Filter" : {
+
+    },
+    "Filter Bookmarks" : {
+
+    },
+    "Filter Files" : {
+
+    },
+    "Filter shortcuts" : {
+
+    },
+    "Find" : {
+
+    },
+    "Find References" : {
+
+    },
+    "Find navigator detail" : {
+
+    },
+    "Find your user ID and create a key at zotero.org/settings/keys" : {
+
+    },
+    "Fit" : {
+
+    },
+    "Fit Page" : {
+
+    },
+    "Fit Width" : {
+
+    },
+    "Focus Mode" : {
+
+    },
+    "Focused Editor Pane" : {
+
+    },
+    "Fold All Sections" : {
+
+    },
+    "Fold Section" : {
+
+    },
+    "Folding animation" : {
+
+    },
+    "Follow Cursor" : {
+
+    },
+    "Form" : {
+
+    },
+    "Format" : {
+
+    },
+    "Format Document" : {
+
+    },
+    "Format Document uses typstyle, which only writes spaces: with Tabs it turns indentation back into spaces." : {
+
+    },
+    "Format Selection" : {
+
+    },
+    "Format on Save (⌘S)" : {
+
+    },
+    "Formatting" : {
+
+    },
+    "Formatting uses typstyle with the line width from Display and the indent width from Indentation. Autosave never formats." : {
+
+    },
+    "Forward" : {
+
+    },
+    "From DOI, arXiv or ISBN…" : {
+
+    },
+    "Full" : {
+
+    },
+    "General" : {
+
+    },
+    "Get" : {
+
+    },
+    "Get %@" : {
+
+    },
+    "Git" : {
+
+    },
+    "Git settings" : {
+
+    },
+    "Gives AI agents Typo's Typst tools: compile errors, page previews, Typst docs, packages and fonts." : {
+
+    },
+    "Go" : {
+
+    },
+    "Go Back" : {
+
+    },
+    "Go Forward" : {
+
+    },
+    "Go back" : {
+
+    },
+    "Go forward" : {
+
+    },
+    "Go to %@ in %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Go to %1$@ in %2$@"
+          }
+        }
+      }
+    },
+    "Go to Line (⌘L)" : {
+
+    },
+    "Go to Line…" : {
+
+    },
+    "Go to a page" : {
+
+    },
+    "Goal" : {
+
+    },
+    "Good answer" : {
+
+    },
+    "Group Name" : {
+
+    },
+    "Half-done chapter 3" : {
+
+    },
+    "Header" : {
+
+    },
+    "Header row" : {
+
+    },
+    "Heading" : {
+
+    },
+    "Headings whose label is never referenced" : {
+
+    },
+    "Hex" : {
+
+    },
+    "Hex value" : {
+
+    },
+    "Hide .typ" : {
+
+    },
+    "Hide All" : {
+
+    },
+    "Hide Alternates" : {
+
+    },
+    "Hide Details" : {
+
+    },
+    "Hide Inline" : {
+
+    },
+    "Highlight instances of selected symbol" : {
+
+    },
+    "Highlight matching brackets" : {
+
+    },
+    "Highlighting delay" : {
+
+    },
+    "Hints" : {
+
+    },
+    "Hints for missing alternative text, skipped heading levels, tables without a header, and a missing title or language." : {
+
+    },
+    "Homepage" : {
+
+    },
+    "How freely the agent works in this conversation" : {
+
+    },
+    "How to Sign In…" : {
+
+    },
+    "Hue %lld degrees, saturation %lld percent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hue %1$lld degrees, saturation %2$lld percent"
+          }
+        }
+      }
+    },
+    "Hybrid" : {
+
+    },
+    "I moved the introduction into its own file and included it from the main file." : {
+
+    },
+    "Ignoring Case" : {
+
+    },
+    "Import…" : {
+
+    },
+    "In Flow" : {
+
+    },
+    "In progress" : {
+
+    },
+    "Include upstream changes" : {
+
+    },
+    "Included from %@" : {
+
+    },
+    "Incomplete Only" : {
+
+    },
+    "Indent // comments" : {
+
+    },
+    "Indent solo { by" : {
+
+    },
+    "Indent when typing" : {
+
+    },
+    "Indent width" : {
+
+    },
+    "Indent wrapped lines" : {
+
+    },
+    "Indentation" : {
+
+    },
+    "Indentation comes from %@; change it there. Encoding and line endings are kept as the file has them." : {
+
+    },
+    "Indents always" : {
+
+    },
+    "Indents in leading whitespace" : {
+
+    },
+    "Inlay hints" : {
+
+    },
+    "Inline" : {
+
+    },
+    "Insert" : {
+
+    },
+    "Insert Citation…" : {
+
+    },
+    "Insert Table" : {
+
+    },
+    "Insert Table…" : {
+
+    },
+    "Insert citation at cursor" : {
+
+    },
+    "Inserts tab" : {
+
+    },
+    "Inspector" : {
+
+    },
+    "Installed" : {
+
+    },
+    "Installed Packages" : {
+
+    },
+    "Installing %@" : {
+
+    },
+    "Intelligence in Typo & Privacy" : {
+
+    },
+    "Internet Hosted" : {
+
+    },
+    "Interpreter" : {
+
+    },
+    "Invalid Expression" : {
+
+    },
+    "Issue navigator detail" : {
+
+    },
+    "Issue presentation" : {
+
+    },
+    "Issues" : {
+
+    },
+    "It stays on this Mac." : {
+
+    },
+    "Italic" : {
+
+    },
+    "Italic (⌘I): wraps the cells in _…_" : {
+
+    },
+    "Its API key is removed from the Keychain." : {
+
+    },
+    "Its command is removed. The agent itself stays installed." : {
+
+    },
+    "Its label is never referenced" : {
+
+    },
+    "Jump to Definition" : {
+
+    },
+    "Jumps to Definition" : {
+
+    },
+    "Jumps to the section" : {
+
+    },
+    "Keep Both" : {
+
+    },
+    "Keep Editing" : {
+
+    },
+    "Keep Mine" : {
+
+    },
+    "Keep Planning" : {
+
+    },
+    "Keep Theirs" : {
+
+    },
+    "Keep the preview on the main document while another file is open" : {
+
+    },
+    "Key" : {
+
+    },
+    "Label" : {
+
+    },
+    "Large" : {
+
+    },
+    "Layout" : {
+
+    },
+    "Library" : {
+
+    },
+    "Library…" : {
+
+    },
+    "Line %lld" : {
+
+    },
+    "Line %lld: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Line %1$lld: %2$@"
+          }
+        }
+      }
+    },
+    "Line Number" : {
+
+    },
+    "Line Wrapping" : {
+
+    },
+    "Line numbers" : {
+
+    },
+    "Live Typeset" : {
+
+    },
+    "Live preview" : {
+
+    },
+    "Live typeset" : {
+
+    },
+    "Load Collections" : {
+
+    },
+    "Loading Templates…" : {
+
+    },
+    "Loads your own CLAUDE.md, skills, plug-ins, hooks, memory and settings from ~/.claude, as in the terminal. Off, Claude sees only this project's setup and the skills turned on under Skills. Applies to new conversations." : {
+
+    },
+    "Local Packages" : {
+
+    },
+    "Local Revision on Left Side" : {
+
+    },
+    "Local Revision on Right Side" : {
+
+    },
+    "Local Zotero App" : {
+
+    },
+    "Local packages folder" : {
+
+    },
+    "Locally Hosted" : {
+
+    },
+    "Location" : {
+
+    },
+    "Lock Preview" : {
+
+    },
+    "Lock Preview Document" : {
+
+    },
+    "Lock preview" : {
+
+    },
+    "Locked to %@. Unlock to preview the file selected in the sidebar." : {
+
+    },
+    "M" : {
+
+    },
+    "Main document" : {
+
+    },
+    "Make every table in the project match the template." : {
+
+    },
+    "Managed by Zotero" : {
+
+    },
+    "Manage…" : {
+
+    },
+    "Manually" : {
+
+    },
+    "Manually: a file opened by a single click replaces the italic preview tab. Automatically: every opened file gets its own tab." : {
+
+    },
+    "Mark as Complete" : {
+
+    },
+    "Mark as Incomplete" : {
+
+    },
+    "Mark as Resolved" : {
+
+    },
+    "Markdown" : {
+
+    },
+    "Matching Case" : {
+
+    },
+    "Matching Word" : {
+
+    },
+    "Math" : {
+
+    },
+    "May the assistant search the web?" : {
+
+    },
+    "Medium" : {
+
+    },
+    "Merge" : {
+
+    },
+    "Merge Conflict" : {
+
+    },
+    "Merge the selected cells into one (colspan / rowspan)" : {
+
+    },
+    "Merging: resolve the conflicts, then commit." : {
+
+    },
+    "Message" : {
+
+    },
+    "Middle" : {
+
+    },
+    "Mine" : {
+
+    },
+    "Mine (%@)" : {
+
+    },
+    "Minimap" : {
+
+    },
+    "Modal editing in the editor: Esc for Normal mode, i to insert, v for Visual mode, : for w, q and wq. Also in View > Vim Mode." : {
+
+    },
+    "Mode" : {
+
+    },
+    "Model" : {
+
+    },
+    "Model Context Protocol" : {
+
+    },
+    "Model Providers" : {
+
+    },
+    "Model id" : {
+
+    },
+    "Modes" : {
+
+    },
+    "Modified" : {
+
+    },
+    "More" : {
+
+    },
+    "More Fields" : {
+
+    },
+    "More Options" : {
+
+    },
+    "More preview controls" : {
+
+    },
+    "Move Section Down" : {
+
+    },
+    "Move Section Up" : {
+
+    },
+    "Move to Group" : {
+
+    },
+    "Move to Trash" : {
+
+    },
+    "My Agent" : {
+
+    },
+    "My Library" : {
+
+    },
+    "My Model Server" : {
+
+    },
+    "My Workflows" : {
+
+    },
+    "Name" : {
+
+    },
+    "Navigate" : {
+
+    },
+    "Navigation" : {
+
+    },
+    "Navigation and Files" : {
+
+    },
+    "Navigator" : {
+
+    },
+    "Never" : {
+
+    },
+    "New" : {
+
+    },
+    "New Branch" : {
+
+    },
+    "New Branch…" : {
+
+    },
+    "New Conversation" : {
+
+    },
+    "New Entry" : {
+
+    },
+    "New Entry from DOI, arXiv or ISBN…" : {
+
+    },
+    "New Entry…" : {
+
+    },
+    "New File" : {
+
+    },
+    "New File or Folder" : {
+
+    },
+    "New File…" : {
+
+    },
+    "New Folder" : {
+
+    },
+    "New Folder…" : {
+
+    },
+    "New Group from Selection" : {
+
+    },
+    "New Group with Selection" : {
+
+    },
+    "New Project from Template" : {
+
+    },
+    "New Project from Template…" : {
+
+    },
+    "New Project…" : {
+
+    },
+    "New Tab" : {
+
+    },
+    "New Tab…" : {
+
+    },
+    "New Workflow" : {
+
+    },
+    "New file or folder" : {
+
+    },
+    "New name" : {
+
+    },
+    "Next" : {
+
+    },
+    "Next Bookmark" : {
+
+    },
+    "No API key saved. The local Zotero app needs none." : {
+
+    },
+    "No Arguments" : {
+
+    },
+    "No Bibliography" : {
+
+    },
+    "No Bookmarks" : {
+
+    },
+    "No Changes" : {
+
+    },
+    "No Conversations" : {
+
+    },
+    "No Entries" : {
+
+    },
+    "No Entry Selected" : {
+
+    },
+    "No File Selected" : {
+
+    },
+    "No Fill" : {
+
+    },
+    "No Group" : {
+
+    },
+    "No Headings" : {
+
+    },
+    "No History" : {
+
+    },
+    "No Images in This Project" : {
+
+    },
+    "No Issues" : {
+
+    },
+    "No Matches" : {
+
+    },
+    "No Matching %@" : {
+
+    },
+    "No Matching Bookmarks" : {
+
+    },
+    "No Other Text File" : {
+
+    },
+    "No Packages" : {
+
+    },
+    "No Preview" : {
+
+    },
+    "No Recent Projects" : {
+
+    },
+    "No References" : {
+
+    },
+    "No Selection" : {
+
+    },
+    "No Snapshots Yet" : {
+
+    },
+    "No TODOs" : {
+
+    },
+    "No Typst Universe packages are downloaded yet." : {
+
+    },
+    "No Workflows of Your Own" : {
+
+    },
+    "No bibliography entries." : {
+
+    },
+    "No changes" : {
+
+    },
+    "No fonts set with text(font:)." : {
+
+    },
+    "No goal" : {
+
+    },
+    "No headings yet." : {
+
+    },
+    "No other file includes or imports this one." : {
+
+    },
+    "No packages imported." : {
+
+    },
+    "No remote" : {
+
+    },
+    "No skills in ~/.claude/skills." : {
+
+    },
+    "No textual changes" : {
+
+    },
+    "None" : {
+
+    },
+    "Not Configured" : {
+
+    },
+    "Not a Git Repository" : {
+
+    },
+    "Not a valid label name: it won't be written" : {
+
+    },
+    "Not applied" : {
+
+    },
+    "Notes" : {
+
+    },
+    "Nothing is checked, so every change is committed" : {
+
+    },
+    "Nothing of the table shows on a page yet." : {
+
+    },
+    "Numbered List" : {
+
+    },
+    "OK" : {
+
+    },
+    "Off" : {
+
+    },
+    "On" : {
+
+    },
+    "On Save" : {
+
+    },
+    "On Save compiles when the file is saved, which includes autosave." : {
+
+    },
+    "Open Documentation" : {
+
+    },
+    "Open File" : {
+
+    },
+    "Open Intelligence Settings" : {
+
+    },
+    "Open Quickly" : {
+
+    },
+    "Open Quickly…" : {
+
+    },
+    "Open Recent" : {
+
+    },
+    "Open With Default App" : {
+
+    },
+    "Open a Typst file to insert." : {
+
+    },
+    "Open a file in a new tab (⌘T)" : {
+
+    },
+    "Open a file in this pane" : {
+
+    },
+    "Open in New Tab" : {
+
+    },
+    "Open in Typst Documentation" : {
+
+    },
+    "Open the file to see its encoding, line endings and indentation." : {
+
+    },
+    "Open the preview in its own window" : {
+
+    },
+    "Opens Permanent Tab" : {
+
+    },
+    "Open…" : {
+
+    },
+    "Optional" : {
+
+    },
+    "Optional. The key is kept in your Keychain only." : {
+
+    },
+    "Other…" : {
+
+    },
+    "Own line" : {
+
+    },
+    "PDF/A-2b for Archiving…" : {
+
+    },
+    "PDF/A-3b for Archiving…" : {
+
+    },
+    "PDF/UA-1 (Accessible)…" : {
+
+    },
+    "PDF…" : {
+
+    },
+    "PNG Images…" : {
+
+    },
+    "Package" : {
+
+    },
+    "Packages Typst downloads and your local packages appear here." : {
+
+    },
+    "Packages here resolve as @local/name:version, and any other namespace folder works too. Typst's own folder is Library/Application Support/typst/packages in your home folder." : {
+
+    },
+    "Page" : {
+
+    },
+    "Page %lld" : {
+
+    },
+    "Page %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Page %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Page Thumbnails" : {
+
+    },
+    "Partly staged: check to stage the rest" : {
+
+    },
+    "Pause Timer" : {
+
+    },
+    "Pending" : {
+
+    },
+    "Permission Required" : {
+
+    },
+    "Permissions" : {
+
+    },
+    "Permissions Settings…" : {
+
+    },
+    "Pick the font's exact name in the library" : {
+
+    },
+    "Pin Tab" : {
+
+    },
+    "Pin editor tabs" : {
+
+    },
+    "Pinned" : {
+
+    },
+    "Placement" : {
+
+    },
+    "Plan" : {
+
+    },
+    "Plan, %lld of %lld done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Plan, %1$lld of %2$lld done"
+          }
+        }
+      }
+    },
+    "Planning" : {
+
+    },
+    "Port" : {
+
+    },
+    "Prefer settings from .editorconfig files" : {
+
+    },
+    "Prefer to indent using" : {
+
+    },
+    "Prefix" : {
+
+    },
+    "Present the pages full screen" : {
+
+    },
+    "Presenter View" : {
+
+    },
+    "Presenter View – %@" : {
+
+    },
+    "Preview" : {
+
+    },
+    "Preview Follows Cursor" : {
+
+    },
+    "Preview This Document" : {
+
+    },
+    "Preview follows the cursor" : {
+
+    },
+    "Preview – %@" : {
+
+    },
+    "Previous Bookmark" : {
+
+    },
+    "Primary Editor Pane" : {
+
+    },
+    "Print…" : {
+
+    },
+    "Project Archive (ZIP)…" : {
+
+    },
+    "Project Unavailable" : {
+
+    },
+    "Pull" : {
+
+    },
+    "Push" : {
+
+    },
+    "Put back what the last commit has here (Undo takes it back)" : {
+
+    },
+    "Put changes aside and bring them back later" : {
+
+    },
+    "Put the caret in a figure, table, color, label or function call." : {
+
+    },
+    "Put the caret on a label, variable or function and choose Navigate ▸ Find References (⌃⌘R)." : {
+
+    },
+    "Puts every change aside, new files included, and leaves the project as of the last commit." : {
+
+    },
+    "Quick Fixes" : {
+
+    },
+    "Rainbow brackets" : {
+
+    },
+    "Rate this answer; kept on this Mac only" : {
+
+    },
+    "Raw" : {
+
+    },
+    "Re-Indent" : {
+
+    },
+    "Re-Indent (⌃I) applies the bracket depth and these options to the selection or the current line." : {
+
+    },
+    "Re-indent on paste" : {
+
+    },
+    "Read-only key" : {
+
+    },
+    "Reads the library of the Zotero app on this Mac. Zotero must be running, with “Allow other applications on this computer to communicate with Zotero” on in Zotero › Settings › Advanced." : {
+
+    },
+    "Reads your online library. The key is kept in your Keychain; Typo only reads, never uploads." : {
+
+    },
+    "Ready" : {
+
+    },
+    "Ready to code?" : {
+
+    },
+    "Rebuild Index" : {
+
+    },
+    "Rebuild the font index?" : {
+
+    },
+    "Recent Results" : {
+
+    },
+    "Recent projects and window positions are not included." : {
+
+    },
+    "Reference in %@" : {
+
+    },
+    "References" : {
+
+    },
+    "References to a label or bibliography key that does not exist; click to show the first" : {
+
+    },
+    "Reformat code at column" : {
+
+    },
+    "Refresh" : {
+
+    },
+    "Refresh Models" : {
+
+    },
+    "Refresh Models and Test Connection contact the provider; nothing else is sent until you send a message." : {
+
+    },
+    "Refresh local status automatically" : {
+
+    },
+    "Regular Expression" : {
+
+    },
+    "Reject" : {
+
+    },
+    "Rejected" : {
+
+    },
+    "Related Items" : {
+
+    },
+    "Relative" : {
+
+    },
+    "Relative line numbers" : {
+
+    },
+    "Remove" : {
+
+    },
+    "Remove %@" : {
+
+    },
+    "Remove %@?" : {
+
+    },
+    "Remove %lld Bookmarks" : {
+
+    },
+    "Remove Agent…" : {
+
+    },
+    "Remove All" : {
+
+    },
+    "Remove All Bookmarks…" : {
+
+    },
+    "Remove Argument" : {
+
+    },
+    "Remove Bookmark" : {
+
+    },
+    "Remove Field" : {
+
+    },
+    "Remove Key" : {
+
+    },
+    "Remove Shortcut" : {
+
+    },
+    "Remove all bookmarks?" : {
+
+    },
+    "Remove from List" : {
+
+    },
+    "Remove this account" : {
+
+    },
+    "Removes the text" : {
+
+    },
+    "Rename" : {
+
+    },
+    "Rename Conversation" : {
+
+    },
+    "Rename Group" : {
+
+    },
+    "Rename Group…" : {
+
+    },
+    "Rename Symbol…" : {
+
+    },
+    "Rename “%@”" : {
+
+    },
+    "Rename “%@”…" : {
+
+    },
+    "Rename…" : {
+
+    },
+    "Replace" : {
+
+    },
+    "Replace All" : {
+
+    },
+    "Replace Failed" : {
+
+    },
+    "Replace every match in the project" : {
+
+    },
+    "Replace the selected results" : {
+
+    },
+    "Repository" : {
+
+    },
+    "Reset" : {
+
+    },
+    "Reset %@" : {
+
+    },
+    "Reset Settings" : {
+
+    },
+    "Reset Timer" : {
+
+    },
+    "Reset Typo" : {
+
+    },
+    "Reset all settings?" : {
+
+    },
+    "Resets all settings to their default values." : {
+
+    },
+    "Reset…" : {
+
+    },
+    "Resolve in Merge Editor…" : {
+
+    },
+    "Responding" : {
+
+    },
+    "Restore All Changed Files" : {
+
+    },
+    "Restore Default" : {
+
+    },
+    "Restore Defaults" : {
+
+    },
+    "Restore Defaults…" : {
+
+    },
+    "Restore File" : {
+
+    },
+    "Restore open projects" : {
+
+    },
+    "Restore “%@” to the defaults?" : {
+
+    },
+    "Result" : {
+
+    },
+    "Retry" : {
+
+    },
+    "Reveal in Finder" : {
+
+    },
+    "Revert" : {
+
+    },
+    "Revert Changes in This File" : {
+
+    },
+    "Revert This Change" : {
+
+    },
+    "Reverted" : {
+
+    },
+    "Row Above" : {
+
+    },
+    "Row Below" : {
+
+    },
+    "SVG Images…" : {
+
+    },
+    "Same as Click" : {
+
+    },
+    "Sample Text" : {
+
+    },
+    "Save" : {
+
+    },
+    "Saved in Keychain" : {
+
+    },
+    "Scope guides" : {
+
+    },
+    "Search Symbols" : {
+
+    },
+    "Search Templates" : {
+
+    },
+    "Search entries" : {
+
+    },
+    "Search packages" : {
+
+    },
+    "Search queries go to %@." : {
+
+    },
+    "See how your data is managed…" : {
+
+    },
+    "Select All Occurrences" : {
+
+    },
+    "Select Next Occurrence" : {
+
+    },
+    "Select a commit" : {
+
+    },
+    "Select or add a snippet." : {
+
+    },
+    "Select the type of account you would like to add:" : {
+
+    },
+    "Send" : {
+
+    },
+    "Send (Return)" : {
+
+    },
+    "Send to %@?" : {
+
+    },
+    "Server:" : {
+
+    },
+    "Set Up a Model Provider" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Settings Import & Export" : {
+
+    },
+    "Share PDF" : {
+
+    },
+    "Share PDF…" : {
+
+    },
+    "Share the PDF" : {
+
+    },
+    "Shortcut Set" : {
+
+    },
+    "Shortcut for %@" : {
+
+    },
+    "Show" : {
+
+    },
+    "Show %@ Navigator" : {
+
+    },
+    "Show %@ in the Issues navigator" : {
+
+    },
+    "Show All" : {
+
+    },
+    "Show All Fonts" : {
+
+    },
+    "Show Alternates" : {
+
+    },
+    "Show Assistant" : {
+
+    },
+    "Show Changes" : {
+
+    },
+    "Show Details" : {
+
+    },
+    "Show Diff" : {
+
+    },
+    "Show File History" : {
+
+    },
+    "Show Form" : {
+
+    },
+    "Show Git History" : {
+
+    },
+    "Show History" : {
+
+    },
+    "Show Inline" : {
+
+    },
+    "Show Inspector" : {
+
+    },
+    "Show Next Tab" : {
+
+    },
+    "Show Only Incomplete Bookmarks" : {
+
+    },
+    "Show Previous Tab" : {
+
+    },
+    "Show Quick Fixes" : {
+
+    },
+    "Show details for %@" : {
+
+    },
+    "Show each cell's markup in the grid instead of how Typst renders it" : {
+
+    },
+    "Show function signatures while typing" : {
+
+    },
+    "Show in Editor" : {
+
+    },
+    "Show in Finder" : {
+
+    },
+    "Show in Sidebar" : {
+
+    },
+    "Show lint hints" : {
+
+    },
+    "Show or Hide Bottom Area" : {
+
+    },
+    "Show or hide the bottom area (⇧⌘Y)" : {
+
+    },
+    "Show or hide the inspector" : {
+
+    },
+    "Show or hide the preview" : {
+
+    },
+    "Show page thumbnails" : {
+
+    },
+    "Show reformatting guide" : {
+
+    },
+    "Show source control changes" : {
+
+    },
+    "Show the assistant" : {
+
+    },
+    "Show the changes of this conversation" : {
+
+    },
+    "Show the entries as a form or as BibTeX source" : {
+
+    },
+    "Show the include in %@" : {
+
+    },
+    "Show the navigator" : {
+
+    },
+    "Show the pages full screen" : {
+
+    },
+    "Show the shortcut in hover cards" : {
+
+    },
+    "Show these references in the sidebar" : {
+
+    },
+    "Showing the last valid version" : {
+
+    },
+    "Shows Quick Help" : {
+
+    },
+    "Side by Side" : {
+
+    },
+    "Sign In" : {
+
+    },
+    "Sign In to %@" : {
+
+    },
+    "Sign in to your %@ account" : {
+
+    },
+    "Signature %@" : {
+
+    },
+    "Size" : {
+
+    },
+    "Slide %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Slide %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Slides are black – press B" : {
+
+    },
+    "Small" : {
+
+    },
+    "Smaller Text" : {
+
+    },
+    "Snapshots…" : {
+
+    },
+    "Source" : {
+
+    },
+    "Source control navigator" : {
+
+    },
+    "Spaces" : {
+
+    },
+    "Speaker notes" : {
+
+    },
+    "Specify an interpreter if the executable is a script. The interpreter runs the executable as its argument." : {
+
+    },
+    "Split" : {
+
+    },
+    "Split Editor" : {
+
+    },
+    "Split editor" : {
+
+    },
+    "Stage" : {
+
+    },
+    "Stage for the next commit" : {
+
+    },
+    "Stage just this change for the next commit, as it is in the editor now" : {
+
+    },
+    "Staged" : {
+
+    },
+    "Staged for the next commit" : {
+
+    },
+    "Stages files you create, rename or move to the Trash in Typo" : {
+
+    },
+    "Start Presentation" : {
+
+    },
+    "Start Presentation with Presenter View" : {
+
+    },
+    "Start Timer" : {
+
+    },
+    "Starting %@…" : {
+
+    },
+    "Starting Points" : {
+
+    },
+    "Starts a new conversation with the assistant" : {
+
+    },
+    "Starts at the current commit and switches to it. Uncommitted changes come along." : {
+
+    },
+    "Stash" : {
+
+    },
+    "Stash (%lld)" : {
+
+    },
+    "Stash Changes" : {
+
+    },
+    "Stash Changes…" : {
+
+    },
+    "Stashes" : {
+
+    },
+    "Stop" : {
+
+    },
+    "Stop syncing; the file stays as ordinary BibTeX" : {
+
+    },
+    "Stop the answer" : {
+
+    },
+    "Stopped" : {
+
+    },
+    "Stored in the Keychain" : {
+
+    },
+    "Strokes and fills; a custom style stays as written until you pick one" : {
+
+    },
+    "Styles" : {
+
+    },
+    "Suggest completions while typing" : {
+
+    },
+    "Summary" : {
+
+    },
+    "Switch or create a branch" : {
+
+    },
+    "Switch to “%@”" : {
+
+    },
+    "Symbols" : {
+
+    },
+    "Sync Now" : {
+
+    },
+    "Syntax-Aware Indentation" : {
+
+    },
+    "System Monospaced" : {
+
+    },
+    "TODOs" : {
+
+    },
+    "Tab key" : {
+
+    },
+    "Tab width" : {
+
+    },
+    "Tabs" : {
+
+    },
+    "Take Snapshot Now" : {
+
+    },
+    "Template" : {
+
+    },
+    "Templates Unavailable" : {
+
+    },
+    "Templates…" : {
+
+    },
+    "Test Agent" : {
+
+    },
+    "Test Connection" : {
+
+    },
+    "Testing…" : {
+
+    },
+    "Text" : {
+
+    },
+    "The Typst Universe template list could not be loaded." : {
+
+    },
+    "The answer reached the length limit and may be incomplete." : {
+
+    },
+    "The colors below are the %@ variant; switch the appearance above to edit the other." : {
+
+    },
+    "The contents of %@ and your message will be sent to %@ (%@). Files you attach later are sent too." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The contents of %1$@ and your message will be sent to %2$@ (%3$@). Files you attach later are sent too."
+          }
+        }
+      }
+    },
+    "The document has errors; the preview shows the last version that compiled." : {
+
+    },
+    "The figure's label, written as <tab:name>" : {
+
+    },
+    "The first row repeats on every page as the table's header" : {
+
+    },
+    "The folder could not be opened. It may have been moved or deleted." : {
+
+    },
+    "The grid, the typeset table, or both side by side" : {
+
+    },
+    "The gutter compares with the upstream branch, so commits not yet pulled or pushed show too" : {
+
+    },
+    "The key is kept in your Keychain only." : {
+
+    },
+    "The model of this conversation" : {
+
+    },
+    "The model provider and model the table goes to" : {
+
+    },
+    "The package index has not been downloaded yet. Check now to browse the packages of Typst Universe." : {
+
+    },
+    "The sample table did not parse" : {
+
+    },
+    "The set and every change in it are discarded." : {
+
+    },
+    "The table as typeset" : {
+
+    },
+    "The table, its caption and your request will be sent to %@ (%@)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The table, its caption and your request will be sent to %1$@ (%2$@)."
+          }
+        }
+      }
+    },
+    "The workflow moves to the Trash." : {
+
+    },
+    "Theirs" : {
+
+    },
+    "Theirs (%@)" : {
+
+    },
+    "Theme" : {
+
+    },
+    "Thinking: %@" : {
+
+    },
+    "This Table Can’t Be Edited Visually" : {
+
+    },
+    "This build of Typo has no built-in workflows." : {
+
+    },
+    "This build of Typo has no typo-mcp." : {
+
+    },
+    "This cannot be undone." : {
+
+    },
+    "This conversation may:" : {
+
+    },
+    "This deletes the font index cache. Typo rebuilds it on the next launch, which then starts a little slower." : {
+
+    },
+    "This file has no conflict markers, for example because one side deleted it. Close this and use “Keep Mine” or “Keep Theirs” in the file’s context menu." : {
+
+    },
+    "This file has not been committed yet." : {
+
+    },
+    "Thought" : {
+
+    },
+    "Time of day" : {
+
+    },
+    "Tip: Press" : {
+
+    },
+    "Title" : {
+
+    },
+    "Today: %@%@ words" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Today: %1$@%2$@ words"
+          }
+        }
+      }
+    },
+    "Toggle Bookmark" : {
+
+    },
+    "Top" : {
+
+    },
+    "Track versions of this project with git." : {
+
+    },
+    "Trim whitespace-only lines" : {
+
+    },
+    "Try Again" : {
+
+    },
+    "Two Pages" : {
+
+    },
+    "Type" : {
+
+    },
+    "Type the model id" : {
+
+    },
+    "Typesetting…" : {
+
+    },
+    "Typewriter scrolling in Focus Mode" : {
+
+    },
+    "Typo" : {
+
+    },
+    "Typo collects no analytics or usage data." : {
+
+    },
+    "Typo sends nothing anywhere until you set up a model provider or an agent in Settings › Intelligence. You choose which one a conversation uses." : {
+
+    },
+    "Typo uses the value for “Close windows when quitting an application” set in System Settings." : {
+
+    },
+    "Typst" : {
+
+    },
+    "Typst %@ (Typo has %@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Typst %1$@ (Typo has %2$@)"
+          }
+        }
+      }
+    },
+    "Typst %@ or newer" : {
+
+    },
+    "Typst Universe" : {
+
+    },
+    "Typst built-in" : {
+
+    },
+    "Typst reads UTF-8. Other files open with this encoding and are saved back in it unless converted." : {
+
+    },
+    "URL" : {
+
+    },
+    "Unarchive Conversation" : {
+
+    },
+    "Unbalanced braces or duplicate key" : {
+
+    },
+    "Underline" : {
+
+    },
+    "Undo" : {
+
+    },
+    "Undo Apply" : {
+
+    },
+    "Unfold All Sections" : {
+
+    },
+    "Unfold Section" : {
+
+    },
+    "Unified" : {
+
+    },
+    "Universe" : {
+
+    },
+    "Unlimited" : {
+
+    },
+    "Unlocked: selecting a .typ file in the sidebar previews it." : {
+
+    },
+    "Unmerge" : {
+
+    },
+    "Unpin Tab" : {
+
+    },
+    "Unread" : {
+
+    },
+    "Unsaved changes" : {
+
+    },
+    "Unstage" : {
+
+    },
+    "Unstaged" : {
+
+    },
+    "Unstaged and Staged let you stage or unstage single hunks" : {
+
+    },
+    "Unused label" : {
+
+    },
+    "Up to 2 Lines" : {
+
+    },
+    "Up to 3 Lines" : {
+
+    },
+    "Update" : {
+
+    },
+    "Update All" : {
+
+    },
+    "Updates the Changes list when you save and when you come back to Typo" : {
+
+    },
+    "Updating %@" : {
+
+    },
+    "Upload Files…" : {
+
+    },
+    "Use $ARGUMENTS where the text typed after the name goes." : {
+
+    },
+    "Use %@" : {
+
+    },
+    "Use System Setting" : {
+
+    },
+    "Use my Claude Code setup" : {
+
+    },
+    "Use ours for every conflict" : {
+
+    },
+    "Use the Vim shortcut set" : {
+
+    },
+    "Use the theme's color" : {
+
+    },
+    "Use theirs for every conflict" : {
+
+    },
+    "Used for new conversations. Automatic picks the first ready provider, else the on-device model." : {
+
+    },
+    "User %@ · API key saved in the Keychain" : {
+
+    },
+    "User ID" : {
+
+    },
+    "Uses indent_style, indent_size and tab_width from .editorconfig files in the project folder for the files they match." : {
+
+    },
+    "Using Third-Party Models" : {
+
+    },
+    "Version" : {
+
+    },
+    "Version %@" : {
+
+    },
+    "Vertical Alignment" : {
+
+    },
+    "Vertical alignment of the selected columns" : {
+
+    },
+    "View" : {
+
+    },
+    "Vim Mode" : {
+
+    },
+    "Vim mode" : {
+
+    },
+    "Vim: %@" : {
+
+    },
+    "Warnings in this file" : {
+
+    },
+    "Web Access" : {
+
+    },
+    "Welcome to Typo" : {
+
+    },
+    "What it reads goes to %@." : {
+
+    },
+    "What the assistant may do in this conversation" : {
+
+    },
+    "When Editing" : {
+
+    },
+    "When Exporting PDF/UA" : {
+
+    },
+    "When an agent fetches a web page or searches the web." : {
+
+    },
+    "When this is off, Typo refuses files outside the project, and requests to change them follow “Change files”." : {
+
+    },
+    "When this is on, agents that read or write files through Typo may do so in the project folder. For a file anywhere else, Typo asks first, and an agent's request to change, move or delete files outside the project asks even when changes are allowed. Always Allow adds the folder to Allowed Folders." : {
+
+    },
+    "Where jumps, search results, problems, reference results and Quick Open open a file when the split editor is showing." : {
+
+    },
+    "While Typing" : {
+
+    },
+    "Width" : {
+
+    },
+    "Window" : {
+
+    },
+    "With" : {
+
+    },
+    "With ($1 for groups)" : {
+
+    },
+    "With Command" : {
+
+    },
+    "With Option" : {
+
+    },
+    "With Tabs, one level is one tab. Indent width sets the spaces of a level and the formatter's indentation." : {
+
+    },
+    "With double-click" : {
+
+    },
+    "Working" : {
+
+    },
+    "Works with Claude, GPT and Gemini models (also through OpenCode) and with OpenRouter." : {
+
+    },
+    "Works with Claude, GPT, Gemini and other models that call functions. The on-device model can only read outlines." : {
+
+    },
+    "Works with Claude, GPT-4o/5/6 and Gemini models." : {
+
+    },
+    "Wrap lines to editor width" : {
+
+    },
+    "Write down a task you repeat, such as checking your thesis against its template, and start it with /." : {
+
+    },
+    "Writes the chosen sides into the file" : {
+
+    },
+    "Written to your global git configuration (~/.gitconfig), so commits made in Terminal and other apps use them too." : {
+
+    },
+    "Your Name" : {
+
+    },
+    "Your message and the selected text will be sent to %@ (%@)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your message and the selected text will be sent to %1$@ (%2$@)."
+          }
+        }
+      }
+    },
+    "Your recent projects and snippets are kept." : {
+
+    },
+    "Zoom" : {
+
+    },
+    "Zoom In" : {
+
+    },
+    "Zoom Out" : {
+
+    },
+    "Zoom relative to the page's natural size" : {
+
+    },
+    "Zotero" : {
+
+    },
+    "Zotero Account" : {
+
+    },
+    "[what to type after the name]" : {
+
+    },
+    "`${1:name}` is a tab stop with a default, `${1}` again mirrors it, `${}` and `${name}` are stops after the numbered ones, `${0}` is where the caret ends. A `$` without a brace is literal." : {
+
+    },
+    "agent --acp" : {
+
+    },
+    "and %lld more" : {
+
+    },
+    "as %@" : {
+
+    },
+    "cargo check" : {
+
+    },
+    "check-my-tables" : {
+
+    },
+    "draft/chapter-2" : {
+
+    },
+    "empty" : {
+
+    },
+    "git@github.com:user/thesis.git" : {
+
+    },
+    "https://example.com" : {
+
+    },
+    "https://example.com/v1" : {
+
+    },
+    "https://…/v1" : {
+
+    },
+    "main" : {
+
+    },
+    "or" : {
+
+    },
+    "partly" : {
+
+    },
+    "refs.bib" : {
+
+    },
+    "refs.bib (new file)" : {
+
+    },
+    "surname2024" : {
+
+    },
+    "tab:name" : {
+
+    },
+    "to navigate & add rows" : {
+
+    },
+    "vs. Last Commit" : {
+
+    },
+    "words" : {
+
+    },
+    "you@example.com" : {
+
+    },
+    "… %lld unchanged lines" : {
+
+    },
+    "↑%lld ↓%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "↑%1$lld ↓%2$lld"
+          }
+        }
+      }
+    },
+    "−" : {
+
+    },
+    "−%lld" : {
+
+    },
+    "⌘-click a row does the same; several fonts become a fallback list" : {
+
+    },
+    "⌘/⇧-click selects several" : {
+
+    },
+    "✓ %@" : {
+
+    }
+  },
+  "version" : "1.0"
 }
