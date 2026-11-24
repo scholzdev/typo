@@ -9,14 +9,14 @@ import TypoTestSupport
 @testable import TypoAssistant
 @testable import TypstEngine
 
-private final class Collected<T: Sendable>: Sendable {
+final class Collected<T: Sendable>: Sendable {
     let items = Mutex<[T]>([])
     func add(_ x: T) { items.withLock { $0.append(x) } }
     var all: [T] { items.withLock { $0 } }
 }
 
 /// Waits until `condition` holds, for up to five seconds.
-private func eventually(isolation: isolated (any Actor)? = #isolation, _ condition: () async -> Bool) async -> Bool {
+func eventually(isolation: isolated (any Actor)? = #isolation, _ condition: () async -> Bool) async -> Bool {
     for _ in 0..<500 {
         if await condition() { return true }
         try? await Task.sleep(for: .milliseconds(10))
@@ -25,7 +25,7 @@ private func eventually(isolation: isolated (any Actor)? = #isolation, _ conditi
 }
 
 /// An agent on the other ends of two pipes: an `ACPConnection` whose handler answers like an agent.
-private final class FakeAgent: @unchecked Sendable {
+final class FakeAgent: @unchecked Sendable {
     let toAgent = Pipe(), toClient = Pipe()
     let peer: ACPConnection
     let peerOutput: ACPPipeWriter

@@ -92,6 +92,9 @@ extension FocusedValues {
     private(set) var agentOptions: [UUID: ACPSessionOptions] = [:]
     /// The mode picked before the first message.
     var draftAgentMode: String?
+    /// The id the next new conversation gets; its agent's session is started under it before the first message.
+    private var draftID = UUID()
+    let warmup = ACPWarmup()
     /// Groups, order, unread and disclosure state of the sidebar list.
     var layout: AssistantConversationLayout { didSet { if layout != oldValue { layoutStore.save(layout) } } }
     private let layoutStore: AssistantConversationLayoutStore
@@ -131,7 +134,7 @@ extension FocusedValues {
     deinit { agents.closeAll() }
 
     /// Stops this window's agents; the window closes.
-    func closeAgents() { agents.closeAll() }
+    func closeAgents() { warmup.cancel(); agents.closeAll() }
 
     var current: AssistantConversation? { conversations.first { $0.id == currentID } }
     /// Whether the shown conversation's turn runs (or a message is being prepared).
@@ -240,7 +243,7 @@ extension FocusedValues {
     // MARK: Conversations
 
     func newConversation() {
-        agentCommands = []
+        if currentID != nil { agentCommands = [] }    // a warm new conversation keeps its agent's
         currentID = nil
         draftAgentMode = nil
         draft = ""
@@ -283,19 +286,25 @@ extension FocusedValues {
 
     /// Changes the provider and model: of the open conversation, or for the next one.
     func choose(_ p: AssistantProvider, model: String) {
-        agentCommands = []
+        if provider?.id != p.id { agentCommands = [] }
         if let id = currentID {
             if current?.providerID != p.id { agents.close(id.uuidString); change(id) { $0.agentMode = nil; $0.agentSession = nil } }
             change(id) { $0.providerID = p.id; $0.model = model }
             if p.isAgent, !model.isEmpty { Task { await agents.running(id.uuidString)?.select(model: model) } }
         } else {
             draftProviderID = p.id; draftModel = model
+            if p.isAgent, !model.isEmpty { let key = draftID.uuidString; Task { await agents.running(key)?.select(model: model) } }
         }
     }
 
     /// The mode menu: the conversation's agent switches at once when it runs.
     func setAgentMode(_ mode: String?) {
-        guard let id = currentID else { draftAgentMode = mode; return }
+        guard let id = currentID else {
+            draftAgentMode = mode
+            let key = draftID.uuidString, policy = permissions.policy(.changeFiles)
+            Task { let a = await agents.running(key); if let mode { await a?.select(mode: mode) } else { await a?.apply(policy) } }
+            return
+        }
         change(id) { $0.agentMode = mode }
         if let mode { Task { await agents.running(id.uuidString)?.select(mode: mode) } } else { applyAgentMode(id) }
     }
@@ -376,6 +385,9 @@ extension FocusedValues {
 
     private func start(provider: AssistantProvider, model: String, title: String) -> UUID {
         var c = AssistantConversation(providerID: provider.id, model: model)
+        if !provider.isAgent { agents.close(draftID.uuidString) }    // a warm agent the conversation won't use
+        c.id = draftID    // the session warmed up for it
+        draftID = UUID()
         c.permissions = draftPermissions
         c.agentMode = draftAgentMode
         draftPermissions = nil
@@ -545,7 +557,7 @@ extension FocusedValues {
         let resume = conversations.first { $0.id == id }?.agentSession
         let claude = p.presetID == "acp-claude"
         return ACPClient(provider: p, sessions: agents, attachments: attachments.map(project.url(for:)) + externalAttachments, changeFiles: permissions.policy(.changeFiles),
-                         mode: current?.agentMode) { [weak self] in
+                         mode: agentMode) { [weak self] in
             // Only the Claude Code adapter reads plugin folders from session/new; the skills are assembled when the agent starts.
             let meta = claude ? ACPAgent.claudeCodeMeta(plugins: SkillStore.agentPlugins()) : nil
             let agent = try await ACPAgent.launch(command: command, cwd: root, host: self, mcp: mcp, meta: meta, resume: resume).agent
@@ -558,6 +570,35 @@ extension FocusedValues {
     private func remember(agentSession: String, in id: UUID) {
         // Saved with the turn's end, not with the half-streamed answer.
         if conversations.first(where: { $0.id == id })?.agentSession != agentSession { change(id, save: false) { $0.agentSession = agentSession } }
+    }
+
+    // MARK: Warm-up
+
+    /// What the warm-up starts: the agent of a new conversation, once the user agreed to talk to it. A conversation
+    /// with history waits for its first message, whose session needs the recap.
+    var warmTarget: String? {
+        guard currentID == nil, let p = provider, p.isAgent, providers.isReady(p), !providers.needsConsent(p) else { return nil }
+        return "\(draftID) \(p.id) \(p.command ?? "")"
+    }
+
+    /// True while the new conversation's agent starts; its menus show what it offered last, disabled.
+    var agentStarting: Bool { currentID == nil && provider?.isAgent == true && warmup.state == .starting }
+
+    /// Starts the new conversation's agent, or stops it when the conversation moved to a model provider.
+    func warmUp() {
+        guard currentID == nil else { return }
+        let key = draftID.uuidString
+        // The same client and start as a turn's, so the first message finds this session; a new conversation has no
+        // stored session to resume.
+        guard let target = warmTarget, let p = provider, let agentClient = client(for: p, in: draftID) as? ACPClient else { warmup.cancel(); agents.close(key); return }
+        let model = model
+        let started = warmup.warm(target) { [weak self] in
+            let agent = try await agentClient.warm(session: key, model: model)
+            guard let self, provider?.id == p.id else { return }    // another agent was picked meanwhile
+            agentOptions[p.id] = agent.options
+            agentCommands = agent.commands
+        }
+        if !started, warmup.state == .ready { Task { if let a = await agents.running(key), provider?.id == p.id { agentCommands = a.commands } } }
     }
 
     private func request(_ c: AssistantConversation, provider: AssistantProvider, tools: [ClientTool] = []) async throws -> AssistantRequest {

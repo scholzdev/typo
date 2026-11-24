@@ -130,6 +130,8 @@ public final class ACPAgent: Sendable {
         var resumed = false
         /// The host's edit steps run one after another, so a call's end never overtakes its start.
         var hostWork: Task<Void, Never>?
+        /// The slash commands the agent offered last.
+        var commands: [ACPCommand] = []
 
         mutating func send(_ steps: [ACPTurn.EditStep], to host: ACPHostRef) {
             for step in steps {
@@ -163,6 +165,10 @@ public final class ACPAgent: Sendable {
     /// The agent's id of the session, which a later `launch(resume:)` reattaches.
     public var sessionID: String { state.withLock { $0.sessionID } }
     var resumed: Bool { state.withLock { $0.resumed } }
+
+    /// The session's modes and models and the agent's commands, for a window that shows them after the updates came.
+    public var options: ACPSessionOptions { state.withLock { $0.options } }
+    public var commands: [ACPCommand] { state.withLock { $0.commands } }
 
     /// Starts the agent of `command` in `cwd` and opens a session; returns it with the agent's name and version.
     /// `mcp`: the path of the bundled typo-mcp, which the session gets as an MCP server for `cwd`.
@@ -349,6 +355,7 @@ public final class ACPAgent: Sendable {
         // Arrives right after session/new, outside any turn, so it can't go through the turn below.
         if u["sessionUpdate"]?.string == "available_commands_update" {
             let commands = ACPCommand.list(u["availableCommands"])
+            state.withLock { $0.commands = commands }
             Task { @MainActor [host] in host.value?.commandsChanged(commands) }
             return
         }
@@ -543,6 +550,17 @@ public struct ACPClient: AssistantClient {
     }
 
     public func models() async throws -> [String] { [] }
+
+    /// Starts the agent of `session` before its first prompt, in the conversation's mode and model, without prompting;
+    /// the first turn then finds it running.
+    public func warm(session: String, model: String) async throws -> ACPAgent {
+        guard let sessions else { throw AssistantError.agent("Agents answer in the assistant panel only.") }
+        let agent = try await sessions.agent(for: session, command: provider.command ?? "", start: start).agent
+        try Task.checkCancellation()
+        if let mode { await agent.select(mode: mode) } else if let changeFiles { await agent.apply(changeFiles) }
+        if !model.isEmpty { await agent.select(model: model) }
+        return agent
+    }
 }
 
 /// How the agent's file access maps onto the project.
