@@ -11,6 +11,7 @@ extension SettingsKey {
 /// Touying and Polylux notes are shown and jump to their call in the source.
 struct NotesStrip: View {
     let project: Project
+    var editorBottom: BottomAreaModel?
     private let providers = AssistantProviderStore.shared
     @Environment(\.openSettings) private var openSettings
     @AppStorage(SettingsKey.notesStripHeight) private var storedHeight = 110.0
@@ -27,7 +28,9 @@ struct NotesStrip: View {
 
     private var page: Int { min(max(preview.visiblePage, 0), max(preview.pages.count - 1, 0)) }
     private var slideNotes: [PresenterNote] { notes.filter { $0.pages.contains(page) } }
-    private var height: Double { min(max(storedHeight, Self.minHeight), Self.maxHeight) }
+    /// Beside an open bottom area, the strip shares its top edge, and dragging either one resizes both.
+    private var linked: BottomAreaModel? { editorBottom.flatMap { $0.isShown && $0.insetHeight > 0 ? $0 : nil } }
+    private var height: Double { linked.map { Double($0.insetHeight) } ?? min(max(storedHeight, Self.minHeight), Self.maxHeight) }
 
     private struct Refresh: Equatable { let hashes: [UInt128]; let revision: Int; let written: Int }
 
@@ -59,11 +62,20 @@ struct NotesStrip: View {
     private var resize: some Gesture {
         DragGesture(minimumDistance: 1, coordinateSpace: .global)
             .onChanged { v in
-                let start = startHeight ?? height
-                startHeight = start
-                storedHeight = min(max(start - v.translation.height, Self.minHeight), Self.maxHeight)
+                if let m = linked {
+                    let start = startHeight ?? Double(m.clamped)
+                    startHeight = start
+                    m.height = start - v.translation.height
+                } else {
+                    let start = startHeight ?? height
+                    startHeight = start
+                    storedHeight = min(max(start - v.translation.height, Self.minHeight), Self.maxHeight)
+                }
             }
-            .onEnded { _ in startHeight = nil }
+            .onEnded { _ in
+                startHeight = nil
+                if let m = linked { m.height = m.clamped; m.persistHeight() }
+            }
     }
 
     // MARK: header

@@ -14,6 +14,8 @@ extension SettingsKey {
     var height = UserDefaults.standard.object(forKey: SettingsKey.bottomAreaHeight) as? Double ?? 170
     /// The editor column's height, for the 75 % clamp.
     var available: CGFloat = 0
+    /// The editor's whole bottom inset (format bar and this area), so the notes strip beside it can match its top edge.
+    var insetHeight: CGFloat = 0
 
     var clamped: CGFloat { min(max(height, 120), max(available * 0.75, 120)) }
     func persistHeight() { UserDefaults.standard.set(height, forKey: SettingsKey.bottomAreaHeight) }

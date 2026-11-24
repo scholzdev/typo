@@ -52,7 +52,7 @@ struct ProjectView: View {
                                .allowsHitTesting(assistant.mode != .assistant)
                            if assistant.mode == .assistant { AssistantChatView(model: assistant) }
                        },
-                       trailing: PreviewPane(project: project, popOut: popOut))
+                       trailing: PreviewPane(project: project, popOut: popOut, editorBottom: layout.bottom))
             .inspector(isPresented: Binding(get: { layout.showInspector && layout.inspectorFits && !layout.focus },
                                             set: { if !layout.focus, layout.inspectorFits { layout.showInspector = $0 } })) {
                 InspectorView(project: project, sidebar: sidebar, actions: actions, tables: tables, browseFonts: { layout.library = .fonts })
@@ -227,6 +227,7 @@ struct EditorPane: View {
                 if showsBar { bottomBar }
                 if layout.bottom.isShown { BottomArea(project: project, model: layout.bottom) }
             }
+            .onGeometryChange(for: CGFloat.self, of: \.size.height) { layout.bottom.insetHeight = $0 }
         }
         .onGeometryChange(for: CGFloat.self, of: \.size.height) { layout.bottom.available = $0 }
         .onChange(of: project.selectedFile) { old, new in layout.firstFileChanged(from: old, to: new); sidebar.quickLook = nil }

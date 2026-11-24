@@ -154,11 +154,13 @@ struct PreviewPane: View {
     let project: Project
     /// Moves the preview to its own window or back; the caller owns the window environment.
     let popOut: () -> Void
+    /// The editor's bottom area beside the preview in the project window; the notes strip matches its height.
+    var editorBottom: BottomAreaModel?
 
     var body: some View {
         VStack(spacing: 0) {
             PreviewView(project: project).safeAreaInset(edge: .top, spacing: 0) { PreviewToolbar(project: project, popOut: popOut) }
-            if project.preview.notesShown { NotesStrip(project: project) }
+            if project.preview.notesShown { NotesStrip(project: project, editorBottom: editorBottom) }
         }
         .task { project.detectPresenterContent() }
     }

@@ -8,6 +8,9 @@ struct PreviewView: View {
     private var preview: PreviewModel { project.preview }
     @State private var position = ScrollPosition()
     @State private var visible = CGRect.zero        // visible rect in scroll content coordinates
+    /// The page a thumbnail or Go to Page asked for. It stays the current page while it is on screen, so the last
+    /// page counts as current even when the scroll view cannot bring it to the top.
+    @State private var jumped: Int?
 
     private static let inset = PreviewMath.pageInset      // LazyVStack padding and page spacing
 
@@ -49,6 +52,7 @@ struct PreviewView: View {
             .onChange(of: preview.pageRequest.serial) { scrollToPage(preview.pageRequest.page, fit: fit) }
             .onChange(of: fit, initial: true) { preview.fitWidth = fit }
             .onChange(of: geo.size, initial: true) { preview.viewport = geo.size }
+            .onScrollPhaseChange { _, phase in if phase == .interacting { jumped = nil } }   // the user's own scroll ends the jump
             .onChange(of: visible) { updateVisiblePage(fit: fit) }
             .onChange(of: preview.pages.count) { updateVisiblePage(fit: fit) }
         }
@@ -71,11 +75,16 @@ struct PreviewView: View {
     private func scrollToPage(_ page: Int, fit: CGFloat) {
         let f = frames(fit: fit)
         guard f.indices.contains(page) else { return }
+        jumped = page
+        preview.visiblePage = page
         position.scrollTo(y: max(0, f[page].minY - Self.inset))
     }
 
     private func updateVisiblePage(fit: CGFloat) {
-        guard let p = PreviewMath.mostVisiblePage(frames: frames(fit: fit), visible: visible), p != preview.visiblePage else { return }
+        let f = frames(fit: fit)
+        if let j = jumped, f.indices.contains(j), f[j].intersects(visible) { return }
+        jumped = nil
+        guard let p = PreviewMath.mostVisiblePage(frames: f, visible: visible), p != preview.visiblePage else { return }
         preview.visiblePage = p
     }
 }
