@@ -41,6 +41,7 @@ struct AssistantChatView: View {
             }
         }
         .background(Color(nsColor: .textBackgroundColor))
+        .task(id: model.warmTarget) { model.warmUp() }
     }
 
     private var conversation: some View {
@@ -468,11 +469,14 @@ struct AssistantPromptBox: View {
             if let p = model.provider {
                 if p.isAgent, let models = model.shownAgentOptions?.models, !models.choices.isEmpty {
                     let byDefault = models.choices.first { $0.id == models.current }?.name
-                    Toggle(byDefault.map { "Default (\($0))" } ?? "Default", isOn: Binding(get: { model.model.isEmpty }, set: { _ in model.choose(p, model: "") }))
-                    Divider()
-                    ForEach(models.choices) { c in
-                        Toggle(c.name, isOn: Binding(get: { model.model == c.id }, set: { _ in model.choose(p, model: c.id) }))
+                    Group {
+                        Toggle(byDefault.map { "Default (\($0))" } ?? "Default", isOn: Binding(get: { model.model.isEmpty }, set: { _ in model.choose(p, model: "") }))
+                        Divider()
+                        ForEach(models.choices) { c in
+                            Toggle(c.name, isOn: Binding(get: { model.model == c.id }, set: { _ in model.choose(p, model: c.id) }))
+                        }
                     }
+                    .disabled(model.agentStarting)
                     Divider()
                 } else if !p.isAgent, !p.isOnDevice, case let ms = models(of: p), ms.count > 1 {
                     ForEach(ms, id: \.self) { m in Toggle(m, isOn: Binding(get: { model.model == m }, set: { _ in model.choose(p, model: m) })) }
@@ -521,8 +525,14 @@ struct AssistantPromptBox: View {
                 menuLabel(name.localizedCaseInsensitiveContains("mode") ? name : name + " Mode")
             }
             .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
-            .accessibilityLabel("Mode").help("How freely the agent works in this conversation")
+            .accessibilityLabel("Mode").help(model.agentStarting ? "Starting \(providerName)…" : "How freely the agent works in this conversation")
             .popover(isPresented: $showsModes, arrowEdge: .top) { AssistantModesAbout(modes: modes.choices) }
+            .disabled(model.agentStarting)
+        } else if model.agentStarting {
+            // Before the agent first answered: the menu's place, so nothing moves when it arrives.
+            Menu {} label: { menuLabel("Mode") }
+                .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize().disabled(true)
+                .accessibilityLabel("Mode").help("Starting \(providerName)…")
         }
     }
 
