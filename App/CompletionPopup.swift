@@ -6,6 +6,8 @@ import TypstEngine
 /// and every key. It never takes focus; the editor's delegate forwards the navigation keys.
 @MainActor final class CompletionPopup: NSObject, NSTableViewDataSource, NSTableViewDelegate {
     var onPick: ((CompletionItem) -> Void)?
+    /// The rendered equation a label points at, shown in place of its flat text.
+    var labelEquation: ((String) async -> NSImage?)?
     private(set) var items: [CompletionItem] = []
     var isVisible: Bool { panel.isVisible }
     var selected: CompletionItem? { items.indices.contains(table.selectedRow) ? items[table.selectedRow] : nil }
@@ -15,6 +17,8 @@ import TypstEngine
     private let panel = GlassChildPanel(cornerRadius: 12)
     private let table = NSTableView()
     private let detail = NSTextField(wrappingLabelWithString: "")
+    private let equation = NSImageView()
+    private var equationTask: Task<Void, Never>?
     private var typed = ""                          // what the user typed into the replaced range: its matches are bold
 
     override init() {
@@ -44,8 +48,12 @@ import TypstEngine
         detail.maximumNumberOfLines = 2
         detail.lineBreakMode = .byTruncatingTail
         detail.translatesAutoresizingMaskIntoConstraints = false
+        equation.imageScaling = .scaleProportionallyDown
+        equation.imageAlignment = .alignLeft
+        equation.translatesAutoresizingMaskIntoConstraints = false
         effect.addSubview(rule)
         effect.addSubview(detail)
+        effect.addSubview(equation)
         NSLayoutConstraint.activate([
             rule.leadingAnchor.constraint(equalTo: effect.leadingAnchor),
             rule.trailingAnchor.constraint(equalTo: effect.trailingAnchor),
@@ -53,6 +61,10 @@ import TypstEngine
             detail.leadingAnchor.constraint(equalTo: effect.leadingAnchor, constant: 10),
             detail.trailingAnchor.constraint(equalTo: effect.trailingAnchor, constant: -10),
             detail.topAnchor.constraint(equalTo: rule.bottomAnchor, constant: 4),
+            equation.leadingAnchor.constraint(equalTo: detail.leadingAnchor),
+            equation.trailingAnchor.constraint(equalTo: detail.trailingAnchor),
+            equation.topAnchor.constraint(equalTo: rule.bottomAnchor, constant: 4),
+            equation.bottomAnchor.constraint(equalTo: effect.bottomAnchor, constant: -4),
             scroll.leadingAnchor.constraint(equalTo: effect.leadingAnchor, constant: Self.inset),
             scroll.trailingAnchor.constraint(equalTo: effect.trailingAnchor, constant: -Self.inset),
             scroll.topAnchor.constraint(equalTo: effect.topAnchor, constant: Self.inset),
@@ -111,8 +123,17 @@ import TypstEngine
 
     /// The area under the list: the first sentence of the selected item's docs, or a label's content ("P = NP").
     private func showDetail() {
+        equationTask?.cancel()
+        equation.image = nil
+        detail.isHidden = false
         guard let item = selected else { return detail.stringValue = "" }
         detail.stringValue = (item.kind == .label ? item.detail : item.summary) ?? ""
+        guard item.kind == .label, let labelEquation else { return }
+        equationTask = Task { [weak self] in
+            guard let image = await labelEquation(item.label), !Task.isCancelled, let self, self.selected == item else { return }
+            self.equation.image = image
+            self.detail.isHidden = true
+        }
     }
 
     var pageSize: Int { Self.maxRows - 1 }

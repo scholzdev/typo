@@ -147,6 +147,8 @@ public struct FileNode: Identifiable, Sendable, Equatable {
     /// No sync before this: Zotero asked to back off (Retry-After, Backoff).
     @ObservationIgnored var zoteroNotBefore: Date?
     private var result: CompileResult?                       // latest delivered, never older than the previous one
+    /// Counts the compiles shown; a view of what the source says (not only what the pages look like) refreshes on it.
+    public private(set) var compileRevision = 0
     private var lastGood: CompileResult?                     // latest result with a document: what the preview and the outline show
     private var lint: (seq: Seq, hints: [Diagnostic])?       // lint hints of the texts as of `seq`; see runLint()
     @ObservationIgnored private var lintTask: Task<Void, Never>?
@@ -463,6 +465,7 @@ public struct FileNode: Identifiable, Sendable, Equatable {
             let previousMain = result?.main
             guard r.serial >= (result?.serial ?? 0) else { return }     // seq alone cannot order the compiles around a main switch
             result = r
+            compileRevision += 1
             if r.snapshot.pageCount > 0 { lastGood = r; countWords(r.snapshot) }
             if let g = lastGood, g.seq >= staleSince { staleRoots = [] }     // the outline is the older of the two, so it decides
             trimLog()
@@ -588,6 +591,27 @@ public struct FileNode: Identifiable, Sendable, Equatable {
         }
         guard let range, tooltip != nil || !hits.isEmpty || equation != nil else { return nil }
         return HoverInfo(range: range, diagnostics: hits, tooltip: tooltip, equation: equation)
+    }
+
+    /// The compiled image of the equation labelled `<name>` in an open file, for the completion list's detail:
+    /// the label's flat text loses fractions and scripts. Nil when the label is not on an equation.
+    public func labelEquation(_ name: String, pixelsPerPoint: Float) async -> EquationImage? {
+        let tag = "<\(name)>"
+        for (file, buffer) in buffers {
+            let text = buffer.storage.string as NSString
+            var at = text.range(of: tag)
+            while at.location != NSNotFound {
+                var i = at.location
+                while i > 0, [0x20, 0x09].contains(text.character(at: i - 1)) { i -= 1 }
+                if i > 0, text.character(at: i - 1) == 0x24 {    // `$`: the label follows an equation
+                    let answer = await ask { reply in .hover(HoverRequest(file: file, cursor: i - 1, pixelsPerPoint: pixelsPerPoint, reply: reply)) }
+                    if let e = answer?.equation { return EquationImage(image: e.image, size: e.size) }
+                }
+                let next = NSMaxRange(at)
+                at = text.range(of: tag, range: NSRange(location: next, length: text.length - next))
+            }
+        }
+        return nil
     }
 
     /// Reports the caret of `file` (the selected one) after a selection change with length 0. The reason

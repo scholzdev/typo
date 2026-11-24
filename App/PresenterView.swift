@@ -27,8 +27,8 @@ struct PresenterWindow: View {
         .onChange(of: session?.ended == true) { _, ended in if ended { dismissWindow(value: id) } }
         .task(id: session.map { $0.project.preview.pages.map(\.hash) }) {
             guard let session else { return }
-            let notes = await session.project.speakerNotes()
-            if !Task.isCancelled { session.notes = notes }
+            let notes = await session.project.presenterNotes()
+            if !Task.isCancelled { session.notes = PresenterNotes.texts(notes) }
         }
     }
 }

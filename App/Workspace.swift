@@ -156,7 +156,11 @@ struct PreviewPane: View {
     let popOut: () -> Void
 
     var body: some View {
-        PreviewView(project: project).safeAreaInset(edge: .top, spacing: 0) { PreviewToolbar(project: project, popOut: popOut) }
+        VStack(spacing: 0) {
+            PreviewView(project: project).safeAreaInset(edge: .top, spacing: 0) { PreviewToolbar(project: project, popOut: popOut) }
+            if project.preview.notesShown { NotesStrip(project: project) }
+        }
+        .task { project.detectPresenterContent() }
     }
 }
 
@@ -219,6 +223,9 @@ struct PreviewToolbar: View {
             ClusterToggle(title: "Page Thumbnails", symbol: "sidebar.squares.left", isOn: Bindable(preview).showsThumbnails)
                 .labelStyle(.iconOnly)
                 .help("Show page thumbnails")
+            ClusterToggle(title: "Presenter Notes", symbol: "note.text", isOn: Binding(get: { preview.notesShown }, set: { preview.showsNotes = $0 }))
+                .labelStyle(.iconOnly)
+                .help("Show the notes of the slide in view")
             Button { pageField = "\(page)"; pagePopover = true } label: { Text("Page \(page) of \(preview.pages.count)").monospacedDigit().fixedSize() }
                 .disabled(preview.pages.isEmpty)
                 .help("Go to a page")

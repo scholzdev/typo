@@ -160,7 +160,7 @@ public final class WorldHandle: @unchecked Sendable {
 
     /// Resolves against `shown`, the document the user clicked on, and the world's current text.
     /// Nil target = nothing there (or a package file). The result's file is project-relative.
-    func jumpFromClick(shown: Snapshot, page: Int, point: CGPoint) -> JumpTarget? {
+    public func jumpFromClick(shown: Snapshot, page: Int, point: CGPoint) -> JumpTarget? {
         guard let j = tb_world_jump_from_click(raw, shown.handle,
                                                TbPosition(page: UInt32(page), x_pt: Float(point.x), y_pt: Float(point.y))) else { return nil }
         defer { tb_jump_free(j) }

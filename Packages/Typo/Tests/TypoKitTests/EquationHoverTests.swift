@@ -47,6 +47,18 @@ import TypoTestSupport
         #expect(e.size.width > 20 && e.size.height > 10)
     }
 
+    @Test func labelledEquationRendersForCompletion() async throws {
+        let text = "$ sum_(k=1)^n k = (n (n + 1)) / 2 $ <gauss>\n= Intro <intro>\n"
+        let (p, _) = try await TestEnv.project(files: ["main.typ": text])
+        _ = try await p.open(Self.main)
+        _ = await p.settle()
+        let e = try #require(await p.labelEquation("gauss", pixelsPerPoint: 2))
+        Self.save(e, "label")
+        #expect(e.size.width > 40 && e.size.height > 10, "\(e.size)")
+        #expect(await p.labelEquation("intro", pixelsPerPoint: 2) == nil)
+        #expect(await p.labelEquation("missing", pixelsPerPoint: 2) == nil)
+    }
+
     @Test func equationHoverHasNoSymbolTooltip() async throws {
         let (info, _, _) = try await Self.hover("$ integral_0^1 x^2 dif x = 1/3 $\n", "integral", shift: 2)
         let i = try #require(info)

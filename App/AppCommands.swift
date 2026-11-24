@@ -167,7 +167,10 @@ struct AppCommand: Identifiable {
              AppCommand(menu: "Format", title: "Format Selection", systemImage: "text.line.first.and.arrowtriangle.forward", isEnabled: editor != nil) { editor?.formatCode(selectionOnly: true) },
              AppCommand(menu: "Format", title: "Re-Indent", systemImage: "increase.indent", shortcut: KeyboardShortcut("i", modifiers: [.control]), isEnabled: editor?.editor != nil,
                         help: "Indents the selected lines, or the current line, by bracket depth.") { editor?.editor?.reindent() }],
-            [AppCommand(menu: "Format", title: "Insert Table…", systemImage: "tablecells", isEnabled: !(tables == nil || project?.selectedBuffer == nil)) { tables?.insertPresented = true },
+            [AppCommand(menu: "Format", title: "Add Presenter Note", systemImage: "note.text", shortcut: KeyboardShortcut("p", modifiers: [.command, .option]),
+                        isEnabled: project?.selectedBuffer?.isTypst == true && editor?.editor != nil,
+                        help: "Adds an empty note for the speaker after the caret's line and puts the caret in it.") { editor?.editor?.addPresenterNote() },
+             AppCommand(menu: "Format", title: "Insert Table…", systemImage: "tablecells", isEnabled: !(tables == nil || project?.selectedBuffer == nil)) { tables?.insertPresented = true },
              AppCommand(menu: "Format", title: "Edit Table…", systemImage: "tablecells.badge.ellipsis", isEnabled: tables?.caretInTable == true) { tables?.beginEdit() }],
             [AppCommand(menu: "Format", title: "Move Section Up", systemImage: "arrow.up.square", shortcut: KeyboardShortcut(.upArrow, modifiers: [.control, .option]), isEnabled: project?.selectedBuffer?.isTypst == true && editor != nil) {
                  if let e = editor?.editor { e.moveSectionAtCaret(up: true) } else { NSSound.beep() }
@@ -188,6 +191,10 @@ struct AppCommand: Identifiable {
              AppCommand(menu: "View", title: "Two Pages", systemImage: "book.pages", shortcut: KeyboardShortcut("8"), isEnabled: project != nil, isOn: project.map { $0.preview.fit == .twoPages }) { project?.preview.fit = .twoPages }],
             [AppCommand(menu: "View", title: "Page Thumbnails", systemImage: "sidebar.squares.left", isEnabled: project != nil, isOn: project?.preview.showsThumbnails ?? false,
                         help: "Shows a strip of small pages beside the preview.") { project?.preview.showsThumbnails.toggle() },
+             AppCommand(menu: "View", title: project?.preview.notesShown == true ? "Hide Presenter Notes" : "Show Presenter Notes", idTitle: "Presenter Notes", systemImage: "note.text",
+                        isEnabled: project != nil, help: "Shows the notes of the slide in view under the preview.") {
+                 if let preview = project?.preview { preview.showsNotes = !preview.notesShown }
+             },
              AppCommand(menu: "View", title: "Dark Preview Pages", systemImage: "circle.lefthalf.filled", isEnabled: project != nil, isOn: project?.preview.darkPages ?? false,
                         help: "Darkens the pages on screen only; exports keep their colors.") { project?.preview.darkPages.toggle() },
              AppCommand(menu: "View", title: "Start Presentation", systemImage: "play.rectangle", shortcut: KeyboardShortcut(.return, modifiers: [.command, .option]),

@@ -1649,6 +1649,26 @@
         }
       }
     },
+    "Add Note" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz hinzufügen"
+          }
+        }
+      }
+    },
+    "Add Presenter Note" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderatornotiz hinzufügen"
+          }
+        }
+      }
+    },
     "Add Reference" : {
       "localizations" : {
         "de" : {
@@ -1915,6 +1935,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fügt eine Gruppe zum Einsortieren von Unterhaltungen hinzu"
+          }
+        }
+      }
+    },
+    "Adds an empty note for the speaker after the caret's line and puts the caret in it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fügt nach der Zeile mit der Einfügemarke eine leere Notiz für den Vortragenden ein und setzt die Einfügemarke hinein."
           }
         }
       }
@@ -5483,6 +5513,16 @@
         }
       }
     },
+    "Discard" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwerfen"
+          }
+        }
+      }
+    },
     "Discard Change" : {
       "localizations" : {
         "de" : {
@@ -5735,6 +5775,16 @@
         }
       }
     },
+    "Draft Notes with AI" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen mit KI entwerfen"
+          }
+        }
+      }
+    },
     "Duplicate" : {
       "localizations" : {
         "de" : {
@@ -5851,6 +5901,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Notiz bearbeiten …"
+          }
+        }
+      }
+    },
+    "Edit Presenter Note" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderatornotiz bearbeiten"
           }
         }
       }
@@ -7433,6 +7493,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Andere ausblenden"
+          }
+        }
+      }
+    },
+    "Hide Presenter Notes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderatornotizen ausblenden"
           }
         }
       }
@@ -10265,6 +10335,16 @@
         }
       }
     },
+    "No notes for this slide" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Notizen zu dieser Folie"
+          }
+        }
+      }
+    },
     "No notes for this slide." : {
       "localizations" : {
         "de" : {
@@ -10441,6 +10521,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Notizen"
+          }
+        }
+      }
+    },
+    "Notes · Slide %lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen · Folie %lld"
           }
         }
       }
@@ -11343,6 +11433,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Präsentation – %@"
+          }
+        }
+      }
+    },
+    "Presenter Notes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderatornotizen"
           }
         }
       }
@@ -13577,6 +13677,16 @@
         }
       }
     },
+    "Show Presenter Notes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderatornotizen einblenden"
+          }
+        }
+      }
+    },
     "Show Previous Tab" : {
       "localizations" : {
         "de" : {
@@ -13653,6 +13763,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "In der Seitenleiste einblenden"
+          }
+        }
+      }
+    },
+    "Show in Source" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Quelltext zeigen"
           }
         }
       }
@@ -13787,6 +13907,16 @@
         }
       }
     },
+    "Show the notes of the slide in view" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen der sichtbaren Folie anzeigen"
+          }
+        }
+      }
+    },
     "Show the pages full screen" : {
       "localizations" : {
         "de" : {
@@ -13883,6 +14013,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zeigt Details zu Datei, Dokument und Auswahl in einer Spalte rechts."
+          }
+        }
+      }
+    },
+    "Shows the notes of the slide in view under the preview." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt die Notizen der sichtbaren Folie unter der Vorschau."
           }
         }
       }
@@ -15215,6 +15355,22 @@
         }
       }
     },
+    "The source of this slide and its neighbours will be sent to %@ (%@)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The source of this slide and its neighbours will be sent to %1$@ (%2$@)."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Quelltext dieser Folie und der Nachbarfolien wird an %1$@ (%2$@) gesendet."
+          }
+        }
+      }
+    },
     "The table as typeset" : {
       "localizations" : {
         "de" : {
@@ -15427,6 +15583,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dieser Name stammt vom Dateinamen; stattdessen die Datei umbenennen."
+          }
+        }
+      }
+    },
+    "This slide has no text to write notes for." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Folie enthält keinen Text, zu dem sich Notizen schreiben lassen."
           }
         }
       }
@@ -16337,6 +16503,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dateien hochladen …"
+          }
+        }
+      }
+    },
+    "Use" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übernehmen"
           }
         }
       }

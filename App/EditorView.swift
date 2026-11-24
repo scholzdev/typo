@@ -147,6 +147,9 @@ final class EditorTextView: NSTextView {
     @objc private func jumpToDefinition(_ sender: Any?) { onJumpToDefinition?() }
     @objc private func findReferences(_ sender: Any?) { onFindReferences?() }
     var onExplainSelection: (@MainActor () -> Void)?
+    var canAddPresenterNote: (@MainActor () -> Bool)?
+    var onAddPresenterNote: (@MainActor () -> Void)?
+    @objc private func addPresenterNote(_ sender: Any?) { onAddPresenterNote?() }
     @objc private func explainSelection(_ sender: Any?) { onExplainSelection?() }
 
     /// A right-click puts the caret under the pointer (unless it is inside the selection), so "Edit Table…"
@@ -193,6 +196,13 @@ final class EditorTextView: NSTextView {
             let item = NSMenuItem(title: marked ? String(localized: "Remove Bookmark") : String(localized: "Add Bookmark"), action: #selector(toggleBookmark(_:)), keyEquivalent: "")
             item.target = self
             item.image = NSImage(systemSymbolName: marked ? "bookmark.slash" : "bookmark", accessibilityDescription: nil)
+            menu?.insertItem(item, at: 0)
+            menu?.insertItem(.separator(), at: 1)
+        }
+        if canAddPresenterNote?() == true {
+            let item = NSMenuItem(title: String(localized: "Add Presenter Note"), action: #selector(addPresenterNote(_:)), keyEquivalent: "")
+            item.target = self
+            item.image = NSImage(systemSymbolName: "note.text", accessibilityDescription: nil)
             menu?.insertItem(item, at: 0)
             menu?.insertItem(.separator(), at: 1)
         }
@@ -330,6 +340,8 @@ struct EditorView: NSViewRepresentable {
         tv.tableAtCaret = { [weak c] in c?.tableAtCaret() != nil }
         tv.onEditTable = { [weak c] in c?.tables?.beginEdit() }
         tv.onExplainSelection = { [actions] in actions.explainSelection?() }
+        tv.canAddPresenterNote = { [weak c] in c?.buffer?.isTypst == true && c?.readOnly == false }
+        tv.onAddPresenterNote = { [weak c] in c?.addPresenterNote() }
         tv.bookmarkedAt = { [weak c] i in c?.isBookmarked(at: i) }
         tv.onToggleBookmark = { [weak c] i in c?.toggleBookmark(at: i) }
         tv.multi.buffer = { [weak c] in c?.readOnly == true ? nil : c?.buffer }
@@ -496,6 +508,21 @@ struct EditorView: NSViewRepresentable {
         func attach(_ tv: NSTextView, scroll: NSScrollView) {
             textView = tv
             popup.onPick = { [weak self] in self?.accept($0) }
+            popup.labelEquation = { [weak self] name in
+                guard let project = self?.project, let scale = tv.window?.backingScaleFactor,
+                      let e = await project.labelEquation(name, pixelsPerPoint: Float(2 * scale)) else { return nil }
+                // Like the hover card: the page-white render on a rounded tile, at most as tall as the detail area.
+                let fit = min(1.4, 30 / e.size.height)
+                let size = NSSize(width: (e.size.width * fit).rounded(), height: (e.size.height * fit).rounded())
+                return NSImage(size: size, flipped: false) { rect in
+                    let shape = NSBezierPath(roundedRect: rect.insetBy(dx: 0.5, dy: 0.5), xRadius: 4, yRadius: 4)
+                    NSGraphicsContext.saveGraphicsState()
+                    shape.addClip()
+                    NSImage(cgImage: e.image, size: size).draw(in: rect)
+                    NSGraphicsContext.restoreGraphicsState()
+                    return true
+                }
+            }
             let nc = NotificationCenter.default
             nc.addObserver(self, selector: #selector(scrollStarted), name: NSScrollView.willStartLiveScrollNotification, object: scroll)
             nc.addObserver(self, selector: #selector(windowResigned), name: NSWindow.didResignKeyNotification, object: nil)

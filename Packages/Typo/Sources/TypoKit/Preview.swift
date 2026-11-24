@@ -54,6 +54,13 @@ public enum PreviewFit: String, CaseIterable, Sendable {
     public var showsThumbnails: Bool = UserDefaults.standard.bool(forKey: "previewShowsThumbnails") {
         didSet { UserDefaults.standard.set(showsThumbnails, forKey: "previewShowsThumbnails") }
     }
+    /// Whether the presenter notes strip shows; nil until the user chooses, then `automaticNotes` decides.
+    public var showsNotes: Bool? = UserDefaults.standard.object(forKey: "previewShowsNotes") as? Bool {
+        didSet { UserDefaults.standard.set(showsNotes, forKey: "previewShowsNotes") }
+    }
+    /// True when the project has a presenter note or imports a slide package (`Project.detectPresenterContent`).
+    public var automaticNotes = false
+    public var notesShown: Bool { showsNotes ?? automaticNotes }
     /// Tints the pages dark on screen only; export and print stay as written.
     public var darkPages: Bool = UserDefaults.standard.bool(forKey: "previewDarkPages") {
         didSet { UserDefaults.standard.set(darkPages, forKey: "previewDarkPages") }
