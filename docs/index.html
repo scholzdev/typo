@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
   <link rel="stylesheet" href="fold-demo.css">
   <link rel="alternate" hreflang="en" href="https://scholzdev.github.io/typo/">
   <link rel="alternate" hreflang="de" href="https://scholzdev.github.io/typo/de/">
@@ -95,80 +95,103 @@
           <p class="eyebrow">The editor</p>
           <h2><span class="grad">Everything you expect from a real IDE.</span> <em>For your prose.</em></h2>
         </header>
-        <ul class="cards">
-          <li class="card wide reveal">
-            <div>
-            <span class="card-icon" aria-hidden="true">{ }</span>
-            <h3>Completion that knows your document</h3>
-            <p>Scope-aware suggestions straight from the Typst engine: variables, functions from imports, built-ins, and only the labels and bib keys you can actually reach.</p>
-            </div>
-            <div class="card-art"><img src="assets/completion-tile.webp" alt="" loading="lazy" width="844" height="600"></div>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">⇄</span>
-            <h3>Live preview, click to source</h3>
-            <p>Click anywhere in the preview to jump to the line that made it. Zoom, two-page spreads, page thumbnails and dark pages included.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon card-icon-red" aria-hidden="true">abc</span>
-            <h3>Spell check that reads <code>lang</code></h3>
-            <p>Checks in the language from <code>#set text(lang:)</code>, and leaves your math alone.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">⌘D</span>
-            <h3>Multi-cursor and Vim mode</h3>
-            <p>Edit many places at once, or keep your muscle memory with a Vim mode and an Xcode-style mode capsule.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">◐</span>
-            <h3>Colours you can see</h3>
-            <p>Swatches sit right next to <code>rgb(…)</code>. Click one for a colour picker with sliders and value fields for every channel, and an optional wheel.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">PDF</span>
-            <h3>Export for print and for everyone</h3>
-            <p>PDF, archival PDF/A, accessible PDF/UA-1, PNG and SVG, with the pages chosen like in the print dialog. Print from File › Print… or take the whole project as a ZIP. Present full screen with a presenter view. A missing font gets a warning and a quick fix.</p>
-          </li>
-          <li class="card wide reveal">
-            <div>
-            <span class="card-icon" aria-hidden="true">✎</span>
-            <h3>Presenter notes, like Keynote</h3>
-            <p>Add a note to any slide from the context menu or a shortcut and write it in a small editor right in the source. The notes of the visible slide sit under the preview, Touying and Polylux notes included, and one click drafts them with AI. Present on a second display or an iPad with a presenter view like Keynote’s.</p>
-            </div>
-            <div class="card-art"><img src="assets/notes-light.webp" alt="The editor with a presenter note card under a slide and a small note in a line of text" loading="lazy" width="700" height="560"></div>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">⇧⌘O</span>
-            <h3>Find anything</h3>
-            <p>Open Quickly (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>O</kbd>) finds files, headings and labels. Go to Line with <kbd>⌘</kbd><kbd>L</kbd>. Find and replace across the whole project, with regular expressions.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">→</span>
-            <h3>Code intelligence for Typst</h3>
-            <p>Jump to definition, find references, rename a symbol, hover for docs, signature help and quick fixes.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">◫</span>
-            <h3>Your workspace, your way</h3>
-            <p>Split editor, focus mode, minimap and sticky headings. Navigators for outline, issues, bookmarks and changes.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">↺</span>
-            <h3>Projects with history</h3>
-            <p>Start from a templates gallery. Snapshots and per-file history, plus a Git gutter with blame, a log and a Changes navigator.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">▣</span>
-            <h3>Images that just drop in</h3>
-            <p>Drag or paste an image and it becomes a figure.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">↻</span>
-            <h3>Updates come to you</h3>
-            <p>Typo checks for new versions and shows what changed. Install with one click, or skip a version.</p>
-          </li>
+      </div>
+    </section>
+
+    <section class="section feature">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Completion</p>
+          <h2>Completion that knows <em>your document.</em></h2>
+          <p>Scope-aware suggestions straight from the Typst engine: variables, functions from imports, built-ins, and only the labels and bib keys you can actually reach. Diagnostics show inline as you type.</p>
+        </div>
+        <figure class="shot feature-shot shot-small" data-scene data-start="1">
+          <img src="guide/images/completion-light.webp" width="960" height="600" loading="lazy" alt="A completion list offering inset for a grid, with its description, under an inline error.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section feature feature-flip">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Live preview</p>
+          <h2>Click the page. <em>Land in the source.</em></h2>
+          <p>Click anywhere in the preview to jump to the line that made it. Zoom, two-page spreads, page thumbnails and dark pages included. Save a PDF next to your document on every save if you like.</p>
+        </div>
+        <figure class="shot feature-shot shot-tall" data-scene data-start="1">
+          <img src="guide/images/thumbnails-light.webp" width="1078" height="1130" loading="lazy" alt="The preview with page thumbnails on the left and a page of the document.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section feature">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Presenter notes</p>
+          <h2>A note for every slide. <em>Right in the source.</em></h2>
+          <p>Add a note from the context menu or with ⌥⌘P and write it in a small editor in the source. The notes of the visible slide sit under the preview, Touying and Polylux notes included, and one click drafts them with AI.</p>
+        </div>
+        <figure class="shot feature-shot" data-scene data-start="1">
+          <img src="guide/images/presenter-notes-light.webp" width="1800" height="1100" loading="lazy" alt="A slide deck in Typo with a presenter note card in the editor and the notes strip under the preview.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section feature feature-flip">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Presenting</p>
+          <h2>Present like Keynote. <em>Even on your iPad.</em></h2>
+          <p>With a second display or an iPad over Sidecar, Play puts the slides there and the presenter view on your Mac: current and next slide, your notes, the clock and a timer. X swaps the displays.</p>
+        </div>
+        <figure class="shot feature-shot" data-scene data-start="1">
+          <img src="guide/images/presenter-view.webp" width="1800" height="1146" loading="lazy" alt="The presenter view with the current and the next slide, notes, the clock and a timer.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section feature">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Find anything</p>
+          <h2>One shortcut. <em>Every file, heading and label.</em></h2>
+          <p>Open Quickly (⇧⌘O) finds files, headings and labels. Go to Line with ⌘L. Find and replace across the whole project, with regular expressions. Jump to definition, find references and rename a symbol.</p>
+        </div>
+        <figure class="shot feature-shot" data-scene data-start="1">
+          <img src="guide/images/open-quickly-light.webp" width="1330" height="360" loading="lazy" alt="Open Quickly with a search field and matching headings and labels.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section feature feature-flip">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">History</p>
+          <h2>Projects with <em>a memory.</em></h2>
+          <p>Start from a templates gallery. Snapshots and per-file history, plus a Git gutter with blame, a log and a Changes navigator.</p>
+        </div>
+        <figure class="shot feature-shot shot-small" data-scene data-start="1">
+          <img src="guide/images/git-gutter-light.webp" width="850" height="600" loading="lazy" alt="The editor with Git change marks in the gutter.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="eyebrow">And there is more</p>
+          <h2>The little things, <em>done right.</em></h2>
+        </header>
+        <ul class="ticks ticks-cols ticks-4 reveal">
+          <li>Spell check in the language from <code>#set text(lang:)</code>, never inside math</li>
+          <li>Multi-cursor editing and a Vim mode with an Xcode-style mode capsule</li>
+          <li>Colour swatches next to <code>rgb(…)</code> with a full colour picker</li>
+          <li>PDF, PDF/A, PDF/UA-1, PNG, SVG and ZIP, with pages chosen like in the print dialog</li>
+          <li>Split editor, focus mode, minimap and sticky headings</li>
+          <li>Drag or paste an image and it becomes a figure</li>
+          <li>Rainbow brackets, inlay hints, snippets and typstyle formatting</li>
+          <li>Updates with release notes, one click to install or skip</li>
         </ul>
-        <p class="also reveal">Also on board: rainbow brackets, inlay hints, snippets, typstyle formatting, and a word count that counts only your words.</p>
       </div>
     </section>
 

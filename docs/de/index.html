@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../style.css?v=7">
+  <link rel="stylesheet" href="../style.css?v=8">
   <link rel="stylesheet" href="../fold-demo.css">
   <link rel="alternate" hreflang="en" href="https://scholzdev.github.io/typo/">
   <link rel="alternate" hreflang="de" href="https://scholzdev.github.io/typo/de/">
@@ -87,80 +87,103 @@
           <p class="eyebrow">Der Editor</p>
           <h2><span class="grad">Alles, was du von einer echten IDE erwartest.</span> <em>Für deine Texte.</em></h2>
         </header>
-        <ul class="cards">
-          <li class="card wide reveal">
-            <div>
-            <span class="card-icon" aria-hidden="true">{ }</span>
-            <h3>Autovervollständigung, die dein Dokument kennt</h3>
-            <p>Kontextbewusste Vorschläge direkt aus der Typst-Engine: Variablen, Funktionen aus Imports, Built-ins und nur die Labels und Bib-Keys, die du an der Stelle wirklich erreichst.</p>
-            </div>
-            <div class="card-art"><img src="../assets/completion-tile.webp" alt="" loading="lazy" width="844" height="600"></div>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">⇄</span>
-            <h3>Live-Vorschau mit Klick zur Quelle</h3>
-            <p>Klick irgendwo in die Vorschau und du landest in der Zeile, aus der es stammt. Zoom, Doppelseiten, Seitenminiaturen und dunkle Seiten inklusive.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon card-icon-red" aria-hidden="true">abc</span>
-            <h3>Rechtschreibprüfung, die <code>lang</code> liest</h3>
-            <p>Prüft in der Sprache aus <code>#set text(lang:)</code> und lässt deine Formeln in Ruhe.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">⌘D</span>
-            <h3>Multi-Cursor und Vim-Modus</h3>
-            <p>Bearbeite viele Stellen auf einmal oder bleib bei deinem Muskelgedächtnis: mit Vim-Modus und einer Modus-Kapsel wie in Xcode.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">◐</span>
-            <h3>Farben, die du siehst</h3>
-            <p>Farbfelder stehen direkt neben <code>rgb(…)</code>. Ein Klick öffnet den Farbwähler mit Schiebereglern und Wertefeldern für jeden Kanal, auf Wunsch mit Farbrad.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">PDF</span>
-            <h3>Export für den Druck und für alle</h3>
-            <p>PDF, archivtaugliches PDF/A, barrierefreies PDF/UA-1, PNG und SVG, die Seiten wählst du wie im Druckdialog. Drucke über File › Print… oder nimm das ganze Projekt als ZIP mit. Präsentiere im Vollbild mit Referentenansicht. Fehlt eine Schrift, gibt es eine Warnung samt Schnellkorrektur.</p>
-          </li>
-          <li class="card wide reveal">
-            <div>
-            <span class="card-icon" aria-hidden="true">✎</span>
-            <h3>Moderatornotizen wie in Keynote</h3>
-            <p>Füge jeder Folie per Kontextmenü oder Tastenkürzel eine Notiz hinzu und schreib sie in einem kleinen Editor direkt im Quelltext. Die Notizen der sichtbaren Folie stehen unter der Vorschau, auch die aus Touying und Polylux, und ein Klick entwirft sie mit KI. Präsentiere auf einem zweiten Bildschirm oder iPad mit einer Referentenansicht wie in Keynote.</p>
-            </div>
-            <div class="card-art"><img src="../assets/notes-light.webp" alt="Der Editor mit einer Notiz-Karte unter einer Folie und einer kleinen Notiz in einer Textzeile" loading="lazy" width="700" height="560"></div>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">⇧⌘O</span>
-            <h3>Alles finden</h3>
-            <p>Mit „Schnell öffnen“ (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>O</kbd>) findest du Dateien, Überschriften und Labels. „Gehe zu Zeile“ mit <kbd>⌘</kbd><kbd>L</kbd>. Suchen und Ersetzen im ganzen Projekt, auch mit regulären Ausdrücken.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">→</span>
-            <h3>Code-Intelligenz für Typst</h3>
-            <p>Zur Definition springen, Referenzen finden, Symbol umbenennen, Doku beim Überfahren, Signaturhilfe und Schnellkorrekturen.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">◫</span>
-            <h3>Dein Arbeitsplatz, wie du ihn willst</h3>
-            <p>Geteilter Editor, Fokusmodus, Minimap und Sticky Headings. Navigatoren für Gliederung, Probleme, Lesezeichen und Änderungen.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">↺</span>
-            <h3>Projekte mit Verlauf</h3>
-            <p>Starte mit einer Vorlagengalerie. Schnappschüsse und Verlauf pro Datei, dazu eine Git-Randleiste mit Blame, ein Log und ein Änderungen-Navigator.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">▣</span>
-            <h3>Bilder, die einfach landen</h3>
-            <p>Zieh ein Bild hinein oder füg es ein, und es wird zur Abbildung.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card-icon" aria-hidden="true">↻</span>
-            <h3>Updates kommen zu dir</h3>
-            <p>Typo sucht nach neuen Versionen und zeigt, was neu ist. Installiere sie mit einem Klick oder überspringe eine Version.</p>
-          </li>
+      </div>
+    </section>
+
+    <section class="section feature">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Autovervollständigung</p>
+          <h2>Vorschläge, die <em>dein Dokument kennen.</em></h2>
+          <p>Kontextbewusste Vorschläge direkt aus der Typst-Engine: Variablen, Funktionen aus Imports, Built-ins und nur die Labels und Bib-Keys, die du an der Stelle wirklich erreichst. Fehler erscheinen direkt beim Tippen.</p>
+        </div>
+        <figure class="shot feature-shot shot-small" data-scene data-start="1">
+          <img src="../guide/images/completion-light.webp" width="960" height="600" loading="lazy" alt="Eine Vorschlagsliste mit inset für ein Grid samt Beschreibung, unter einem Fehlerhinweis.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section feature feature-flip">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Live-Vorschau</p>
+          <h2>Klick auf die Seite. <em>Lande in der Quelle.</em></h2>
+          <p>Klick irgendwo in die Vorschau und du landest in der Zeile, aus der es stammt. Zoom, Doppelseiten, Seitenminiaturen und dunkle Seiten inklusive. Auf Wunsch liegt bei jedem Speichern ein PDF neben deinem Dokument.</p>
+        </div>
+        <figure class="shot feature-shot shot-tall" data-scene data-start="1">
+          <img src="../guide/images/thumbnails-light.webp" width="1078" height="1130" loading="lazy" alt="Die Vorschau mit Seitenminiaturen links und einer Seite des Dokuments.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section feature">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Moderatornotizen</p>
+          <h2>Eine Notiz für jede Folie. <em>Direkt im Quelltext.</em></h2>
+          <p>Füge per Kontextmenü oder ⌥⌘P eine Notiz hinzu und schreib sie in einem kleinen Editor im Quelltext. Die Notizen der sichtbaren Folie stehen unter der Vorschau, auch die aus Touying und Polylux, und ein Klick entwirft sie mit KI.</p>
+        </div>
+        <figure class="shot feature-shot" data-scene data-start="1">
+          <img src="../guide/images/presenter-notes-light.webp" width="1800" height="1100" loading="lazy" alt="Ein Foliensatz in Typo mit einer Notiz-Karte im Editor und dem Notizbereich unter der Vorschau.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section feature feature-flip">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Präsentieren</p>
+          <h2>Präsentieren wie in Keynote. <em>Auch auf dem iPad.</em></h2>
+          <p>Mit einem zweiten Bildschirm oder einem iPad über Sidecar zeigt Play dort die Folien und auf deinem Mac die Referentenansicht: aktuelle und nächste Folie, deine Notizen, Uhr und Timer. X tauscht die Bildschirme.</p>
+        </div>
+        <figure class="shot feature-shot" data-scene data-start="1">
+          <img src="../guide/images/presenter-view.webp" width="1800" height="1146" loading="lazy" alt="Die Referentenansicht mit aktueller und nächster Folie, Notizen, Uhr und Timer.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section feature">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Alles finden</p>
+          <h2>Ein Kürzel. <em>Jede Datei, Überschrift und Label.</em></h2>
+          <p>„Schnell öffnen“ (⇧⌘O) findet Dateien, Überschriften und Labels. „Gehe zu Zeile“ mit ⌘L. Suchen und Ersetzen im ganzen Projekt, auch mit regulären Ausdrücken. Zur Definition springen, Referenzen finden und Symbole umbenennen.</p>
+        </div>
+        <figure class="shot feature-shot" data-scene data-start="1">
+          <img src="../guide/images/open-quickly-light.webp" width="1330" height="360" loading="lazy" alt="„Schnell öffnen“ mit Suchfeld und passenden Überschriften und Labels.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section feature feature-flip">
+      <div class="wrap feature-grid">
+        <div class="feature-copy reveal">
+          <p class="eyebrow">Verlauf</p>
+          <h2>Projekte mit <em>Gedächtnis.</em></h2>
+          <p>Starte mit einer Vorlagengalerie. Schnappschüsse und Verlauf pro Datei, dazu eine Git-Randleiste mit Blame, ein Log und ein Änderungen-Navigator.</p>
+        </div>
+        <figure class="shot feature-shot shot-small" data-scene data-start="1">
+          <img src="../guide/images/git-gutter-light.webp" width="850" height="600" loading="lazy" alt="Der Editor mit Git-Änderungsmarken in der Randleiste.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="eyebrow">Und noch mehr</p>
+          <h2>Die kleinen Dinge, <em>richtig gemacht.</em></h2>
+        </header>
+        <ul class="ticks ticks-cols ticks-4 reveal">
+          <li>Rechtschreibprüfung in der Sprache aus <code>#set text(lang:)</code>, nie in Formeln</li>
+          <li>Multi-Cursor und ein Vim-Modus mit Modus-Kapsel wie in Xcode</li>
+          <li>Farbfelder neben <code>rgb(…)</code> mit vollständigem Farbwähler</li>
+          <li>PDF, PDF/A, PDF/UA-1, PNG, SVG und ZIP, Seiten wählbar wie im Druckdialog</li>
+          <li>Geteilter Editor, Fokusmodus, Minimap und Sticky Headings</li>
+          <li>Bild hineinziehen oder einfügen, und es wird zur Abbildung</li>
+          <li>Regenbogenklammern, Inlay Hints, Snippets und Formatierung mit typstyle</li>
+          <li>Updates mit Versionshinweisen, mit einem Klick installieren oder überspringen</li>
         </ul>
-        <p class="also reveal">Außerdem an Bord: Regenbogenklammern, Inlay Hints, Snippets, Formatierung mit typstyle und ein Wortzähler, der nur deine Wörter zählt.</p>
       </div>
     </section>
 
