@@ -3,13 +3,20 @@ import SwiftUI
 import TypoKit
 import TypstEngine
 
-/// Asks which pages File › Export › PDF writes, laid out like the print dialog: the pages on the left with a tick
-/// each, and All / Range / Selection on the right. Nil when the user cancels.
-@MainActor func choosePDFPages(_ project: Project, pageCount: Int) async -> PageSelection? {
-    guard let window = NSApp.keyWindow else { return .all }
+/// What File › Export writes: the format, which pages, and for PNG the resolution.
+struct ExportChoice {
+    var target: ExportTarget
+    var pages: PageSelection
+    var ppi: Int
+}
+
+/// The export dialog, laid out like the print dialog: the pages on the left with a tick each; the format, the pages
+/// (All / Range / Selection) and the format's options on the right. Nil when the user cancels.
+@MainActor func chooseExport(_ project: Project, target: ExportTarget, pageCount: Int) async -> ExportChoice? {
+    guard let window = NSApp.keyWindow else { return ExportChoice(target: target, pages: .all, ppi: 300) }
     return await withCheckedContinuation { done in
         let sheet = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 680, height: 500), styleMask: [.titled], backing: .buffered, defer: false)
-        sheet.contentViewController = NSHostingController(rootView: ExportPagesView(preview: project.preview, pageCount: pageCount) { choice in
+        sheet.contentViewController = NSHostingController(rootView: ExportView(preview: project.preview, pageCount: pageCount, target: target) { choice in
             window.endSheet(sheet)
             done.resume(returning: choice)
         })
@@ -17,21 +24,25 @@ import TypstEngine
     }
 }
 
-private struct ExportPagesView: View {
+private struct ExportView: View {
     let preview: PreviewModel
     let pageCount: Int
-    let finish: (PageSelection?) -> Void
+    let finish: (ExportChoice?) -> Void
+    static let resolutions = [72, 150, 300, 600]
 
     private enum Kind { case all, range, selection }
     @State private var kind = Kind.all
     @State private var from = 1
     @State private var to: Int
     @State private var ticked: Set<Int>
+    @State private var target: ExportTarget
+    @AppStorage("exportPPI") private var ppi = 300
 
-    init(preview: PreviewModel, pageCount: Int, finish: @escaping (PageSelection?) -> Void) {
+    init(preview: PreviewModel, pageCount: Int, target: ExportTarget, finish: @escaping (ExportChoice?) -> Void) {
         self.preview = preview
         self.pageCount = pageCount
         self.finish = finish
+        _target = State(initialValue: target)
         _to = State(initialValue: pageCount)
         _ticked = State(initialValue: Set(1...pageCount))
     }
@@ -44,8 +55,12 @@ private struct ExportPagesView: View {
         }
     }
 
+    /// PDF/UA is tagged, and Typst tags only whole documents; a ZIP holds the project, not pages.
+    private var choosesPages: Bool { pageCount > 1 && target != .pdfUA1 && target != .archive }
+
     private func included(_ page: Int) -> Bool {
-        switch kind {
+        guard choosesPages else { return target != .archive }
+        return switch kind {
         case .all: true
         case .range: (min(from, to)...max(from, to)).contains(page)
         case .selection: ticked.contains(page)
@@ -54,6 +69,7 @@ private struct ExportPagesView: View {
 
     /// Ticking a page switches to Selection, starting from the pages the current choice covers.
     private func toggle(_ page: Int) {
+        guard choosesPages else { return }
         if kind != .selection { ticked = Set((1...pageCount).filter(included)) }
         kind = .selection
         if ticked.contains(page) { ticked.remove(page) } else { ticked.insert(page) }
@@ -71,22 +87,37 @@ private struct ExportPagesView: View {
             }
             .frame(width: 220)
             .background(.quaternary.opacity(0.5))
+            .disabled(!choosesPages)
             VStack(spacing: 0) {
                 Form {
-                    Section("Pages") {
-                        radio(.all) { Text("All \(pageCount) Pages") }
-                        radio(.range) {
-                            HStack {
-                                Text("Range from")
-                                pageField($from)
-                                Text("to")
-                                pageField($to)
+                    Section {
+                        Picker("Format", selection: $target) {
+                            ForEach(ExportTarget.allCases) { t in Label(t.title, systemImage: t.symbol).tag(t) }
+                        }
+                        if target == .png {
+                            Picker("Resolution", selection: $ppi) {
+                                ForEach(Self.resolutions, id: \.self) { Text("\($0) ppi").tag($0) }
                             }
                         }
-                        radio(.selection) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Selection")
-                                Text("Select pages in the sidebar").font(.caption).foregroundStyle(.secondary)
+                    } footer: {
+                        Text(target.summary).font(.caption).foregroundStyle(.secondary)
+                    }
+                    if choosesPages {
+                        Section("Pages") {
+                            radio(.all) { Text("All \(pageCount) Pages") }
+                            radio(.range) {
+                                HStack {
+                                    Text("Range from")
+                                    pageField($from)
+                                    Text("to")
+                                    pageField($to)
+                                }
+                            }
+                            radio(.selection) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Selection")
+                                    Text("Select pages in the sidebar").font(.caption).foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }
@@ -95,9 +126,9 @@ private struct ExportPagesView: View {
                 HStack {
                     Spacer()
                     Button("Cancel", role: .cancel) { finish(nil) }.keyboardShortcut(.cancelAction)
-                    Button("Export…") { finish(selection) }
+                    Button("Export…") { finish(ExportChoice(target: target, pages: choosesPages ? selection : .all, ppi: ppi)) }
                         .keyboardShortcut(.defaultAction)
-                        .disabled(selection.spans(pageCount: pageCount)?.isEmpty == true)
+                        .disabled(choosesPages && selection.spans(pageCount: pageCount)?.isEmpty == true)
                 }
                 .padding(16)
             }

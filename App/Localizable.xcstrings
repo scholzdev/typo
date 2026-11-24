@@ -1173,6 +1173,36 @@
         }
       }
     },
+    "A PDF for long-term archiving that may carry embedded files." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein PDF für die Langzeitarchivierung, das eingebettete Dateien enthalten darf."
+          }
+        }
+      }
+    },
+    "A PDF for long-term archiving." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein PDF für die Langzeitarchivierung."
+          }
+        }
+      }
+    },
+    "A PDF for reading, sharing and printing." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein PDF zum Lesen, Teilen und Drucken."
+          }
+        }
+      }
+    },
     "A font file in this project: it travels with the project and wins over an installed font of the same name." : {
       "localizations" : {
         "de" : {
@@ -1209,6 +1239,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ein Modellanbieter, der mit einem API-Schlüssel hinzugefügt wird, erhält die Nachrichten, die bisherige Unterhaltung und die Dateien, die angehängt oder zum Lesen freigegeben werden. Er verarbeitet sie gemäß seinen eigenen Bedingungen. Der Schlüssel wird im Schlüsselbund gespeichert."
+          }
+        }
+      }
+    },
+    "A tagged, accessible PDF. It always holds every page." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein getaggtes, barrierefreies PDF. Es enthält immer alle Seiten."
           }
         }
       }
@@ -10515,6 +10555,26 @@
         }
       }
     },
+    "One image file per page." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Bilddatei pro Seite."
+          }
+        }
+      }
+    },
+    "One vector image file per page." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Vektorbilddatei pro Seite."
+          }
+        }
+      }
+    },
     "Open Documentation" : {
       "localizations" : {
         "de" : {
@@ -12577,12 +12637,12 @@
         }
       }
     },
-    "Resolution:" : {
+    "Resolution" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auflösung:"
+            "value" : "Auflösung"
           }
         }
       }
@@ -15101,6 +15161,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Der Paketindex wurde noch nicht geladen. Jetzt nach Updates suchen, um die Pakete von Typst Universe zu durchsuchen."
+          }
+        }
+      }
+    },
+    "The project folder as a ZIP file, to share or back up the sources." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Projektordner als ZIP-Datei, um die Quellen zu teilen oder zu sichern."
           }
         }
       }

@@ -58,28 +58,34 @@ struct ExportCommands: Commands {
         }
     }
 
-    static func pdf(_ project: Project, _ standard: PDFStandard) async {
-        guard confirmFonts(project, printing: false) else { return }
+    /// The export dialog, preset to `target`, then the save panel for what was chosen.
+    static func export(_ project: Project, _ target: ExportTarget) async {
         do {
             let count = try await project.exportPageCount()
-            // PDF/UA is tagged, and Typst tags only whole documents.
-            var spans: [PageSpan]?
-            if standard != .ua1 && count > 1 {
-                guard let choice = await choosePDFPages(project, pageCount: count) else { return }
-                spans = choice.spans(pageCount: count)
+            guard let choice = await chooseExport(project, target: target, pageCount: count) else { return }
+            switch choice.target {
+            case .archive: await archive(project)
+            case .png, .svg:
+                guard confirmFonts(project, printing: false) else { return }
+                try await pages(project, choice.target == .png ? .png(ppi: choice.ppi) : .svg, choice.pages, count: count)
+            case .pdf, .pdfA2b, .pdfA3b, .pdfUA1:
+                guard confirmFonts(project, printing: false), let standard = choice.target.standard else { return }
+                try await pdf(project, standard, choice.pages.spans(pageCount: count))
             }
-            let panel = NSSavePanel()
-            panel.allowedContentTypes = [.pdf]
-            panel.nameFieldStringValue = project.pdfFileName
-            guard panel.runModal() == .OK, let url = panel.url else { return }
-            let pdf = try await project.exportPDF(standard: standard, pages: spans)
-            try pdf.write(to: url)
         } catch {
-            showExportFailure(error, pdfUA: standard == .ua1)
+            showExportFailure(error, pdfUA: target == .pdfUA1)
         }
     }
 
-    static func archive(_ project: Project) async {
+    private static func pdf(_ project: Project, _ standard: PDFStandard, _ spans: [PageSpan]?) async throws {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.pdf]
+        panel.nameFieldStringValue = project.pdfFileName
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        try await project.exportPDF(standard: standard, pages: spans).write(to: url)
+    }
+
+    private static func archive(_ project: Project) async {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.zip]
         panel.nameFieldStringValue = (project.pdfFileName as NSString).deletingPathExtension + ".zip"
@@ -87,61 +93,36 @@ struct ExportCommands: Commands {
         do { try await project.exportArchive(to: url) } catch { showExportFailure(error) }
     }
 
-    /// `.png`'s ppi is chosen in the panel. One page: a save panel. Several: a folder (the sandbox grants no siblings of a saved file).
-    static func pages(_ project: Project, _ requested: PageFormat) async {
-        guard confirmFonts(project, printing: false) else { return }
-        do {
-            let count = try await project.exportPageCount()
-            let isPNG = requested != .svg
-            let ext = isPNG ? "png" : "svg"
-            let stem = (project.pdfFileName as NSString).deletingPathExtension
-            let accessory = isPNG ? PPIAccessory() : nil
-            let panel: NSSavePanel
-            if count == 1 {
-                panel = NSSavePanel()
-                panel.allowedContentTypes = [isPNG ? .png : .svg]
-                panel.nameFieldStringValue = "\(stem).\(ext)"
-            } else {
-                let open = NSOpenPanel()
-                open.canChooseFiles = false
-                open.canChooseDirectories = true
-                open.canCreateDirectories = true
-                open.prompt = String(localized: "Export")
-                open.message = String(localized: "Choose a folder for \(count) \(ext.uppercased()) files.")
-                panel = open
-            }
-            panel.accessoryView = accessory?.view
-            guard panel.runModal() == .OK, let chosen = panel.url else { return }
-            let format: PageFormat = accessory.map { .png(ppi: $0.ppi) } ?? .svg
-            let width = String(count).count
-            let urls = count == 1 ? [chosen] : (1...count).map {
-                chosen.appending(path: "\(stem)-\(String(format: "%0\(width)d", $0)).\(ext)")
-            }
-            if count > 1, urls.contains(where: { FileManager.default.fileExists(atPath: $0.path) }) {
-                guard confirm("Replace Existing Files?", "Some files named \u{201C}\(stem)-…\(".\(ext)")\u{201D} already exist in this folder.", ok: "Replace") else { return }
-            }
-            let data = try await project.exportPages(format)
-            guard data.count == urls.count else { throw ProjectError.exportFailed(String(localized: "The document changed while exporting. Try again.")) }
-            for (d, url) in zip(data, urls) { try d.write(to: url, options: .atomic) }
-        } catch {
-            showExportFailure(error)
+    /// One file per chosen page, named after its page number. One page: a save panel. Several: a folder (the sandbox grants no siblings of a saved file).
+    private static func pages(_ project: Project, _ format: PageFormat, _ selection: PageSelection, count: Int) async throws {
+        let numbers = (selection.spans(pageCount: count) ?? [PageSpan(first: 1, last: count)])
+            .flatMap { ($0.first ?? 1)...($0.last ?? count) }
+        let ext = format == .svg ? "svg" : "png"
+        let stem = (project.pdfFileName as NSString).deletingPathExtension
+        let panel: NSSavePanel
+        if numbers.count == 1 {
+            panel = NSSavePanel()
+            panel.allowedContentTypes = [format == .svg ? .svg : .png]
+            panel.nameFieldStringValue = count == 1 ? "\(stem).\(ext)" : "\(stem)-\(numbers[0]).\(ext)"
+        } else {
+            let open = NSOpenPanel()
+            open.canChooseFiles = false
+            open.canChooseDirectories = true
+            open.canCreateDirectories = true
+            open.prompt = String(localized: "Export")
+            open.message = String(localized: "Choose a folder for \(numbers.count) \(ext.uppercased()) files.")
+            panel = open
         }
+        guard panel.runModal() == .OK, let chosen = panel.url else { return }
+        let width = String(count).count
+        let urls = numbers.count == 1 ? [chosen] : numbers.map {
+            chosen.appending(path: "\(stem)-\(String(format: "%0\(width)d", $0)).\(ext)")
+        }
+        if numbers.count > 1, urls.contains(where: { FileManager.default.fileExists(atPath: $0.path) }) {
+            guard confirm("Replace Existing Files?", "Some files named \u{201C}\(stem)-…\(".\(ext)")\u{201D} already exist in this folder.", ok: "Replace") else { return }
+        }
+        let data = try await project.exportPages(format)
+        guard data.count == count else { throw ProjectError.exportFailed(String(localized: "The document changed while exporting. Try again.")) }
+        for (n, url) in zip(numbers, urls) { try data[n - 1].write(to: url, options: .atomic) }
     }
-}
-
-/// "Resolution: 300 ppi" under the panel's file list.
-@MainActor private final class PPIAccessory {
-    static let choices = [72, 150, 300, 600]
-    private let popup = NSPopUpButton(frame: .zero, pullsDown: false)
-    let view: NSView
-
-    init() {
-        popup.addItems(withTitles: Self.choices.map { String(localized: "\($0) ppi") })
-        popup.selectItem(at: 2)
-        let stack = NSStackView(views: [NSTextField(labelWithString: String(localized: "Resolution:")), popup])
-        stack.edgeInsets = NSEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
-        view = stack
-    }
-
-    var ppi: Int { Self.choices[popup.indexOfSelectedItem] }
 }

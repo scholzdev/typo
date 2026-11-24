@@ -129,13 +129,13 @@ struct AppCommand: Identifiable {
         func item(_ title: LocalizedStringResource, _ symbol: String, _ shortcut: KeyboardShortcut? = nil, _ run: @escaping @MainActor (Project) async -> Void) -> AppCommand {
             AppCommand(menu: "Export", title: title, systemImage: symbol, shortcut: shortcut, isEnabled: project != nil) { if let project { Task { await run(project) } } }
         }
-        return [[item("PDF…", "doc.richtext", KeyboardShortcut("e", modifiers: [.command, .shift])) { await ProjectExporter.pdf($0, .plain) },
-                 item("PDF/A-2b for Archiving…", "archivebox") { await ProjectExporter.pdf($0, .pdfA2b) },
-                 item("PDF/A-3b for Archiving…", "archivebox") { await ProjectExporter.pdf($0, .pdfA3b) },
-                 item("PDF/UA-1 (Accessible)…", "accessibility") { await ProjectExporter.pdf($0, .ua1) },
-                 item("PNG Images…", "photo") { await ProjectExporter.pages($0, .png(ppi: 0)) },
-                 item("SVG Images…", "point.topleft.down.to.point.bottomright.curvepath") { await ProjectExporter.pages($0, .svg) },
-                 item("Project Archive (ZIP)…", "doc.zipper") { await ProjectExporter.archive($0) }]]
+        return [[item("PDF…", "doc.richtext", KeyboardShortcut("e", modifiers: [.command, .shift])) { await ExportTarget.pdf.run($0) },
+                 item("PDF/A-2b for Archiving…", "archivebox") { await ExportTarget.pdfA2b.run($0) },
+                 item("PDF/A-3b for Archiving…", "archivebox") { await ExportTarget.pdfA3b.run($0) },
+                 item("PDF/UA-1 (Accessible)…", "accessibility") { await ExportTarget.pdfUA1.run($0) },
+                 item("PNG Images…", "photo") { await ExportTarget.png.run($0) },
+                 item("SVG Images…", "point.topleft.down.to.point.bottomright.curvepath") { await ExportTarget.svg.run($0) },
+                 item("Project Archive (ZIP)…", "doc.zipper") { await ExportTarget.archive.run($0) }]]
     }
 
     static func snapshots(_ ctx: AppCommandContext) -> [[AppCommand]] {

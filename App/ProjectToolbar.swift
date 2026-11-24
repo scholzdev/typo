@@ -31,17 +31,31 @@ enum ExportTarget: String, CaseIterable, Identifiable {
         }
     }
 
-    @MainActor func run(_ project: Project) async {
+    /// One line under the format in the export dialog.
+    var summary: LocalizedStringResource {
         switch self {
-        case .pdf: await ProjectExporter.pdf(project, .plain)
-        case .pdfA2b: await ProjectExporter.pdf(project, .pdfA2b)
-        case .pdfA3b: await ProjectExporter.pdf(project, .pdfA3b)
-        case .pdfUA1: await ProjectExporter.pdf(project, .ua1)
-        case .png: await ProjectExporter.pages(project, .png(ppi: 0))
-        case .svg: await ProjectExporter.pages(project, .svg)
-        case .archive: await ProjectExporter.archive(project)
+        case .pdf: "A PDF for reading, sharing and printing."
+        case .pdfA2b: "A PDF for long-term archiving."
+        case .pdfA3b: "A PDF for long-term archiving that may carry embedded files."
+        case .pdfUA1: "A tagged, accessible PDF. It always holds every page."
+        case .png: "One image file per page."
+        case .svg: "One vector image file per page."
+        case .archive: "The project folder as a ZIP file, to share or back up the sources."
         }
     }
+
+    var standard: PDFStandard? {
+        switch self {
+        case .pdf: .plain
+        case .pdfA2b: .pdfA2b
+        case .pdfA3b: .pdfA3b
+        case .pdfUA1: .ua1
+        case .png, .svg, .archive: nil
+        }
+    }
+
+    /// Opens the export dialog with this format chosen.
+    @MainActor func run(_ project: Project) async { await ProjectExporter.export(project, self) }
 }
 
 /// The window toolbar as in Xcode, left to right: navigator and assistant toggles, back and forward, the project's
