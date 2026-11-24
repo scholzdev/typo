@@ -248,7 +248,7 @@ struct PreviewToolbar: View {
             ClusterToggle(title: "Lock Preview", symbol: project.previewLocked ? "lock.fill" : "lock.open", isOn: Bindable(project).previewLocked)
                 .help(project.previewLocked ? "Locked to \(project.main.raw). Unlock to preview the file selected in the sidebar."
                                             : "Unlocked: selecting a .typ file in the sidebar previews it.")
-            ClusterToggle(title: "Follow Cursor", symbol: "scope", isOn: Bindable(preview).followsCursor)
+            ClusterToggle(title: "Follow Cursor", symbol: "text.cursor", isOn: Bindable(preview).followsCursor)
                 .help("Preview follows the cursor")
             // In the project window these sit in the window toolbar; a popped-out preview has no other place for them.
             if preview.isPoppedOut {
@@ -274,7 +274,7 @@ struct PreviewToolbar: View {
                 Divider()
             }
             Toggle("Lock Preview", systemImage: "lock", isOn: Bindable(project).previewLocked)
-            Toggle("Follow Cursor", systemImage: "scope", isOn: Bindable(preview).followsCursor)
+            Toggle("Follow Cursor", systemImage: "text.cursor", isOn: Bindable(preview).followsCursor)
             Divider()
             Button(popOutTitle, systemImage: preview.isPoppedOut ? "arrow.down.backward.square" : "arrow.up.forward.square", action: popOut)
             if preview.isPoppedOut {
