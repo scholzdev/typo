@@ -29,8 +29,8 @@ struct NotesStrip: View {
     private var page: Int { min(max(preview.visiblePage, 0), max(preview.pages.count - 1, 0)) }
     private var slideNotes: [PresenterNote] { notes.filter { $0.pages.contains(page) } }
     /// Beside an open bottom area, the strip shares its top edge, and dragging either one resizes both.
-    private var linked: BottomAreaModel? { editorBottom.flatMap { $0.isShown && $0.insetHeight > 0 ? $0 : nil } }
-    private var height: Double { linked.map { Double($0.insetHeight) } ?? min(max(storedHeight, Self.minHeight), Self.maxHeight) }
+    private var linked: BottomAreaModel? { editorBottom }
+    private var height: Double { linked.map { Double($0.clamped) } ?? min(max(storedHeight, Self.minHeight), Self.maxHeight) }
 
     private struct Refresh: Equatable { let hashes: [UInt128]; let revision: Int; let written: Int }
 
@@ -49,6 +49,7 @@ struct NotesStrip: View {
         }
         .frame(height: height)
         .background(Color(nsColor: .textBackgroundColor))
+        .modifier(FadeIn())
         .task(id: Refresh(hashes: preview.pages.map(\.hash), revision: project.compileRevision, written: written)) {
             try? await Task.sleep(for: .milliseconds(500))
             guard !Task.isCancelled else { return }

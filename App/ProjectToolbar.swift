@@ -74,10 +74,10 @@ struct ProjectToolbar: ToolbarContent {
     var body: some ToolbarContent {
         if !layout.focus {
             // With the navigator open these two come from its column (ProjectView), which keeps them next to the traffic lights.
-            if layout.columns == .detailOnly {
-                NavigatorToggles(layout: layout, assistant: assistant, actions: actions)
-                ToolbarSpacer(.fixed, placement: .navigation)
-            }
+            // Hidden rather than left out: adding and removing items rebuilt the whole toolbar, and its right side flickered.
+            NavigatorToggles(layout: layout, assistant: assistant, actions: actions)
+                .hidden(layout.columns != .detailOnly)
+            if layout.columns == .detailOnly { ToolbarSpacer(.fixed, placement: .navigation) }
             ToolbarItemGroup(placement: .navigation) {
                 Button("Go Back", systemImage: "chevron.left") { project.goBack() }
                     .disabled(!project.navigationHistory.canGoBack).help("Go back")

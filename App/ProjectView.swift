@@ -41,7 +41,7 @@ struct ProjectView: View {
             .frame(minWidth: 280, maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 .navigationSplitViewColumnWidth(min: 300, ideal: 300, max: 440)
                 .toolbar(removing: .sidebarToggle)
-                .toolbar { if !layout.focus, layout.columns != .detailOnly { NavigatorToggles(layout: layout, assistant: assistant, actions: actions, placement: .automatic) } }
+                .toolbar { NavigatorToggles(layout: layout, assistant: assistant, actions: actions, placement: .automatic).hidden(layout.focus || layout.columns == .detailOnly) }
         } detail: {
             // Two panes in one detail column, so the preview can leave the window (pop-out) without rebuilding the editor.
             SplitPanes(autosaveName: "Tympan.split.\(project.id.raw)", showsTrailing: !project.preview.isPoppedOut && !layout.focus && layout.showPreview && assistant.mode != .assistant,
@@ -229,7 +229,6 @@ struct EditorPane: View {
                 if showsBar { bottomBar }
                 if layout.bottom.isShown { BottomArea(project: project, model: layout.bottom) }
             }
-            .onGeometryChange(for: CGFloat.self, of: \.size.height) { layout.bottom.insetHeight = $0 }
         }
         .onGeometryChange(for: CGFloat.self, of: \.size.height) { layout.bottom.available = $0 }
         .onChange(of: project.selectedFile) { old, new in layout.firstFileChanged(from: old, to: new); sidebar.quickLook = nil }

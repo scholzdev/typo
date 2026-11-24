@@ -154,13 +154,19 @@ struct PreviewPane: View {
     let project: Project
     /// Moves the preview to its own window or back; the caller owns the window environment.
     let popOut: () -> Void
-    /// The editor's bottom area beside the preview in the project window; the notes strip matches its height.
+    /// The editor's bottom area beside the preview in the project window. There the notes strip is its other half,
+    /// shown and hidden with it, so both bars and both panes always line up; a popped-out preview has its own toggle.
     var editorBottom: BottomAreaModel?
+
+    private var stripShown: Bool { editorBottom?.isShown ?? project.preview.notesShown }
 
     var body: some View {
         VStack(spacing: 0) {
             PreviewView(project: project).safeAreaInset(edge: .top, spacing: 0) { PreviewToolbar(project: project, popOut: popOut) }
-            if project.preview.notesShown { NotesStrip(project: project, editorBottom: editorBottom) }
+            PreviewBottomBar(isOn: stripShown) {
+                if let editorBottom { editorBottom.isShown.toggle() } else { project.preview.showsNotes = !project.preview.notesShown }
+            }
+            if stripShown { NotesStrip(project: project, editorBottom: editorBottom) }
         }
         .task { project.detectPresenterContent() }
     }
@@ -225,9 +231,6 @@ struct PreviewToolbar: View {
             ClusterToggle(title: "Page Thumbnails", symbol: "sidebar.squares.left", isOn: Bindable(preview).showsThumbnails)
                 .labelStyle(.iconOnly)
                 .help("Show page thumbnails")
-            ClusterToggle(title: "Presenter Notes", symbol: "note.text", isOn: Binding(get: { preview.notesShown }, set: { preview.showsNotes = $0 }))
-                .labelStyle(.iconOnly)
-                .help("Show the notes of the slide in view")
             Button { pageField = "\(page)"; pagePopover = true } label: { Text("Page \(page) of \(preview.pages.count)").monospacedDigit().fixedSize() }
                 .disabled(preview.pages.isEmpty)
                 .help("Go to a page")
@@ -425,5 +428,26 @@ private struct BranchSwitcher: View {
         if project.hasUnsavedChanges,
            !confirm("You have unsaved changes", "Switching to “\(b.name)” saves them first, and git may refuse if they conflict.", ok: "Switch Anyway") { return }
         Task { await model.run(project, "Couldn’t Switch to “\(b.name)”") { try await project.switchBranch(b.name) } }
+    }
+}
+
+/// The preview's counterpart of the editor's bottom bar: as tall, on the same line, with the notes strip's toggle on
+/// the right where the editor has the bottom area's.
+private struct PreviewBottomBar: View {
+    let isOn: Bool
+    let toggle: () -> Void
+
+    var body: some View {
+        HStack {
+            Spacer()
+            Button("Show or Hide Notes Strip", systemImage: "rectangle.bottomthird.inset.filled", action: toggle)
+                .labelStyle(.iconOnly).buttonStyle(.borderless).font(.system(size: 12)).frame(width: 24, height: 20)
+                .foregroundStyle(isOn ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
+                .help("Show or hide the notes of the slide in view")
+        }
+        .padding(.horizontal, 8)
+        .frame(height: 28)
+        .background(.background)
+        .overlay(alignment: .top) { Divider() }
     }
 }

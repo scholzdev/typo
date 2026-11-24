@@ -5397,6 +5397,16 @@
         }
       }
     },
+    "Delete Presenter Note" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderatornotiz löschen"
+          }
+        }
+      }
+    },
     "Delete Provider…" : {
       "localizations" : {
         "de" : {
@@ -14161,6 +14171,16 @@
         }
       }
     },
+    "Show or Hide Notes Strip" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizbereich ein- oder ausblenden"
+          }
+        }
+      }
+    },
     "Show or hide a black screen" : {
       "localizations" : {
         "de" : {
@@ -14207,6 +14227,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Informationen ein- oder ausblenden"
+          }
+        }
+      }
+    },
+    "Show or hide the notes of the slide in view" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen der sichtbaren Folie ein- oder ausblenden"
           }
         }
       }
@@ -14307,16 +14337,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Notiz im Editor zeigen"
-          }
-        }
-      }
-    },
-    "Show the notes of the slide in view" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Notizen der sichtbaren Folie anzeigen"
           }
         }
       }

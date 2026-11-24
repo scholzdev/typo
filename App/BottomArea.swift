@@ -14,8 +14,6 @@ extension SettingsKey {
     var height = UserDefaults.standard.object(forKey: SettingsKey.bottomAreaHeight) as? Double ?? 170
     /// The editor column's height, for the 75 % clamp.
     var available: CGFloat = 0
-    /// The editor's whole bottom inset (format bar and this area), so the notes strip beside it can match its top edge.
-    var insetHeight: CGFloat = 0
 
     var clamped: CGFloat { min(max(height, 120), max(available * 0.75, 120)) }
     func persistHeight() { UserDefaults.standard.set(height, forKey: SettingsKey.bottomAreaHeight) }
@@ -36,6 +34,7 @@ struct BottomArea: View {
         }
         .frame(height: model.clamped)
         .background(Color(nsColor: .textBackgroundColor))
+        .modifier(FadeIn())
     }
 
     private var resize: some Gesture {
@@ -71,5 +70,14 @@ struct BottomArea: View {
         .padding(.horizontal, 8).frame(height: 24)
         .background(.background.secondary)
         .overlay(alignment: .top) { Divider() }
+    }
+}
+
+/// Fades a pane in as it appears. Only the opacity animates: an animated height change of the bottom inset made
+/// the split views re-layout every frame until AppKit gave up ("more Update Constraints in Window passes than views").
+struct FadeIn: ViewModifier {
+    @State private var shown = false
+    func body(content: Content) -> some View {
+        content.opacity(shown ? 1 : 0).onAppear { withAnimation(.easeOut(duration: 0.18)) { shown = true } }
     }
 }
