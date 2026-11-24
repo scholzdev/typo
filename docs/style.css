@@ -13,6 +13,15 @@
   --muted: color-mix(in srgb, #5b5a6e, #a1a1a6 var(--m));
   --line: color-mix(in srgb, rgba(20, 18, 50, 0.1), rgba(255, 255, 255, 0.12) var(--m));
   --card: color-mix(in srgb, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.05) var(--m));
+  /* Feature tiles: solid white with a soft shadow on the light page (like Apple's tiles), glass on the dark one. */
+  --tile: color-mix(in srgb, #ffffff, rgba(255, 255, 255, 0.05) var(--m));
+  --tile-line: color-mix(in srgb, rgba(20, 18, 50, 0.04), rgba(255, 255, 255, 0.12) var(--m));
+  --tile-shadow:
+    0 1px 2px rgb(20 18 60 / calc(0.05 * (1 - var(--dark)))),
+    0 16px 36px -16px rgb(43 31 122 / calc(0.22 * (1 - var(--dark))));
+  --tile-shadow-hover:
+    0 1px 2px rgb(20 18 60 / calc(0.06 * (1 - var(--dark)))),
+    0 24px 48px -18px rgb(43 31 122 / calc(0.3 * (1 - var(--dark))));
   --shot-bg: color-mix(in srgb, #ffffff, #1e1e1e var(--m));
   --shadow:
     0 0 0 1px rgb(255 255 255 / calc(0.08 * var(--dark))),
@@ -179,10 +188,10 @@ html.js .hero-shot { transform: rotateX(calc((1 - var(--p, 1)) * 16deg)) scale(c
 .cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .card {
   padding: 30px; border-radius: var(--radius);
-  background: var(--card); border: 1px solid var(--line);
-  transition: transform .3s;
+  background: var(--tile); border: 1px solid var(--tile-line); box-shadow: var(--tile-shadow);
+  transition: transform .3s, box-shadow .3s;
 }
-.card:hover { transform: translateY(-3px); }
+.card:hover { transform: translateY(-3px); box-shadow: var(--tile-shadow-hover); }
 .card p { margin: 8px 0 0; color: var(--muted); font-size: 15.5px; }
 .card-icon {
   display: inline-grid; place-items: center; min-width: 42px; height: 42px; padding: 0 10px; margin-bottom: 18px;

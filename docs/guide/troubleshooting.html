@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Troubleshooting · Typo User Guide</title>
+  <meta name="description" content="Fixes for missing fonts, packages that do not load and PDF/UA export errors in Typo, and how to report a bug.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html">Writing</a></li>
+          <li><a href="navigating.html">Navigating</a></li>
+          <li><a href="preview-export.html">Preview and export</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="assistant.html">Assistant</a></li>
+          <li><a href="shortcuts.html">Shortcuts</a></li>
+          <li><a href="troubleshooting.html" aria-current="page">Troubleshooting</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+    <main class="guide-main" id="main">
+      <h1>Troubleshooting</h1>
+
+      <p class="lead">This page lists problems you may meet, and what to do about them.</p>
+
+      <h2 id="fonts">A font is missing</h2>
+      <p><strong>Symptom:</strong> an issue says <code>unknown font family</code>, or Typo shows “Some Fonts Are Missing” when you export or print.</p>
+      <p><strong>Cause:</strong> the document names a font that is not installed on this Mac. Typst uses a replacement font.</p>
+      <p><strong>Fix:</strong> install the font, or choose another one. For the second, put the caret on the font name and choose <span class="path">Navigate › Show Quick Fixes</span> (<kbd>⌘</kbd><kbd>.</kbd>). Typo suggests up to three installed fonts. Then export again.</p>
+
+      <h2 id="packages">A package does not load</h2>
+      <p><strong>Symptom:</strong> an <code>@preview</code> import fails, or the template gallery says the list could not be loaded.</p>
+      <p><strong>Cause:</strong> Typst downloads a package the first time a document imports it, and Typo loads the template list from Typst Universe. Both need a network connection.</p>
+      <p><strong>Fix:</strong> connect to the network and compile again. After a package has been downloaded, it is available offline. Settings › Packages lists what is installed.</p>
+
+      <h2 id="ua">PDF/UA-1 export fails without a line number</h2>
+      <p><strong>Symptom:</strong> <span class="path">File › Export › PDF/UA-1 (Accessible)…</span> shows an error that does not point to a line.</p>
+      <p><strong>Cause:</strong> this is a known limitation. Typst gives no position for many PDF/UA-1 errors.</p>
+      <p><strong>Fix:</strong> turn on accessibility checks in Settings › General (When Exporting PDF/UA, or Always). Typo then hints at the usual causes in the editor: missing alternative text, skipped heading levels, tables without a header, and a missing title or language. The <code>/submit</code> workflow in the <a href="assistant.html#builtin">assistant</a> also checks these.</p>
+
+      <h2 id="report">Report a bug</h2>
+      <p>To report a bug or ask for a feature, open an issue with one of the forms at <a href="https://github.com/scholzdev/typo/issues/new/choose">github.com/scholzdev/typo/issues/new/choose</a>. Search the existing issues first. For a security problem, do not open a public issue. Use “Report a vulnerability” on the repository’s Security tab instead.</p>
+
+      <nav class="pager" aria-label="Previous and next page">
+        <a class="prev" href="shortcuts.html" rel="prev">‹ Previous: Shortcuts</a>
+        
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>

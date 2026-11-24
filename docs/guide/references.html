@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>References · Typo User Guide</title>
+  <meta name="description" content="The BibTeX editor, Add Reference, Insert Citation and Zotero sync in Typo.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html">Writing</a></li>
+          <li><a href="navigating.html">Navigating</a></li>
+          <li><a href="preview-export.html">Preview and export</a></li>
+          <li><a href="references.html" aria-current="page">References</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="assistant.html">Assistant</a></li>
+          <li><a href="shortcuts.html">Shortcuts</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+    <main class="guide-main" id="main">
+      <h1>References</h1>
+
+      <p class="lead">Typo edits <code>.bib</code> files in a form, looks up references and inserts citations.</p>
+
+      <h2 id="bib-editor">The BibTeX editor</h2>
+      <p>Open a <code>.bib</code> file from the file tree to edit it as a list of entries with a form for each. Common fields are shown, and More Fields has the rest. Typo checks that the required fields of each entry type are filled in.</p>
+      <figure class="shot">
+        <img class="shot-light" width="684" height="896" src="images/bibtex-editor-light.webp" alt="The BibTeX editor with the entry list on the left and the field form on the right" loading="lazy" decoding="async">
+        <img class="shot-dark" width="684" height="896" src="images/bibtex-editor-dark.webp" alt="The BibTeX editor with the entry list on the left and the field form on the right" loading="lazy" decoding="async">
+        <figcaption>The BibTeX editor</figcaption>
+      </figure>
+
+      <h2 id="add-reference">Add Reference</h2>
+      <p>To add an entry from an identifier, open Add Reference… (a button in the BibTeX editor and in the citation picker). Enter a DOI, an arXiv ID or an ISBN, then press Fetch. Typo looks it up and appends the entry to a <code>.bib</code> file of the project. If the entry exists already, you can cite it instead.</p>
+      <p>Examples of accepted input: <code>10.1145/3591280</code>, <code>arXiv:1706.03762</code>, <code>978-0-201-03801-9</code>.</p>
+
+      <h2 id="citation">Insert Citation</h2>
+      <p>Choose <span class="path">Format › Insert Citation…</span> (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd>). The citation picker lists the references of the project’s bibliography. Pick one to insert it at the caret. Completion also suggests the bibliography keys you can reach.</p>
+
+      <h2 id="zotero">Zotero sync</h2>
+      <p>Choose <span class="path">File › Connect Zotero…</span>. Typo fills a <code>.bib</code> file of the project from your Zotero library and keeps it in sync. It can read the local Zotero app or a Zotero account.</p>
+
+      <nav class="pager" aria-label="Previous and next page">
+        <a class="prev" href="preview-export.html" rel="prev">‹ Previous: Preview and export</a>
+        <a class="next" href="packages.html" rel="next">Next: Packages ›</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>

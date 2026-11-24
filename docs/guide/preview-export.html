@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preview and export · Typo User Guide</title>
+  <meta name="description" content="Preview controls, presentation mode, export formats and printing in Typo.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html">Writing</a></li>
+          <li><a href="navigating.html">Navigating</a></li>
+          <li><a href="preview-export.html" aria-current="page">Preview and export</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="assistant.html">Assistant</a></li>
+          <li><a href="shortcuts.html">Shortcuts</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+    <main class="guide-main" id="main">
+      <h1>Preview and export</h1>
+
+      <p class="lead">This page covers the preview, presentations, the export formats and printing.</p>
+
+      <h2 id="preview">Preview controls</h2>
+      <p>The View menu has the preview commands.</p>
+      <ul>
+        <li><span class="path">View › Zoom In</span> (<kbd>⌘</kbd><kbd>+</kbd>) and <span class="path">View › Zoom Out</span> (<kbd>⌘</kbd><kbd>-</kbd>).</li>
+        <li><span class="path">View › Fit Width</span> (<kbd>⌘</kbd><kbd>0</kbd>), <span class="path">View › Fit Page</span> (<kbd>⌘</kbd><kbd>9</kbd>) and <span class="path">View › Two Pages</span> (<kbd>⌘</kbd><kbd>8</kbd>).</li>
+        <li><span class="path">View › Page Thumbnails</span> shows a strip of small pages beside the preview.</li>
+        <li><span class="path">View › Dark Preview Pages</span> darkens the pages on screen only. Exports keep their colours.</li>
+        <li><span class="path">View › Preview Follows Cursor</span> scrolls the preview to the caret as you move it.</li>
+        <li><span class="path">View › Lock Preview Document</span> keeps previewing the main document instead of the file you are editing.</li>
+      </ul>
+      <p>To find the source of something you see in the preview, click it. The editor jumps to the line that made it.</p>
+      <figure class="shot">
+        <img class="shot-light" width="539" height="565" src="images/thumbnails-light.webp" alt="The preview with the page thumbnails strip open" loading="lazy" decoding="async">
+        <img class="shot-dark" width="539" height="565" src="images/thumbnails-dark.webp" alt="The preview with the page thumbnails strip open" loading="lazy" decoding="async">
+        <figcaption>The page thumbnails strip</figcaption>
+      </figure>
+
+      <h2 id="presentation">Presentation mode</h2>
+      <ul>
+        <li><span class="path">View › Start Presentation</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>Return</kbd>) shows the pages full screen, one at a time. The arrow keys move between pages and <kbd>Esc</kbd> ends it.</li>
+        <li><span class="path">View › Start Presentation with Presenter View</span> (<kbd>⌥</kbd><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Return</kbd>) shows the slides full screen on a second display. On this display it opens a window with the next slide, speaker notes, the slide number and a timer. With one display, only that window opens, so you can rehearse.</li>
+      </ul>
+      <p>Both commands need a compiled document with at least one page.</p>
+
+      <h2 id="export">Export formats</h2>
+      <p>All export commands are in the File › Export menu. Each compiles the project and opens a save panel.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Export formats">
+        <table>
+          <thead><tr><th scope="col">Command</th><th scope="col">Result</th></tr></thead>
+          <tbody>
+            <tr><td><span class="path">File › Export › PDF…</span> (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd>)</td><td>A PDF file.</td></tr>
+            <tr><td><span class="path">File › Export › PDF/A-2b for Archiving…</span></td><td>A PDF/A-2b file, a standard for long-term archiving.</td></tr>
+            <tr><td><span class="path">File › Export › PDF/A-3b for Archiving…</span></td><td>A PDF/A-3b file, an archiving standard that allows embedded files.</td></tr>
+            <tr><td><span class="path">File › Export › PDF/UA-1 (Accessible)…</span></td><td>An accessible PDF/UA-1 file.</td></tr>
+            <tr><td><span class="path">File › Export › PNG Images…</span></td><td>Every page as a PNG image.</td></tr>
+            <tr><td><span class="path">File › Export › SVG Images…</span></td><td>Every page as an SVG image.</td></tr>
+            <tr><td><span class="path">File › Export › Project Archive (ZIP)…</span></td><td>The project folder as a ZIP file, without hidden files such as <code>.git</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>For PDF/UA-1, Typo can check accessibility while you write: in Settings › General, set Accessibility checks to When Exporting PDF/UA or Always. It then hints at missing alternative text, skipped heading levels, tables without a header, and a missing title or language. If a PDF/UA-1 export fails, see <a href="troubleshooting.html#ua">Troubleshooting</a>.</p>
+
+      <figure class="shot">
+        <img class="shot-light" width="580" height="580" src="images/export-menu-light.webp" alt="The File menu with the Export submenu open, listing PDF, PDF/A, PDF/UA, PNG, SVG and project archive" loading="lazy" decoding="async">
+        <img class="shot-dark" width="580" height="580" src="images/export-menu-dark.webp" alt="The File menu with the Export submenu open, listing PDF, PDF/A, PDF/UA, PNG, SVG and project archive" loading="lazy" decoding="async">
+        <figcaption>File › Export has every format in one place.</figcaption>
+      </figure>
+
+      <h2 id="print">Printing</h2>
+      <p>Choose <span class="path">File › Print…</span> (<kbd>⌘</kbd><kbd>P</kbd>). Typo prepares the pages and opens the macOS print panel. You can save as PDF from that panel.</p>
+
+      <h2 id="fonts">Missing fonts</h2>
+      <p>If the document names a font that is not installed, Typst uses a replacement. Before you export or print, Typo lists the missing fonts and asks whether to continue (Export Anyway or Print Anyway). To fix the cause, put the caret on the font name, choose <span class="path">Navigate › Show Quick Fixes</span> (<kbd>⌘</kbd><kbd>.</kbd>) and pick one of the installed fonts Typo suggests. Or install the font and export again.</p>
+
+      <nav class="pager" aria-label="Previous and next page">
+        <a class="prev" href="navigating.html" rel="prev">‹ Previous: Navigating</a>
+        <a class="next" href="references.html" rel="next">Next: References ›</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>

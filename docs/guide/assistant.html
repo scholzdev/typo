@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assistant · Typo User Guide</title>
+  <meta name="description" content="Model providers and agents, privacy, permissions, workflows, Claude skills and the MCP server in Typo.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html">Writing</a></li>
+          <li><a href="navigating.html">Navigating</a></li>
+          <li><a href="preview-export.html">Preview and export</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="assistant.html" aria-current="page">Assistant</a></li>
+          <li><a href="shortcuts.html">Shortcuts</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+    <main class="guide-main" id="main">
+      <h1>Assistant</h1>
+
+      <p class="lead">The assistant is optional. This page explains how to set it up, what it may do, and how to extend it with workflows.</p>
+
+      <h2 id="providers">Model providers and agents</h2>
+      <p>Open Settings › Intelligence. It has two kinds of entries.</p>
+      <ul>
+        <li><strong>Model providers</strong> answer questions with a model. Typo supports on-device (Apple Intelligence), OpenRouter, OpenCode Zen, OpenCode Go and other OpenAI- or Anthropic-compatible providers. To add one, choose Add a Provider… and enter its API key and model.</li>
+        <li><strong>Agents</strong> are programs that run on your Mac in the project folder, such as Claude Code. Typo talks to them through the Agent Client Protocol. To add Claude, press Get next to Claude in the Agents section. You sign in with the agent’s own command line tool, and Typo never sees your login. Test Agent checks that it starts.</li>
+      </ul>
+      <p>The Default provider setting chooses what new conversations use. Automatic picks the first ready provider, otherwise the on-device model.</p>
+      <p>To open the assistant, choose <span class="path">View › Show Assistant</span>. <span class="path">View › New Conversation</span> starts a new conversation.</p>
+      <figure class="shot">
+        <img class="shot-light" width="780" height="560" src="images/settings-intelligence-light.webp" alt="Settings, Intelligence pane with the Agents and Model Providers sections" loading="lazy" decoding="async">
+        <img class="shot-dark" width="780" height="560" src="images/settings-intelligence-dark.webp" alt="Settings, Intelligence pane with the Agents and Model Providers sections" loading="lazy" decoding="async">
+        <figcaption>Settings › Intelligence</figcaption>
+      </figure>
+
+      <h2 id="privacy">Consent and privacy</h2>
+      <ul>
+        <li>Typo sends nothing anywhere until you set up a model provider or an agent in Settings › Intelligence.</li>
+        <li>On-device runs on your Mac, and nothing leaves it.</li>
+        <li>A model provider receives your messages, the conversation, and the files you attach or let it read. API keys are stored only in your Keychain.</li>
+        <li>An agent sends what it reads to its own provider, under that provider’s terms.</li>
+        <li>Typo collects no analytics or usage data. Conversations are stored on your Mac and can be deleted.</li>
+      </ul>
+      <p>The privacy sheet in Settings › Intelligence (About Intelligence in Typo &amp; Privacy…) has the details.</p>
+
+      <h2 id="permissions">Permissions</h2>
+      <p>Settings › Intelligence › Permissions controls what the assistant and agents may do in your projects. For each action you choose Allow, Ask or Never (an action may offer fewer choices). The actions are: search the web, read the attached files, include compiler errors, change files, create new files, read project files, search the project and view the preview.</p>
+      <p>With Change files on Allow, changes are applied right away and can be reverted. With Ask, a card asks you to accept first. For one conversation, use the “This conversation may:” popover in the assistant sidebar. Its toggles override the defaults, and Reset restores them.</p>
+      <p>The same page has Control File &amp; Folder Access, with lists of Allowed Folders and Allowed Commands, and a Web Access setting for agents. When access control is on, agents may work in the project folder, and Typo asks first for files elsewhere. Agents that use their own tools follow their own settings for what they do not ask about.</p>
+      <p>Changes made by the assistant show an inline diff, with a revert bar.</p>
+
+      <h2 id="slash">The “/” menu</h2>
+      <p>Type <code>/</code> in a conversation to list the workflows. Pick one and add your text after it, for example <code>/check chapter 2</code>. Typo sends the workflow’s instructions to whichever model you use.</p>
+
+      <figure class="shot">
+        <img class="shot-light" width="800" height="252" src="images/workflows-menu-light.webp" alt="The command menu above the prompt field: the workflows check, consistency and submit marked typo, then the agent’s own commands" loading="lazy" decoding="async">
+        <img class="shot-dark" width="800" height="252" src="images/workflows-menu-dark.webp" alt="The command menu above the prompt field: the workflows check, consistency and submit marked typo, then the agent’s own commands" loading="lazy" decoding="async">
+        <figcaption>Type / to see the workflows (marked “typo”) and the agent’s own commands.</figcaption>
+      </figure>
+
+      <figure class="shot">
+        <img class="shot-light" width="900" height="611" src="images/conversation-light.webp" alt="A conversation in which the /check workflow compiled the project, looked at both pages and fixed a table" loading="lazy" decoding="async">
+        <img class="shot-dark" width="900" height="611" src="images/conversation-dark.webp" alt="A conversation in which the /check workflow compiled the project, looked at both pages and fixed a table" loading="lazy" decoding="async">
+        <figcaption>A conversation after /check: what the agent did, then its short report.</figcaption>
+      </figure>
+
+      <h2 id="builtin">Built-in workflows</h2>
+      <p>Typo ships three workflows. You can turn each on or off in Settings › Intelligence › Workflows, and press View to read its instructions.</p>
+      <dl>
+        <dt><code>/check</code></dt>
+        <dd>Makes the project compile cleanly and look right on every page. It compiles and fixes errors with the smallest edit, then looks at every page for layout problems such as overflowing text, a nearly empty page, <code>??</code> in place of a reference, a missing image or a broken table. It does not change your wording or delete content. It ends with a short report. Optional argument: a file or page range to look at first.</dd>
+        <dt><code>/submit</code></dt>
+        <dd>Checks the project before you hand it in, as a checklist: it builds, leftovers such as TODO and <code>??</code>, references and citations, page count against a limit you name, document title, author and language, heading structure, alt text and table headers, fonts, accessibility if PDF/UA is wanted, and a look at the pages. It fixes mechanical problems, and asks you for content such as alt text. It does not export the PDF. You do that with File › Export. Optional argument: your requirements, for example the page limit or citation style.</dd>
+        <dt><code>/consistency</code></dt>
+        <dd>Finds terms written in more than one way, such as spelling variants, abbreviations, units, numbers and heading capitalisation, and makes them consistent. It reports a table of what it kept and changed, and lists the cases it left for you to decide. Optional argument: terms to check, or a file.</dd>
+      </dl>
+
+      <h2 id="own-workflows">Write your own workflows</h2>
+      <ol>
+        <li>Open Settings › Intelligence › Workflows.</li>
+        <li>Under My Workflows, press New Workflow. You can also duplicate a built-in one.</li>
+        <li>Enter a name (lowercase letters, digits and single hyphens), a description and an argument hint, then write the instructions.</li>
+        <li>Press Save.</li>
+      </ol>
+      <p>In the instructions, write <code>$ARGUMENTS</code> where the text typed after the workflow name should go. If the instructions do not contain <code>$ARGUMENTS</code>, the text is added at the end. In the workflow list, Show in Finder reveals the file.</p>
+      <pre><code>Make every table in the project match the template.
+
+Focus on: $ARGUMENTS</code></pre>
+
+      <h2 id="claude-skills">Claude’s skills and your Claude Code setup</h2>
+      <p>These settings appear when Claude is set up as an agent (Settings › Intelligence › Claude).</p>
+      <ul>
+        <li><strong>Claude › Skills</strong> lists the skills in <code>~/.claude/skills</code>. Turn on the ones Claude should load in Typo.</li>
+        <li><strong>Use my Claude Code setup</strong> loads your own <code>CLAUDE.md</code>, skills, plug-ins, hooks, memory and settings from <code>~/.claude</code>, as in the terminal. With it off, Claude sees only the project’s setup and the skills you turned on. With it on, all skills load. It applies to new conversations.</li>
+      </ul>
+
+      <h2 id="mcp">The MCP server</h2>
+      <p>Typo includes <code>typo-mcp</code>, a Model Context Protocol server that gives other AI agents Typo’s Typst tools: compile errors, page previews, Typst docs, packages and fonts. In Settings › Intelligence, the Model Context Protocol section has these buttons:</p>
+      <ul>
+        <li>Copy Command copies the path of <code>typo-mcp</code>.</li>
+        <li>Add to Claude Code registers it for all your projects. This needs Claude Code to be installed.</li>
+        <li>Add to Claude Desktop adds it to Claude Desktop’s configuration.</li>
+      </ul>
+
+      <nav class="pager" aria-label="Previous and next page">
+        <a class="prev" href="history.html" rel="prev">‹ Previous: History</a>
+        <a class="next" href="shortcuts.html" rel="next">Next: Shortcuts ›</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>

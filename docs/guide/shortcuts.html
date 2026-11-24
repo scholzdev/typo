@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shortcuts · Typo User Guide</title>
+  <meta name="description" content="The default keyboard shortcuts of Typo, grouped by menu.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html">Writing</a></li>
+          <li><a href="navigating.html">Navigating</a></li>
+          <li><a href="preview-export.html">Preview and export</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="assistant.html">Assistant</a></li>
+          <li><a href="shortcuts.html" aria-current="page">Shortcuts</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+    <main class="guide-main" id="main">
+      <h1>Shortcuts</h1>
+
+      <p class="lead">These are the default shortcuts of the menu commands. Commands that are not listed have no default shortcut.</p>
+      <p>To change a shortcut, open Settings › Shortcuts. You can duplicate and rename shortcut sets, filter by All, Menu, Text, Customized or Conflicts, and record a new binding by double-clicking. “Adapt to current keyboard” adjusts the shortcuts to your keyboard layout.</p>
+      <p>The command palette (<span class="path">View › Command Palette…</span>, <kbd>⇧</kbd><kbd>⌘</kbd><kbd>P</kbd>) runs any command by name. Show Changes Navigator, ⌘6, is available only when source control is on.</p>
+      <h2>File</h2>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="File shortcuts">
+        <table>
+          <thead><tr><th scope="col">Command</th><th scope="col">Shortcut</th></tr></thead>
+          <tbody>
+          <tr><td>New Project…</td><td><kbd>⌘</kbd><kbd>N</kbd></td></tr>
+          <tr><td>Open…</td><td><kbd>⌘</kbd><kbd>O</kbd></td></tr>
+          <tr><td>New File…</td><td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>N</kbd></td></tr>
+          <tr><td>New Folder…</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>N</kbd></td></tr>
+          <tr><td>Move to Trash (file list focused)</td><td><kbd>⌘</kbd><kbd>⌫</kbd></td></tr>
+          <tr><td>Save</td><td><kbd>⌘</kbd><kbd>S</kbd></td></tr>
+          <tr><td>New Tab…</td><td><kbd>⌘</kbd><kbd>T</kbd></td></tr>
+          <tr><td>Close Tab</td><td><kbd>⌘</kbd><kbd>W</kbd></td></tr>
+          <tr><td>Close Window</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>W</kbd></td></tr>
+          <tr><td>Print…</td><td><kbd>⌘</kbd><kbd>P</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>File › Export</h2>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="File › Export shortcuts">
+        <table>
+          <thead><tr><th scope="col">Command</th><th scope="col">Shortcut</th></tr></thead>
+          <tbody>
+          <tr><td>PDF…</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>Edit</h2>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Edit shortcuts">
+        <table>
+          <thead><tr><th scope="col">Command</th><th scope="col">Shortcut</th></tr></thead>
+          <tbody>
+          <tr><td>Select Next Occurrence</td><td><kbd>⌘</kbd><kbd>D</kbd></td></tr>
+          <tr><td>Select All Occurrences</td><td><kbd>⌃</kbd><kbd>⌘</kbd><kbd>G</kbd></td></tr>
+          <tr><td>Add Caret Above</td><td><kbd>⌃</kbd><kbd>⇧</kbd><kbd>↑</kbd></td></tr>
+          <tr><td>Add Caret Below</td><td><kbd>⌃</kbd><kbd>⇧</kbd><kbd>↓</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>Format</h2>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Format shortcuts">
+        <table>
+          <thead><tr><th scope="col">Command</th><th scope="col">Shortcut</th></tr></thead>
+          <tbody>
+          <tr><td>Bold</td><td><kbd>⌘</kbd><kbd>B</kbd></td></tr>
+          <tr><td>Italic</td><td><kbd>⌘</kbd><kbd>I</kbd></td></tr>
+          <tr><td>Underline</td><td><kbd>⌘</kbd><kbd>U</kbd></td></tr>
+          <tr><td>Insert Citation…</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd></td></tr>
+          <tr><td>Format Document</td><td><kbd>⌃</kbd><kbd>⇧</kbd><kbd>I</kbd></td></tr>
+          <tr><td>Re-Indent</td><td><kbd>⌃</kbd><kbd>I</kbd></td></tr>
+          <tr><td>Move Section Up</td><td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>↑</kbd></td></tr>
+          <tr><td>Move Section Down</td><td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>↓</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>View</h2>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="View shortcuts">
+        <table>
+          <thead><tr><th scope="col">Command</th><th scope="col">Shortcut</th></tr></thead>
+          <tbody>
+          <tr><td>Zoom In</td><td><kbd>⌘</kbd><kbd>+</kbd></td></tr>
+          <tr><td>Zoom Out</td><td><kbd>⌘</kbd><kbd>-</kbd></td></tr>
+          <tr><td>Fit Width</td><td><kbd>⌘</kbd><kbd>0</kbd></td></tr>
+          <tr><td>Fit Page</td><td><kbd>⌘</kbd><kbd>9</kbd></td></tr>
+          <tr><td>Two Pages</td><td><kbd>⌘</kbd><kbd>8</kbd></td></tr>
+          <tr><td>Start Presentation</td><td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>Return</kbd></td></tr>
+          <tr><td>Start Presentation with Presenter View</td><td><kbd>⌥</kbd><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Return</kbd></td></tr>
+          <tr><td>Library…</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>L</kbd></td></tr>
+          <tr><td>Command Palette…</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>P</kbd></td></tr>
+          <tr><td>Focus Mode</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Return</kbd></td></tr>
+          <tr><td>Split Editor</td><td><kbd>⌃</kbd><kbd>⌘</kbd><kbd>T</kbd></td></tr>
+          <tr><td>Show Inspector</td><td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>0</kbd></td></tr>
+          <tr><td>Bottom Area</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Y</kbd></td></tr>
+          <tr><td>Bigger Text</td><td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>+</kbd></td></tr>
+          <tr><td>Smaller Text</td><td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>-</kbd></td></tr>
+          <tr><td>Default Text Size</td><td><kbd>⌃</kbd><kbd>⌘</kbd><kbd>0</kbd></td></tr>
+          <tr><td>Fold Section</td><td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>←</kbd></td></tr>
+          <tr><td>Unfold Section</td><td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>→</kbd></td></tr>
+          <tr><td>Fold All Sections</td><td><kbd>⌥</kbd><kbd>⇧</kbd><kbd>⌘</kbd><kbd>←</kbd></td></tr>
+          <tr><td>Unfold All Sections</td><td><kbd>⌥</kbd><kbd>⇧</kbd><kbd>⌘</kbd><kbd>→</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>Navigate</h2>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Navigate shortcuts">
+        <table>
+          <thead><tr><th scope="col">Command</th><th scope="col">Shortcut</th></tr></thead>
+          <tbody>
+          <tr><td>Jump to Definition</td><td><kbd>⌃</kbd><kbd>⌘</kbd><kbd>J</kbd></td></tr>
+          <tr><td>Find References</td><td><kbd>⌃</kbd><kbd>⌘</kbd><kbd>R</kbd></td></tr>
+          <tr><td>Show Quick Fixes</td><td><kbd>⌘</kbd><kbd>.</kbd></td></tr>
+          <tr><td>Rename Symbol…</td><td><kbd>⌃</kbd><kbd>⌘</kbd><kbd>E</kbd></td></tr>
+          <tr><td>Go Back</td><td><kbd>⌃</kbd><kbd>⌘</kbd><kbd>←</kbd></td></tr>
+          <tr><td>Go Forward</td><td><kbd>⌃</kbd><kbd>⌘</kbd><kbd>→</kbd></td></tr>
+          <tr><td>Open Quickly…</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>O</kbd></td></tr>
+          <tr><td>Go to Line…</td><td><kbd>⌘</kbd><kbd>L</kbd></td></tr>
+          <tr><td>Toggle Bookmark</td><td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd></td></tr>
+          <tr><td>Next Bookmark</td><td><kbd>⌃</kbd><kbd>⌘</kbd><kbd>↓</kbd></td></tr>
+          <tr><td>Previous Bookmark</td><td><kbd>⌃</kbd><kbd>⌘</kbd><kbd>↑</kbd></td></tr>
+          <tr><td>Show Files Navigator</td><td><kbd>⌘</kbd><kbd>1</kbd></td></tr>
+          <tr><td>Show Search Navigator</td><td><kbd>⌘</kbd><kbd>2</kbd></td></tr>
+          <tr><td>Show Outline Navigator</td><td><kbd>⌘</kbd><kbd>3</kbd></td></tr>
+          <tr><td>Show Issues Navigator</td><td><kbd>⌘</kbd><kbd>4</kbd></td></tr>
+          <tr><td>Show Bookmarks Navigator</td><td><kbd>⌘</kbd><kbd>5</kbd></td></tr>
+          <tr><td>Show Changes Navigator</td><td><kbd>⌘</kbd><kbd>6</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>Window</h2>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Window shortcuts">
+        <table>
+          <thead><tr><th scope="col">Command</th><th scope="col">Shortcut</th></tr></thead>
+          <tbody>
+          <tr><td>Show Next Tab</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>]</kbd></td></tr>
+          <tr><td>Show Previous Tab</td><td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>[</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>Git</h2>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Git shortcuts">
+        <table>
+          <thead><tr><th scope="col">Command</th><th scope="col">Shortcut</th></tr></thead>
+          <tbody>
+          <tr><td>Show Changes</td><td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>C</kbd></td></tr>
+          <tr><td>Pull</td><td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>X</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="pager" aria-label="Previous and next page">
+        <a class="prev" href="assistant.html" rel="prev">‹ Previous: Assistant</a>
+        <a class="next" href="troubleshooting.html" rel="next">Next: Troubleshooting ›</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>

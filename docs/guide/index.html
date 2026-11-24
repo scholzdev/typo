@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Typo User Guide</title>
+  <meta name="description" content="What the Typo user guide covers and where to find it.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html" aria-current="page">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html">Writing</a></li>
+          <li><a href="navigating.html">Navigating</a></li>
+          <li><a href="preview-export.html">Preview and export</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="assistant.html">Assistant</a></li>
+          <li><a href="shortcuts.html">Shortcuts</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+    <main class="guide-main" id="main">
+      <h1>Typo User Guide</h1>
+
+      <p class="lead">This guide shows how to use Typo, a native macOS editor for Typst. Each page is about one task area, and every page lists the menu commands and shortcuts it mentions.</p>
+
+      <p class="note"><strong>Note:</strong> This guide does not teach the Typst language. For syntax, functions and examples, read the Typst documentation at <a href="https://typst.app/docs">typst.app/docs</a>.</p>
+
+      <h2>Topics</h2>
+      <ul class="cards">
+        <li><a href="getting-started.html"><strong>Getting started</strong><span>Install Typo, open or create a project, and make a first export.</span></a></li>
+        <li><a href="writing.html"><strong>Writing</strong><span>Completion, snippets, formatting, multiple cursors, Vim mode, spell check, tables, images, colours and folding.</span></a></li>
+        <li><a href="navigating.html"><strong>Navigating</strong><span>Open Quickly, the navigators, project search, references, quick fixes and split editor.</span></a></li>
+        <li><a href="preview-export.html"><strong>Preview and export</strong><span>The preview, presentation mode, export formats and printing.</span></a></li>
+        <li><a href="references.html"><strong>References</strong><span>The BibTeX editor, Add Reference, citations and Zotero.</span></a></li>
+        <li><a href="packages.html"><strong>Packages</strong><span>Typst Universe, local packages, updates and templates.</span></a></li>
+        <li><a href="history.html"><strong>History</strong><span>Git in the editor, snapshots and file history.</span></a></li>
+        <li><a href="assistant.html"><strong>Assistant</strong><span>Model providers and agents, privacy, permissions, workflows and the MCP server.</span></a></li>
+        <li><a href="shortcuts.html"><strong>Shortcuts</strong><span>A table of the default keyboard shortcuts.</span></a></li>
+        <li><a href="troubleshooting.html"><strong>Troubleshooting</strong><span>Missing fonts, packages, PDF/UA errors and how to report a bug.</span></a></li>
+      </ul>
+
+      <h2>Conventions</h2>
+      <ul>
+        <li>Menu paths are written like <span class="path">File › Save</span>.</li>
+        <li>Shortcuts are the defaults. You can change them in Settings › Shortcuts.</li>
+        <li>Typo requires macOS 27.</li>
+      </ul>
+
+      <nav class="pager" aria-label="Previous and next page">
+        
+        <a class="next" href="getting-started.html" rel="next">Next: Getting started ›</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>

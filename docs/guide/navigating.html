@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Navigating · Typo User Guide</title>
+  <meta name="description" content="Open Quickly, navigators, project search, references, quick fixes, split editor and focus mode in Typo.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html">Writing</a></li>
+          <li><a href="navigating.html" aria-current="page">Navigating</a></li>
+          <li><a href="preview-export.html">Preview and export</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="assistant.html">Assistant</a></li>
+          <li><a href="shortcuts.html">Shortcuts</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+    <main class="guide-main" id="main">
+      <h1>Navigating</h1>
+
+      <p class="lead">This page shows how to move around a project: files, headings, definitions and issues.</p>
+
+      <h2 id="quickly">Open Quickly and Go to Line</h2>
+      <p><span class="path">Navigate › Open Quickly…</span> (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>O</kbd>) finds a file, heading, label, function, variable, bibliography entry or Typst function from a few of its letters. To open a file at a line, type <code>name:line</code>.</p>
+      <p><span class="path">Navigate › Go to Line…</span> (<kbd>⌘</kbd><kbd>L</kbd>) moves the caret to a line. Type <code>42</code> for a line, <code>42:7</code> for a line and column, or <code>+10</code> and <code>-10</code> relative to the current line.</p>
+
+      <figure class="shot">
+        <img class="shot-light" width="665" height="180" src="images/open-quickly-light.webp" alt="The Open Quickly panel listing a label and a heading that match “write”" loading="lazy" decoding="async">
+        <img class="shot-dark" width="665" height="180" src="images/open-quickly-dark.webp" alt="The Open Quickly panel listing a label and a heading that match “write”" loading="lazy" decoding="async">
+        <figcaption>Open Quickly finds files, headings and labels as you type.</figcaption>
+      </figure>
+
+      <h2 id="navigators">The navigators</h2>
+      <p>The sidebar has six navigators. Switch with <span class="path">Navigate › Show … Navigator</span> or the shortcuts below.</p>
+      <ul>
+        <li><strong>Files</strong> (<kbd>⌘</kbd><kbd>1</kbd>): the file tree, with a filter bar. A file can open in a new tab.</li>
+        <li><strong>Search</strong> (<kbd>⌘</kbd><kbd>2</kbd>): find and replace in the project, see below.</li>
+        <li><strong>Outline</strong> (<kbd>⌘</kbd><kbd>3</kbd>): the headings of the document.</li>
+        <li><strong>Issues</strong> (<kbd>⌘</kbd><kbd>4</kbd>): errors and warnings, with a badge on the tab.</li>
+        <li><strong>Bookmarks</strong> (<kbd>⌘</kbd><kbd>5</kbd>): your bookmarked lines and files.</li>
+        <li><strong>Changes</strong> (<kbd>⌘</kbd><kbd>6</kbd>): Git changes, see <a href="history.html">History</a>. It is hidden when source control is off in the settings.</li>
+      </ul>
+      <figure class="shot">
+        <img class="shot-light" width="800" height="565" src="images/navigator-outline-light.webp" alt="The sidebar with the six navigator tabs and the Outline navigator open" loading="lazy" decoding="async">
+        <img class="shot-dark" width="800" height="565" src="images/navigator-outline-dark.webp" alt="The sidebar with the six navigator tabs and the Outline navigator open" loading="lazy" decoding="async">
+        <figcaption>The Outline navigator</figcaption>
+      </figure>
+
+      <h3 id="search">Find and replace in the project</h3>
+      <p>In the Search navigator, type a query to list the matches in all files, grouped by file. Choose Find or Replace in the pop-up at the top of the navigator. In Replace mode each row shows a preview of the change, and you can use Replace or Replace All. The search options include a regular-expression mode.</p>
+
+      <h3 id="bookmarks">Bookmarks</h3>
+      <ul>
+        <li><span class="path">Navigate › Toggle Bookmark</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd>) bookmarks the caret line, or removes it.</li>
+        <li><span class="path">Navigate › Add File Bookmark</span> bookmarks a whole file. It follows renames.</li>
+        <li><span class="path">Navigate › Next Bookmark</span> (<kbd>⌃</kbd><kbd>⌘</kbd><kbd>↓</kbd>) and <span class="path">Navigate › Previous Bookmark</span> (<kbd>⌃</kbd><kbd>⌘</kbd><kbd>↑</kbd>) jump between them, across files.</li>
+      </ul>
+
+      <h2 id="symbols">Definitions, references and renaming</h2>
+      <ul>
+        <li><span class="path">Navigate › Jump to Definition</span> (<kbd>⌃</kbd><kbd>⌘</kbd><kbd>J</kbd>) goes from a reference, variable, function or import to where it is defined.</li>
+        <li><span class="path">Navigate › Find References</span> (<kbd>⌃</kbd><kbd>⌘</kbd><kbd>R</kbd>) lists every use of the label, variable or function under the caret across the project.</li>
+        <li><span class="path">Navigate › Rename Symbol…</span> (<kbd>⌃</kbd><kbd>⌘</kbd><kbd>E</kbd>) renames a label, variable or function everywhere it is used.</li>
+      </ul>
+      <p><span class="path">Navigate › Go Back</span> (<kbd>⌃</kbd><kbd>⌘</kbd><kbd>←</kbd>) and <span class="path">Navigate › Go Forward</span> (<kbd>⌃</kbd><kbd>⌘</kbd><kbd>→</kbd>) move through the places you visited.</p>
+
+      <h2 id="quick-fixes">Quick fixes</h2>
+      <p>Put the caret on an issue and choose <span class="path">Navigate › Show Quick Fixes</span> (<kbd>⌘</kbd><kbd>.</kbd>). Typo offers fixes such as a similar label or name, a missing import, a nearby file, an installed font instead of a missing one, or an update for a package import.</p>
+
+      <h2 id="layout">Tabs, split editor and focus mode</h2>
+      <ul>
+        <li><span class="path">File › New Tab…</span> (<kbd>⌘</kbd><kbd>T</kbd>) opens Open Quickly to show a file in a new tab. <span class="path">Window › Show Next Tab</span> (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>]</kbd>) and <span class="path">Window › Show Previous Tab</span> (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>[</kbd>) switch tabs. The tab bar appears from two tabs.</li>
+        <li><span class="path">View › Split Editor</span> (<kbd>⌃</kbd><kbd>⌘</kbd><kbd>T</kbd>) shows a second editor pane with its own tabs.</li>
+        <li><span class="path">View › Focus Mode</span> (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>Return</kbd>) hides the sidebar, preview and second pane and centres the text.</li>
+        <li><span class="path">View › Show Inspector</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>0</kbd>) shows details about the figure, table, colour, label or function call under the caret.</li>
+        <li><span class="path">View › Bottom Area</span> (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>Y</kbd>) shows or hides the bottom bar with the issues.</li>
+      </ul>
+      <p>The command palette, <span class="path">View › Command Palette…</span> (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>P</kbd>), finds and runs any menu command.</p>
+
+      <nav class="pager" aria-label="Previous and next page">
+        <a class="prev" href="writing.html" rel="prev">‹ Previous: Writing</a>
+        <a class="next" href="preview-export.html" rel="next">Next: Preview and export ›</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>

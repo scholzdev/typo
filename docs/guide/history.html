@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>History · Typo User Guide</title>
+  <meta name="description" content="Git in the gutter, blame, the log and the Changes navigator, plus snapshots and file history in Typo.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html">Writing</a></li>
+          <li><a href="navigating.html">Navigating</a></li>
+          <li><a href="preview-export.html">Preview and export</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="history.html" aria-current="page">History</a></li>
+          <li><a href="assistant.html">Assistant</a></li>
+          <li><a href="shortcuts.html">Shortcuts</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+    <main class="guide-main" id="main">
+      <h1>History</h1>
+
+      <p class="lead">Typo shows Git changes while you write and keeps local snapshots of your files.</p>
+
+      <h2 id="git">Git</h2>
+      <p>Git features are on by default. To turn them off, change Enable source control in Settings › Source Control. When it is off, the Git menu and the Changes navigator go away.</p>
+      <p>If the project is not a Git repository yet, choose <span class="path">Git › Create Git Repository</span>.</p>
+
+      <h3 id="gutter">Changes in the gutter</h3>
+      <p>Change bars next to the line numbers show what differs from the last commit. When the pointer rests on a line, a blame card shows who last changed it.</p>
+      <figure class="shot">
+        <img class="shot-light" width="425" height="300" src="images/git-gutter-light.webp" alt="The editor gutter with blue change bars and a blame card showing who last changed a line" loading="lazy" decoding="async">
+        <img class="shot-dark" width="560" height="230" src="images/git-gutter-dark.webp" alt="The editor gutter with blue change bars and a blame card showing who last changed a line" loading="lazy" decoding="async">
+        <figcaption>Change bars mark lines that differ from the last commit; hover a line to see who changed it.</figcaption>
+      </figure>
+
+      <h3 id="changes">The Changes navigator</h3>
+      <p>Open it with <span class="path">Git › Show Changes</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>C</kbd>) or <kbd>⌘</kbd><kbd>6</kbd>. It lists changed files, staging and the commit message.</p>
+
+      <h3 id="git-menu">The Git menu</h3>
+      <ul>
+        <li><span class="path">Git › Show File History</span> lists the commits that changed the current file, with the diff of each.</li>
+        <li><span class="path">Git › Pull</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>X</kbd>) fetches from the remote and fast-forwards. <span class="path">Git › Push</span> sends your commits. Both need a remote.</li>
+        <li><span class="path">Git › Stash Changes…</span> puts every change aside, new files included.</li>
+        <li><span class="path">Git › New Branch…</span> creates a branch at the current commit and switches to it. Other branches are listed as Switch to “name”.</li>
+      </ul>
+
+      <h2 id="snapshots">Snapshots</h2>
+      <p>Typo keeps local snapshots of your project, separate from Git. Choose <span class="path">File › Snapshots…</span> to browse them and restore an earlier version.</p>
+
+      <nav class="pager" aria-label="Previous and next page">
+        <a class="prev" href="packages.html" rel="prev">‹ Previous: Packages</a>
+        <a class="next" href="assistant.html" rel="next">Next: Assistant ›</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>

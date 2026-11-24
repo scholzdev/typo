@@ -46,6 +46,7 @@
         <a href="#features">Features</a>
         <a href="#tables">Tables</a>
         <a href="#assistant">Assistant</a>
+        <a href="guide/">Guide</a>
         <a class="nav-cta" href="https://github.com/Scholzdev/typo">GitHub</a>
         <span class="lang" role="group" aria-label="Language">
           <a href="./" hreflang="en" lang="en" title="English" aria-current="page">EN</a>
@@ -118,15 +119,45 @@
           <li class="card reveal">
             <span class="card-icon" aria-hidden="true">◐</span>
             <h3>Colours you can see</h3>
-            <p>Swatches sit right next to <code>rgb(…)</code>. Click one for a colour picker with a wheel or sliders and editable hex values.</p>
+            <p>Swatches sit right next to <code>rgb(…)</code>. Click one for a colour picker with sliders and value fields for every channel, and an optional wheel.</p>
           </li>
           <li class="card reveal">
             <span class="card-icon" aria-hidden="true">PDF</span>
             <h3>Export for print and for everyone</h3>
-            <p>PDF, archival PDF/A, accessible PDF/UA-1, PNG and SVG. Present full screen with a presenter view.</p>
+            <p>PDF, archival PDF/A, accessible PDF/UA-1, PNG and SVG. Print from File › Print… or take the whole project as a ZIP. Present full screen with a presenter view. A missing font gets a warning and a quick fix.</p>
+          </li>
+          <li class="card reveal">
+            <span class="card-icon" aria-hidden="true">⇧⌘O</span>
+            <h3>Find anything</h3>
+            <p>Open Quickly (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>O</kbd>) finds files, headings and labels. Go to Line with <kbd>⌘</kbd><kbd>L</kbd>. Find and replace across the whole project, with regular expressions.</p>
+          </li>
+          <li class="card reveal">
+            <span class="card-icon" aria-hidden="true">→</span>
+            <h3>Code intelligence for Typst</h3>
+            <p>Jump to definition, find references, rename a symbol, hover for docs, signature help and quick fixes.</p>
+          </li>
+          <li class="card reveal">
+            <span class="card-icon" aria-hidden="true">◫</span>
+            <h3>Your workspace, your way</h3>
+            <p>Split editor, focus mode, minimap and sticky headings. Navigators for outline, issues, bookmarks and changes.</p>
+          </li>
+          <li class="card reveal">
+            <span class="card-icon" aria-hidden="true">↺</span>
+            <h3>Projects with history</h3>
+            <p>Start from a templates gallery. Snapshots and per-file history, plus a Git gutter with blame, a log and a Changes navigator.</p>
+          </li>
+          <li class="card reveal">
+            <span class="card-icon" aria-hidden="true">▣</span>
+            <h3>Images that just drop in</h3>
+            <p>Drag or paste an image and it becomes a figure.</p>
+          </li>
+          <li class="card reveal">
+            <span class="card-icon" aria-hidden="true">↻</span>
+            <h3>Typo updates itself</h3>
+            <p>New versions arrive automatically, so you stay current without hunting for a download.</p>
           </li>
         </ul>
-        <p class="also reveal">Also on board: minimap, sticky headings, rainbow brackets, inlay hints, snippets, typstyle formatting, rename symbol, find references, Git changes in the gutter, and a word count that counts only your words.</p>
+        <p class="also reveal">Also on board: rainbow brackets, inlay hints, snippets, typstyle formatting, and a word count that counts only your words.</p>
       </div>
     </section>
 
@@ -187,7 +218,7 @@
         <div class="feature-copy reveal">
           <p class="eyebrow">Folding</p>
           <h2>Fold anything. <em>Watch it fold.</em></h2>
-          <p>Collapse headings, figures, tables, math, code blocks, comments and lists. The animation follows Xcode’s approach: a paper-fold snapshot while the text below reflows every frame, at up to 120 Hz.</p>
+          <p>Collapse headings, figures, tables, math, code blocks, comments and lists. The animation follows Xcode’s approach: a paper-fold snapshot while the text below reflows every frame, at up to 120 Hz. Move sections up and down, or drag them in the outline, even into another file.</p>
         </div>
         <div class="feature-shot reveal">
           <div class="fold-demo" aria-label="Interactive folding demo">
@@ -208,6 +239,7 @@
           <p class="eyebrow">Assistant, optional</p>
           <h2>An assistant that asks first.</h2>
           <p>Run it on-device with Apple Intelligence, or bring your own key for OpenRouter, OpenCode and other OpenAI- or Anthropic-compatible providers.</p>
+          <p>Type <kbd>/</kbd> for workflows. <code>/check</code> compiles and looks at every page, <code>/submit</code> is a checklist before you hand in, <code>/consistency</code> settles on one spelling for every term. Write your own. They work with any model.</p>
           <ul class="ticks">
             <li>Nothing is sent until you agree to a provider</li>
             <li>API keys live only in your Keychain</li>
@@ -229,6 +261,7 @@
           <p class="eyebrow">Bibliography and packages</p>
           <h2>Citations without the curly braces.</h2>
           <p>Edit <code>.bib</code> files in a real form, with required-field checks. Insert a citation with <kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd>. Browse Typst Universe, keep local packages, and work offline with a cached package index.</p>
+          <p>Add Reference looks up a DOI, arXiv ID or ISBN. Zotero sync fills a <code>.bib</code> from your Zotero library and keeps it in sync.</p>
         </div>
         <figure class="shot feature-shot" data-scene data-start="1">
           <img src="assets/bib.webp" width="2300" height="1500" loading="lazy"
@@ -261,6 +294,7 @@
         <div class="cta">
           <a class="btn btn-primary" href="https://github.com/Scholzdev/typo/releases/latest">Download for macOS</a>
           <a class="btn btn-ghost" href="https://github.com/Scholzdev/typo">Star on GitHub</a>
+          <a class="btn btn-ghost" href="guide/">Read the User Guide</a>
         </div>
       </div>
     </section>

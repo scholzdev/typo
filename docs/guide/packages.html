@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Packages · Typo User Guide</title>
+  <meta name="description" content="The Typst Universe browser, local packages, package updates and templates in Typo.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html">Writing</a></li>
+          <li><a href="navigating.html">Navigating</a></li>
+          <li><a href="preview-export.html">Preview and export</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="packages.html" aria-current="page">Packages</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="assistant.html">Assistant</a></li>
+          <li><a href="shortcuts.html">Shortcuts</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+    <main class="guide-main" id="main">
+      <h1>Packages</h1>
+
+      <p class="lead">Typst packages come from Typst Universe or from your own folder. Typo has a browser for the first and a folder setting for the second.</p>
+
+      <h2 id="universe">Typst Universe</h2>
+      <p>Open Settings › Packages to browse Typst Universe. Each package has a detail view. The Installed list shows the packages Typst has downloaded and your local packages, and how much space they use.</p>
+      <p>Packages are downloaded the first time a document imports them, so that needs a network connection. Typo keeps an index of the <code>@preview</code> packages with an offline cache. See <a href="troubleshooting.html#packages">Troubleshooting</a> if a package does not load.</p>
+      <figure class="shot">
+        <img class="shot-light" width="780" height="560" src="images/settings-packages-light.webp" alt="Settings, Packages pane with the Universe browser and a package detail view" loading="lazy" decoding="async">
+        <img class="shot-dark" width="780" height="560" src="images/settings-packages-dark.webp" alt="Settings, Packages pane with the Universe browser and a package detail view" loading="lazy" decoding="async">
+        <figcaption>Settings › Packages</figcaption>
+      </figure>
+
+      <figure class="shot">
+        <img class="shot-light" width="780" height="560" src="images/universe-light.webp" alt="The Typst Universe section in Settings, Packages: a search field, filters and a list of packages with Get buttons" loading="lazy" decoding="async">
+        <img class="shot-dark" width="780" height="560" src="images/universe-dark.webp" alt="The Typst Universe section in Settings, Packages: a search field, filters and a list of packages with Get buttons" loading="lazy" decoding="async">
+        <figcaption>Settings › Packages lists every Typst Universe package. Search, filter by category, and add one with Get.</figcaption>
+      </figure>
+
+      <h2 id="local">Local packages</h2>
+      <p>The Local Packages section of Settings › Packages sets the folder for your own packages. Packages in it are available as <code>@local</code> or under custom namespaces.</p>
+
+      <h2 id="updates">Package updates</h2>
+      <p>A document keeps the package version that it imports. To update an import, use the quick fix: put the caret on the import and choose <span class="path">Navigate › Show Quick Fixes</span> (<kbd>⌘</kbd><kbd>.</kbd>) when an update is offered.</p>
+
+      <h2 id="templates">Templates</h2>
+      <p>Choose <span class="path">File › New Project from Template…</span> to start a project from a Typst Universe template. The welcome window has a Templates… button for the same gallery.</p>
+
+      <nav class="pager" aria-label="Previous and next page">
+        <a class="prev" href="references.html" rel="prev">‹ Previous: References</a>
+        <a class="next" href="history.html" rel="next">Next: History ›</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Writing · Typo User Guide</title>
+  <meta name="description" content="Completion, snippets, formatting, multiple cursors, Vim mode, spell check, tables, images, colours and folding in Typo.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <script>try{var t=localStorage.getItem("typo-guide-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html">
+        <img src="../assets/icon.png" alt="" width="24" height="24">
+        <span>Typo User Guide</span>
+      </a>
+      <div class="header-end">
+        <div class="theme-switch" role="group" aria-labelledby="theme-label">
+          <span id="theme-label" class="sr-only">Appearance</span>
+          <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <a class="site-link" href="../index.html">Typo Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="guide-wrap">
+    <nav class="guide-nav" aria-label="Guide pages">
+      <details class="toc" open>
+        <summary>Table of Contents</summary>
+        <p class="toc-label">Typo User Guide</p>
+        <ul>
+          <li><a href="index.html">Welcome</a></li>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="writing.html" aria-current="page">Writing</a></li>
+          <li><a href="navigating.html">Navigating</a></li>
+          <li><a href="preview-export.html">Preview and export</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="assistant.html">Assistant</a></li>
+          <li><a href="shortcuts.html">Shortcuts</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      </details>
+      <script>if(matchMedia("(max-width: 860px)").matches)document.querySelector(".toc").open=false</script>
+    </nav>
+
+    <main class="guide-main" id="main">
+      <h1>Writing</h1>
+
+      <p class="lead">This page covers the tools that help you write: completion, formatting, editing in several places at once, tables, images and folding.</p>
+
+      <h2 id="completion">Completion and snippets</h2>
+      <p>Typo suggests completions from the Typst engine. Suggestions know your document: variables, functions from imports, built-ins, and labels and bibliography keys that you can reach from the current file. Names from other files are suggested too, and accepting one adds the import.</p>
+      <p>To ask for completions yourself, press <kbd>F5</kbd> or <kbd>⌥</kbd><kbd>Esc</kbd>. To stop suggestions while typing, or to change how you accept one, open Settings › Editing › Completion.</p>
+      <p>Snippets are in the library. To open it, choose <span class="path">View › Library…</span> (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>L</kbd>). It also holds images, symbols and fonts. To manage your own snippets, open Settings › Snippets.</p>
+
+      <figure class="shot">
+        <img class="shot-light" width="480" height="300" src="images/completion-light.webp" alt="A completion list under the caret suggesting the inset parameter, with a one-line description" loading="lazy" decoding="async">
+        <img class="shot-dark" width="540" height="300" src="images/completion-dark.webp" alt="A completion list under the caret suggesting the inset parameter, with a one-line description" loading="lazy" decoding="async">
+        <figcaption>Completion suggests what fits at the caret, with a short description.</figcaption>
+      </figure>
+
+      <h2 id="formatting">Formatting</h2>
+      <p>Typo formats code with typstyle.</p>
+      <ul>
+        <li><span class="path">Format › Format Document</span> (<kbd>⌃</kbd><kbd>⇧</kbd><kbd>I</kbd>) formats the whole file.</li>
+        <li><span class="path">Format › Format Selection</span> formats the selected text.</li>
+        <li><span class="path">Format › Re-Indent</span> (<kbd>⌃</kbd><kbd>I</kbd>) indents the selected lines, or the current line, by bracket depth.</li>
+      </ul>
+      <p>To format every time you save, turn on Format on Save in Settings › Editing. Autosave never formats. The line width and indent width come from the Display and Indentation settings.</p>
+      <p>The Format menu also has Bold (<kbd>⌘</kbd><kbd>B</kbd>), Italic (<kbd>⌘</kbd><kbd>I</kbd>), Underline (<kbd>⌘</kbd><kbd>U</kbd>), Bullet List, Numbered List and Math. They wrap the selection in Typst markup, or remove it again.</p>
+
+      <h2 id="multi-cursor">Multiple cursors</h2>
+      <ul>
+        <li><span class="path">Edit › Select Next Occurrence</span> (<kbd>⌘</kbd><kbd>D</kbd>) adds the next match of the selected text.</li>
+        <li><span class="path">Edit › Select All Occurrences</span> (<kbd>⌃</kbd><kbd>⌘</kbd><kbd>G</kbd>) selects every match.</li>
+        <li><span class="path">Edit › Add Caret Above</span> (<kbd>⌃</kbd><kbd>⇧</kbd><kbd>↑</kbd>) and <span class="path">Edit › Add Caret Below</span> (<kbd>⌃</kbd><kbd>⇧</kbd><kbd>↓</kbd>) add a caret on the neighbouring line.</li>
+      </ul>
+
+      <h2 id="vim">Vim mode</h2>
+      <p>To edit with Vim keys, choose <span class="path">View › Vim Mode</span>. Press <kbd>Esc</kbd> for Normal mode, <kbd>i</kbd> to insert and <kbd>v</kbd> to select. The commands <code>:w</code>, <code>:q</code> and <code>:wq</code> work. A mode capsule shows the current mode.</p>
+
+      <h2 id="spelling">Spell check</h2>
+      <p>Typo checks spelling in the language you set with <code>#set text(lang: …)</code>. Math is not checked.</p>
+
+      <h2 id="tables">Tables</h2>
+      <p>The table editor shows a <code>table(…)</code> or <code>grid(…)</code> as a grid, like a spreadsheet.</p>
+      <ul>
+        <li>To insert a new table, choose <span class="path">Format › Insert Table…</span>.</li>
+        <li>To edit a table, put the caret in it and choose <span class="path">Format › Edit Table…</span>. You can also use the context menu or the inspector.</li>
+      </ul>
+      <p>Cells are typeset by Typst, so math, references and your <code>#set</code> rules show as they will print. You edit with arrow keys, <kbd>Tab</kbd>, <kbd>Return</kbd> and <kbd>Esc</kbd>, and copy and paste work like in a spreadsheet. You can paste tab- or comma-separated data from Numbers or Excel, and the table grows to fit.</p>
+      <p>The editor can also insert, delete, duplicate and move rows and columns, merge and split cells, set alignment, bold and italic, set column widths, and apply a style: Plain, Grid, Header Line, Booktabs or Striped. It has fields for the figure caption, label and placement.</p>
+      <p>Press Done to apply the changes. They land in your document as one undo step.</p>
+      <p>The Intelligence popover in the table editor changes a table from a request in your own words, such as sorting or adding a totals row. It needs a model provider, see <a href="assistant.html">Assistant</a>.</p>
+      <figure class="shot">
+        <img class="shot-light" width="900" height="546" src="images/table-editor-light.webp" alt="The table editor with the grid on the left and the typeset preview on the right" loading="lazy" decoding="async">
+        <img class="shot-dark" width="900" height="550" src="images/table-editor-dark.webp" alt="The table editor with the grid on the left and the typeset preview on the right" loading="lazy" decoding="async">
+        <figcaption>The table editor: edit cells on the left, see the typeset table on the right.</figcaption>
+      </figure>
+
+      <h2 id="images">Images</h2>
+      <p>To add an image, drop an image file onto a Typst file in the editor, or paste an image. Typo turns it into a figure. You can also use the images tab in the library (<span class="path">View › Library…</span>).</p>
+
+      <h2 id="colours">Colour swatches</h2>
+      <p>A small swatch appears next to colours such as <code>rgb(…)</code>. Click it to open a colour picker next to the line. The picker has a wheel or sliders, and you can edit the numbers and the hex value.</p>
+      <figure class="shot">
+        <img class="shot-light" width="390" height="470" src="images/color-picker-light.webp" alt="A colour swatch next to an rgb value with the picker popover open" loading="lazy" decoding="async">
+        <img class="shot-dark" width="390" height="470" src="images/color-picker-dark.webp" alt="A colour swatch next to an rgb value with the picker popover open" loading="lazy" decoding="async">
+        <figcaption>Click a swatch to change the colour with the wheel, sliders or values.</figcaption>
+      </figure>
+
+      <h2 id="folding">Folding</h2>
+      <p>You can collapse headings, brackets, figures, tables, math, raw blocks, comments and lists. Click the ribbon next to the line numbers, or use the View menu:</p>
+      <ul>
+        <li><span class="path">View › Fold Section</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>←</kbd>) and <span class="path">View › Unfold Section</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>→</kbd>).</li>
+        <li><span class="path">View › Fold All Sections</span> (<kbd>⌥</kbd><kbd>⇧</kbd><kbd>⌘</kbd><kbd>←</kbd>) and <span class="path">View › Unfold All Sections</span> (<kbd>⌥</kbd><kbd>⇧</kbd><kbd>⌘</kbd><kbd>→</kbd>).</li>
+      </ul>
+      <p>The duration of the fold animation is in Settings › Editing › Display.</p>
+
+      <h2 id="more">More editor options</h2>
+      <ul>
+        <li><span class="path">Format › Move Section Up</span> (<kbd>⌃</kbd><kbd>⌥</kbd><kbd>↑</kbd>) and <span class="path">Format › Move Section Down</span> (<kbd>⌃</kbd><kbd>⌥</kbd><kbd>↓</kbd>) move the section around the caret with its subsections.</li>
+        <li><span class="path">View › Minimap</span> shows an overview of the file at the right edge.</li>
+        <li><span class="path">View › Bigger Text</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>+</kbd>), <span class="path">View › Smaller Text</span> (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>-</kbd>) and <span class="path">View › Default Text Size</span> (<kbd>⌃</kbd><kbd>⌘</kbd><kbd>0</kbd>) change the editor font size.</li>
+      </ul>
+
+      <nav class="pager" aria-label="Previous and next page">
+        <a class="prev" href="getting-started.html" rel="prev">‹ Previous: Getting started</a>
+        <a class="next" href="navigating.html" rel="next">Next: Navigating ›</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Typo is free for noncommercial use. Not affiliated with Typst GmbH. <a href="https://github.com/scholzdev/typo/blob/main/LICENSE">License</a> · <a href="https://github.com/scholzdev/typo">GitHub</a></p>
+  </footer>
+</body>
+</html>
