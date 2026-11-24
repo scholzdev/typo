@@ -105,8 +105,12 @@ struct ProjectToolbar: ToolbarContent {
                 .help("New file or folder")
                 Button("Start Presentation", systemImage: "play.rectangle") { PresentationSession.start(project, presenter: false, openWindow: openWindow) }
                     .disabled(project.preview.pages.isEmpty).help("Show the pages full screen")
-                Button("Export \(target.title)", systemImage: "square.and.arrow.up") { Task { await target.run(project) } }
-                    .help("Export as \(target.title)")
+                Menu("Export \(target.title)", systemImage: "square.and.arrow.up") {
+                    Button("Share PDF…", systemImage: "square.and.arrow.up") { Task { await sharePDF(project) } }
+                } primaryAction: {
+                    Task { await target.run(project) }
+                }
+                .help("Export as \(target.title)")
             }
             ToolbarSpacer(.fixed, placement: .primaryAction)
             ToolbarItemGroup(placement: .primaryAction) {
@@ -227,5 +231,19 @@ private struct IssueCounts: View {
                 .padding(.horizontal, 8).padding(.vertical, 3)
         }
         .buttonStyle(.plain).help("Show \(label) in the Issues navigator").accessibilityLabel("\(n) \(label)")
+    }
+}
+
+/// The share sheet for the document's PDF, from the window's top-right corner where the export button sits.
+@MainActor func sharePDF(_ project: Project) async {
+    do {
+        let pdf = try await project.exportPDF()
+        let url = FileManager.default.temporaryDirectory.appending(path: project.pdfFileName)
+        try pdf.write(to: url, options: .atomic)
+        guard let view = NSApp.keyWindow?.contentView else { return }
+        let corner = NSRect(x: view.bounds.maxX - 160, y: view.bounds.maxY - 1, width: 1, height: 1)
+        NSSharingServicePicker(items: [url]).show(relativeTo: corner, of: view, preferredEdge: .minY)
+    } catch {
+        showExportFailure(error)
     }
 }

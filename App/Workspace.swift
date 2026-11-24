@@ -248,12 +248,15 @@ struct PreviewToolbar: View {
                                             : "Unlocked: selecting a .typ file in the sidebar previews it.")
             ClusterToggle(title: "Follow Cursor", symbol: "scope", isOn: Bindable(preview).followsCursor)
                 .help("Preview follows the cursor")
-            Button("Start Presentation", systemImage: "play.rectangle", action: present)
-                .disabled(preview.pages.isEmpty)
-                .help("Present the pages full screen")
-            Button("Share PDF", systemImage: "square.and.arrow.up") { Task { await share() } }
-                .help("Share the PDF")
-                .background(ShareAnchor(box: anchor))
+            // In the project window these sit in the window toolbar; a popped-out preview has no other place for them.
+            if preview.isPoppedOut {
+                Button("Start Presentation", systemImage: "play.rectangle", action: present)
+                    .disabled(preview.pages.isEmpty)
+                    .help("Present the pages full screen")
+                Button("Share PDF", systemImage: "square.and.arrow.up") { Task { await share() } }
+                    .help("Share the PDF")
+                    .background(ShareAnchor(box: anchor))
+            }
         }
         .labelStyle(.iconOnly)
     }
@@ -272,8 +275,10 @@ struct PreviewToolbar: View {
             Toggle("Follow Cursor", systemImage: "scope", isOn: Bindable(preview).followsCursor)
             Divider()
             Button(popOutTitle, systemImage: preview.isPoppedOut ? "arrow.down.backward.square" : "arrow.up.forward.square", action: popOut)
-            Button("Start Presentation", systemImage: "play.rectangle", action: present).disabled(preview.pages.isEmpty)
-            Button("Share PDF…", systemImage: "square.and.arrow.up") { Task { await share() } }
+            if preview.isPoppedOut {
+                Button("Start Presentation", systemImage: "play.rectangle", action: present).disabled(preview.pages.isEmpty)
+                Button("Share PDF…", systemImage: "square.and.arrow.up") { Task { await share() } }
+            }
         } label: {
             Label("More", systemImage: "ellipsis")
         }
