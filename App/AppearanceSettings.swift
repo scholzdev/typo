@@ -48,9 +48,12 @@ struct AppearanceSettings: View {
         return Button { appearance = a.rawValue } label: {
             VStack(spacing: 5) {
                 AppearanceCard(kind: a)
-                    .frame(width: 66, height: 44)
-                    .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(selected ? Color.accentColor : .secondary.opacity(0.3), lineWidth: selected ? 3 : 1))
-                Text(a.title).font(.caption).foregroundStyle(selected ? .primary : .secondary)
+                    .frame(width: 67, height: 44)
+                    // As in System Settings: the chosen picture gets an accent ring with a small gap around it.
+                    .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(.black.opacity(0.1), lineWidth: 0.5))
+                    .padding(4)
+                    .overlay { if selected { RoundedRectangle(cornerRadius: 10).strokeBorder(Color.accentColor, lineWidth: 3) } }
+                Text(a.title).font(.system(size: 13, weight: selected ? .semibold : .regular)).foregroundStyle(selected ? .primary : .secondary)
             }
         }
         .buttonStyle(.plain)
@@ -161,13 +164,31 @@ struct AppearanceSettings: View {
     }
 }
 
-/// A small drawn window in the light, dark or split (System) look.
+/// The picture System Settings › Appearance shows for the same choice, or a small drawn window where macOS has none.
 private struct AppearanceCard: View {
     let kind: AppAppearance
 
+    // shortcut: reads a private System Settings bundle, so a macOS update may move it; the drawn card covers that.
+    private static let system = Bundle(path: "/System/Library/ExtensionKit/Extensions/Appearance.appex")
+
     var body: some View {
+        let name = switch kind { case .system: "AppearanceAuto"; case .light: "AppearanceLight"; case .dark: "AppearanceDark" }
+        if let image = Self.system?.image(forResource: name) {
+            Image(nsImage: image).resizable()
+                .overlay {    // the bar in the picture takes the accent colour, through System Settings' own mask
+                    if let mask = Self.system?.image(forResource: kind == .system ? "selectionColor_mask-auto" : "selectionColor_mask") {
+                        Image(nsImage: mask).renderingMode(.template).resizable().foregroundStyle(Color.accentColor)
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 7)).accessibilityHidden(true)
+        } else {
+            drawn
+        }
+    }
+
+    private var drawn: some View {
         let light = Color(white: 0.93), dark = Color(white: 0.2)
-        ZStack {
+        return ZStack {
             light
             HStack(spacing: 0) { if kind == .system { light }; if kind != .light { dark } }
             RoundedRectangle(cornerRadius: 3)
@@ -266,4 +287,8 @@ struct CapsuleSegments<T: Hashable>: View {
         .background(Capsule().fill(.quaternary))
         .accessibilityElement(children: .contain)
     }
+}
+
+#Preview {
+    AppearanceSettings()
 }

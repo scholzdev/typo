@@ -172,72 +172,111 @@ struct PreviewToolbar: View {
 
     var body: some View {
         GlassEffectContainer(spacing: 8) {
-            HStack(spacing: 8) {
-                GlassCluster {
-                    Button("Zoom Out", systemImage: "minus.magnifyingglass") { preview.zoom(by: 0.8) }
-                        .help("Zoom Out")
-                    Menu("\(PreviewMath.percent(zoom: preview.zoom, fitWidth: preview.fitWidth, pageWidth: pageWidth)) %") {
-                        ForEach(PreviewMath.presets, id: \.self) { p in
-                            Button("\(p) %") { preview.set(zoom: PreviewMath.zoom(percent: p, fitWidth: preview.fitWidth, pageWidth: pageWidth)) }
-                        }
-                        Divider()
-                        Picker("Fit", selection: Bindable(preview).fit) {
-                            ForEach(PreviewFit.allCases, id: \.self) { Text($0.title).tag(Optional($0)) }
-                        }
-                        .pickerStyle(.inline)
-                        .labelsHidden()
-                        Divider()
-                        Toggle("Dark Pages", systemImage: "circle.lefthalf.filled", isOn: Bindable(preview).darkPages)
-                    }
-                    .menuStyle(.button)
-                    .monospacedDigit()
-                    .fixedSize()
-                    .help("Zoom relative to the page's natural size")
-                    .accessibilityLabel("Zoom")
-                    Button("Zoom In", systemImage: "plus.magnifyingglass") { preview.zoom(by: 1.25) }
-                        .help("Zoom In")
-                    Button("Fit Width", systemImage: "arrow.left.and.right.square") { preview.fit = .width }
-                        .help("Fit Width")
-                }
-                .labelStyle(.iconOnly)
-                GlassCluster {
-                    ClusterToggle(title: "Page Thumbnails", symbol: "sidebar.squares.left", isOn: Bindable(preview).showsThumbnails)
-                        .labelStyle(.iconOnly)
-                        .help("Show page thumbnails")
-                    Button { pageField = "\(page)"; pagePopover = true } label: { Text("Page \(page) of \(preview.pages.count)").monospacedDigit().fixedSize() }
-                        .disabled(preview.pages.isEmpty)
-                        .help("Go to a page")
-                        .popover(isPresented: $pagePopover, arrowEdge: .bottom) {
-                            HStack {
-                                TextField("Page", text: $pageField).frame(width: 60).onSubmit(go)
-                                Button("Go", action: go).keyboardShortcut(.defaultAction)
-                            }
-                            .padding(12)
-                        }
-                }
-                Spacer()
-                GlassCluster {
-                    Button(preview.isPoppedOut ? "Return Preview to Window" : "Pop Out Preview",
-                           systemImage: preview.isPoppedOut ? "arrow.down.backward.square" : "arrow.up.forward.square", action: popOut)
-                        .help(preview.isPoppedOut ? "Bring the preview back to the project window" : "Open the preview in its own window")
-                    ClusterToggle(title: "Lock Preview", symbol: project.previewLocked ? "lock.fill" : "lock.open", isOn: Bindable(project).previewLocked)
-                        .help(project.previewLocked ? "Locked to \(project.main.raw). Unlock to preview the file selected in the sidebar."
-                                                    : "Unlocked: selecting a .typ file in the sidebar previews it.")
-                    ClusterToggle(title: "Follow Cursor", symbol: "scope", isOn: Bindable(preview).followsCursor)
-                        .help("Preview follows the cursor")
-                    Button("Start Presentation", systemImage: "play.rectangle") { PresentationSession.start(project, presenter: false, openWindow: openWindow) }
-                        .disabled(preview.pages.isEmpty)
-                        .help("Present the pages full screen")
-                    Button("Share PDF", systemImage: "square.and.arrow.up") { Task { await share() } }
-                        .help("Share the PDF")
-                        .background(ShareAnchor(box: anchor))
-                }
-                .labelStyle(.iconOnly)
+            // Narrow previews get fewer clusters instead of a toolbar that runs off both sides; the rest goes into "More".
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) { zoomCluster; pageCluster; Spacer(minLength: 0); actionsCluster }
+                HStack(spacing: 8) { zoomCluster; pageCluster; Spacer(minLength: 0); GlassCluster { moreMenu(zoom: false) } }
+                HStack(spacing: 8) { pageCluster; Spacer(minLength: 0); GlassCluster { moreMenu(zoom: true) } }
             }
         }
         .controlSize(.large)
         .padding()
     }
+
+    private var zoomCluster: some View {
+        GlassCluster {
+            Button("Zoom Out", systemImage: "minus.magnifyingglass") { preview.zoom(by: 0.8) }
+                .help("Zoom Out")
+            Menu("\(PreviewMath.percent(zoom: preview.zoom, fitWidth: preview.fitWidth, pageWidth: pageWidth)) %") {
+                ForEach(PreviewMath.presets, id: \.self) { p in
+                    Button("\(p) %") { preview.set(zoom: PreviewMath.zoom(percent: p, fitWidth: preview.fitWidth, pageWidth: pageWidth)) }
+                }
+                Divider()
+                Picker("Fit", selection: Bindable(preview).fit) {
+                    ForEach(PreviewFit.allCases, id: \.self) { Text($0.title).tag(Optional($0)) }
+                }
+                .pickerStyle(.inline)
+                .labelsHidden()
+                Divider()
+                Toggle("Dark Pages", systemImage: "circle.lefthalf.filled", isOn: Bindable(preview).darkPages)
+            }
+            .menuStyle(.button)
+            .monospacedDigit()
+            .fixedSize()
+            .help("Zoom relative to the page's natural size")
+            .accessibilityLabel("Zoom")
+            Button("Zoom In", systemImage: "plus.magnifyingglass") { preview.zoom(by: 1.25) }
+                .help("Zoom In")
+            Button("Fit Width", systemImage: "arrow.left.and.right.square") { preview.fit = .width }
+                .help("Fit Width")
+        }
+        .labelStyle(.iconOnly)
+    }
+
+    private var pageCluster: some View {
+        GlassCluster {
+            ClusterToggle(title: "Page Thumbnails", symbol: "sidebar.squares.left", isOn: Bindable(preview).showsThumbnails)
+                .labelStyle(.iconOnly)
+                .help("Show page thumbnails")
+            Button { pageField = "\(page)"; pagePopover = true } label: { Text("Page \(page) of \(preview.pages.count)").monospacedDigit().fixedSize() }
+                .disabled(preview.pages.isEmpty)
+                .help("Go to a page")
+                .popover(isPresented: $pagePopover, arrowEdge: .bottom) {
+                    HStack {
+                        TextField("Page", text: $pageField).frame(width: 60).onSubmit(go)
+                        Button("Go", action: go).keyboardShortcut(.defaultAction)
+                    }
+                    .padding(12)
+                }
+        }
+    }
+
+    private var actionsCluster: some View {
+        GlassCluster {
+            Button(popOutTitle, systemImage: preview.isPoppedOut ? "arrow.down.backward.square" : "arrow.up.forward.square", action: popOut)
+                .help(preview.isPoppedOut ? "Bring the preview back to the project window" : "Open the preview in its own window")
+            ClusterToggle(title: "Lock Preview", symbol: project.previewLocked ? "lock.fill" : "lock.open", isOn: Bindable(project).previewLocked)
+                .help(project.previewLocked ? "Locked to \(project.main.raw). Unlock to preview the file selected in the sidebar."
+                                            : "Unlocked: selecting a .typ file in the sidebar previews it.")
+            ClusterToggle(title: "Follow Cursor", symbol: "scope", isOn: Bindable(preview).followsCursor)
+                .help("Preview follows the cursor")
+            Button("Start Presentation", systemImage: "play.rectangle", action: present)
+                .disabled(preview.pages.isEmpty)
+                .help("Present the pages full screen")
+            Button("Share PDF", systemImage: "square.and.arrow.up") { Task { await share() } }
+                .help("Share the PDF")
+                .background(ShareAnchor(box: anchor))
+        }
+        .labelStyle(.iconOnly)
+    }
+
+    /// The actions cluster as one menu, and with `zoom` the zoom controls too.
+    private func moreMenu(zoom: Bool) -> some View {
+        Menu {
+            if zoom {
+                Button("Zoom In", systemImage: "plus.magnifyingglass") { preview.zoom(by: 1.25) }
+                Button("Zoom Out", systemImage: "minus.magnifyingglass") { preview.zoom(by: 0.8) }
+                Button("Fit Width", systemImage: "arrow.left.and.right.square") { preview.fit = .width }
+                Toggle("Dark Pages", systemImage: "circle.lefthalf.filled", isOn: Bindable(preview).darkPages)
+                Divider()
+            }
+            Toggle("Lock Preview", systemImage: "lock", isOn: Bindable(project).previewLocked)
+            Toggle("Follow Cursor", systemImage: "scope", isOn: Bindable(preview).followsCursor)
+            Divider()
+            Button(popOutTitle, systemImage: preview.isPoppedOut ? "arrow.down.backward.square" : "arrow.up.forward.square", action: popOut)
+            Button("Start Presentation", systemImage: "play.rectangle", action: present).disabled(preview.pages.isEmpty)
+            Button("Share PDF…", systemImage: "square.and.arrow.up") { Task { await share() } }
+        } label: {
+            Label("More", systemImage: "ellipsis")
+        }
+        .menuStyle(.button).menuIndicator(.hidden).labelStyle(.iconOnly).fixedSize()
+        .background(ShareAnchor(box: anchor))
+        .help("More preview controls")
+    }
+
+    private var popOutTitle: String { preview.isPoppedOut ? "Return Preview to Window" : "Pop Out Preview" }
+
+    private func present() { PresentationSession.start(project, presenter: false, openWindow: openWindow) }
 
     private var page: Int { min(max(preview.visiblePage, 0), max(preview.pages.count - 1, 0)) + 1 }
 

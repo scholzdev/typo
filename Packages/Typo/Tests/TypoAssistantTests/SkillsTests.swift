@@ -27,51 +27,27 @@ private func tempDir() -> URL {
     #expect(Skill.parse("---\nname: a\n---", fallbackName: "f") == Skill(name: "a", description: "", body: ""))
 }
 
-@Test func skillRoundTripsThroughMarkdown() {
-    let s = Skill(name: "my-skill", description: "Use when: the user asks \"why\"\nsecond line", body: "# Title\n\nSome **bold** prose.")
-    #expect(s.markdown == "---\nname: my-skill\ndescription: \"Use when: the user asks \\\"why\\\" second line\"\n---\n\n# Title\n\nSome **bold** prose.\n")
-    let back = Skill.parse(s.markdown, fallbackName: "x")
-    #expect(back.name == "my-skill")
-    #expect(back.description == "Use when: the user asks \"why\" second line")
-    #expect(back.body == "# Title\n\nSome **bold** prose.\n")
-}
-
-@Test func slugsAndNames() {
-    #expect(Skill.slug("Write Tables, Fast!") == "write-tables-fast")
-    #expect(Skill.slug("  Über Größe 2 ") == "uber-grosse-2")
-    #expect(Skill.slug("---") == "")
-    #expect(Skill.isValidName("a-b-9"))
-    #expect(!Skill.isValidName(""))
-    #expect(!Skill.isValidName("A"))
-    #expect(!Skill.isValidName("a--b"))
-    #expect(!Skill.isValidName("-a"))
-    #expect(!Skill.isValidName(String(repeating: "a", count: 65)))
-    #expect(Skill.unique("math", among: ["math", "math-2"]) == "math-3")
-    #expect(Skill.unique("new", among: []) == "new")
-}
-
-@Test func pluginSavesListsRenamesAndAssembles() throws {
+@Test func pluginListsAndAssembles() throws {
     let root = tempDir()
     defer { try? FileManager.default.removeItem(at: root) }
     let plugin = SkillPlugin(url: root.appending(path: "user"), name: "typo-user")
     #expect(plugin.list().isEmpty)
-    try plugin.save(Skill(name: "alpha", description: "A", body: "a"))
-    try plugin.save(Skill(name: "beta", description: "B", body: "b"))
-    let manifest = try String(contentsOf: plugin.url.appending(path: ".claude-plugin/plugin.json"), encoding: .utf8)
-    #expect(manifest.contains("\"typo-user\""))
-    try plugin.save(Skill(name: "gamma", description: "G", body: "g"), replacing: "beta")
+    for (name, d) in [("alpha", "A"), ("gamma", "G")] {
+        try FileManager.default.createDirectory(at: plugin.folder(name), withIntermediateDirectories: true)
+        try Data("---\nname: \(name)\ndescription: \(d)\n---\nbody".utf8).write(to: plugin.folder(name).appending(path: "SKILL.md"))
+    }
     #expect(plugin.list().map(\.name) == ["alpha", "gamma"])
     #expect(plugin.list()[1].description == "G")
 
     let dest = root.appending(path: "cache/typo-user")
     try FileManager.default.createDirectory(at: dest.deletingLastPathComponent(), withIntermediateDirectories: true)
-    #expect(try plugin.assemble(into: dest, disabled: ["typo-user/alpha"]) == dest)
+    #expect(try plugin.assemble(into: dest, enabled: ["typo-user/gamma"]) == dest)
     #expect(SkillPlugin(url: dest, name: "typo-user").list().map(\.name) == ["gamma"])
     #expect(FileManager.default.fileExists(atPath: dest.appending(path: ".claude-plugin/plugin.json").path))
     // Again, with a different set: the folder is replaced, not merged.
-    _ = try plugin.assemble(into: dest, disabled: ["typo-user/gamma"])
+    _ = try plugin.assemble(into: dest, enabled: ["typo-user/alpha"])
     #expect(SkillPlugin(url: dest, name: "typo-user").list().map(\.name) == ["alpha"])
-    #expect(try plugin.assemble(into: dest, disabled: ["typo-user/alpha", "typo-user/gamma"]) == nil)
+    #expect(try plugin.assemble(into: dest, enabled: []) == nil)
     #expect(!FileManager.default.fileExists(atPath: dest.path))
     #expect(try FileManager.default.contentsOfDirectory(atPath: dest.deletingLastPathComponent().path).isEmpty)
 }
@@ -82,29 +58,10 @@ private func tempDir() -> URL {
     let src = root.appending(path: "src")
     try FileManager.default.createDirectory(at: src.appending(path: "skills/one"), withIntermediateDirectories: true)
     try Data("Prose only".utf8).write(to: src.appending(path: "skills/one/SKILL.md"))
-    let dest = try SkillPlugin(url: src, name: "typo").assemble(into: root.appending(path: "out"), disabled: [])
+    let dest = try SkillPlugin(url: src, name: "typo").assemble(into: root.appending(path: "out"), enabled: ["typo/one"])
     #expect(dest != nil)
     let manifest = try String(contentsOf: root.appending(path: "out/.claude-plugin/plugin.json"), encoding: .utf8)
     #expect(manifest.contains("\"typo\""))
     #expect(SkillPlugin(url: root.appending(path: "out"), name: "typo").list() == [Skill(name: "one", description: "", body: "Prose only")])
 }
 
-@Test func findsAndImportsSkillFolders() throws {
-    let root = tempDir()
-    defer { try? FileManager.default.removeItem(at: root) }
-    let fm = FileManager.default
-    for dir in ["skills/a", "plugins/p/skills/b", "plugins/p/node_modules/x/skills/c", "empty"] {
-        try fm.createDirectory(at: root.appending(path: dir), withIntermediateDirectories: true)
-    }
-    for dir in ["skills/a", "plugins/p/skills/b", "plugins/p/node_modules/x/skills/c"] {
-        try Data("---\nname: n\ndescription: d\n---\nBody".utf8).write(to: root.appending(path: dir + "/SKILL.md"))
-    }
-    try Data("extra".utf8).write(to: root.appending(path: "skills/a/notes.md"))
-    let found = SkillPlugin.skillFolders(in: root)
-    #expect(found.map(\.lastPathComponent) == ["b", "a"])
-    #expect(SkillPlugin.skillFolders(in: root.appending(path: "skills/a")).map(\.lastPathComponent) == ["a"])
-    let mine = SkillPlugin(url: root.appending(path: "mine"), name: "typo-user")
-    try mine.importSkill(from: root.appending(path: "skills/a"), as: "alpha")
-    #expect(mine.list().map(\.name) == ["alpha"])
-    #expect(fm.fileExists(atPath: mine.folder("alpha").appending(path: "notes.md").path))
-}

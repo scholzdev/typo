@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 import TypoKit
 import UniformTypeIdentifiers
+import PDFKit
 import TypstEngine
 
 /// File ▸ Export: PDF, PDF/A, and one PNG or SVG file per page.
@@ -13,6 +14,9 @@ struct ExportCommands: Commands {
 
     var body: some Commands {
         let ctx = context
+        CommandGroup(replacing: .printItem) {
+            AppCommands.items(AppCommands.print(ctx))
+        }
         CommandGroup(after: .newItem) {
             Menu {
                 AppCommands.items(AppCommands.export(ctx))
@@ -23,7 +27,33 @@ struct ExportCommands: Commands {
 }
 
 @MainActor enum ProjectExporter {
+    /// Warns about fonts the engine could not find; false when the user cancels.
+    private static func confirmFonts(_ project: Project, ok: String) -> Bool {
+        let names = QuickFixes.missingFonts(in: project.diagnostics)
+        guard !names.isEmpty else { return true }
+        let list = ListFormatter.localizedString(byJoining: names)
+        return confirm("Some Fonts Are Missing", "\(list) \(names.count == 1 ? "isn\u{2019}t" : "aren\u{2019}t") installed, so the document uses a replacement font. Install \(names.count == 1 ? "it" : "them") or choose other fonts, then \(ok == "Print Anyway" ? "print" : "export") again.", ok: ok)
+    }
+
+    static func print(_ project: Project) async {
+        guard confirmFonts(project, ok: "Print Anyway") else { return }
+        do {
+            let data = try await project.exportPDF(standard: .plain)
+            guard let document = PDFDocument(data: data),
+                  let op = document.printOperation(for: NSPrintInfo.shared, scalingMode: .pageScaleToFit, autoRotate: true) else {
+                return showAlert("Could Not Print", "The document could not be prepared for printing.")
+            }
+            op.showsPrintPanel = true
+            op.showsProgressPanel = true
+            op.jobTitle = (project.pdfFileName as NSString).deletingPathExtension
+            if let window = NSApp.keyWindow { op.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil) } else { op.run() }
+        } catch {
+            showAlert("Could Not Print", error.localizedDescription)
+        }
+    }
+
     static func pdf(_ project: Project, _ standard: PDFStandard) async {
+        guard confirmFonts(project, ok: "Export Anyway") else { return }
         do {
             let pdf = try await project.exportPDF(standard: standard)
             let panel = NSSavePanel()
@@ -46,6 +76,7 @@ struct ExportCommands: Commands {
 
     /// `.png`'s ppi is chosen in the panel. One page: a save panel. Several: a folder (the sandbox grants no siblings of a saved file).
     static func pages(_ project: Project, _ requested: PageFormat) async {
+        guard confirmFonts(project, ok: "Export Anyway") else { return }
         do {
             let count = try await project.exportPageCount()
             let isPNG = requested != .svg

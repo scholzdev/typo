@@ -376,16 +376,17 @@ struct AssistantPromptBox: View {
         .buttonStyle(.plain)
     }
 
-    /// The agent's commands matching what follows "/", until the first space.
-    private var commandMatches: [ACPCommand] {
+    /// The entries of `items` matching what follows "/", until the first space.
+    private func slashMatches<T>(_ items: [T], name: (T) -> String) -> [T] {
         guard model.draft.hasPrefix("/"), !model.draft.contains(" ") else { return [] }
         let typed = model.draft.dropFirst().lowercased()
         // Names starting with the typed text first, then names containing it.
-        let all = model.agentCommands.filter { typed.isEmpty || $0.name.lowercased().contains(typed) }
-        return all.filter { $0.name.lowercased().hasPrefix(typed) } + all.filter { !$0.name.lowercased().hasPrefix(typed) }
+        let all = items.filter { typed.isEmpty || name($0).lowercased().contains(typed) }
+        return all.filter { name($0).lowercased().hasPrefix(typed) } + all.filter { !name($0).lowercased().hasPrefix(typed) }
     }
 
-    /// The completion list's entries: project files after "@", else the agent's commands after "/".
+    /// The completion list's entries: project files after "@", else after "/" the workflows (which on-device answers
+    /// cannot run) and the agent's commands.
     private var completions: [AssistantPromptField.Completion] {
         guard dismissed != model.draft else { return [] }
         // On-device answers take no files.
@@ -393,10 +394,16 @@ struct AssistantPromptBox: View {
             let paths = model.project.allFiles.map(\.raw).filter(FileKind.isText)
             return AssistantMentions.matches(q.query, in: paths).map { .init(id: $0, kind: .file, name: ($0 as NSString).lastPathComponent, detail: nil, help: $0) }
         }
-        return commandMatches.map { c in
+        let workflows = model.provider?.isOnDevice == true ? [] : slashMatches(WorkflowStore.shared.available, name: \.name)
+        let shown = Set(workflows.map(\.name))
+        let commands = slashMatches(model.agentCommands.filter { !shown.contains($0.name) }, name: \.name).map { c in
             let k = AssistantCommandKind.classify(c.description)
-            return .init(id: c.name, kind: k.kind == .skill ? .skill : .command, name: c.name, detail: k.description.isEmpty ? nil : k.description, help: k.description)
+            return AssistantPromptField.Completion(id: c.name, kind: k.kind == .skill ? .skill : .command, name: c.name, detail: k.description.isEmpty ? nil : k.description, help: k.description)
         }
+        return workflows.map { w in
+            let detail = [w.description, w.argumentHint].filter { !$0.isEmpty }.joined(separator: " ")
+            return .init(id: w.id, kind: .workflow, name: w.name, detail: detail.isEmpty ? nil : detail, help: w.description, tag: w.source == .builtIn ? "typo" : "my")
+        } + commands
     }
 
     // MARK: Suggestions
@@ -620,12 +627,14 @@ struct AssistantPromptField: NSViewRepresentable {
     struct Query: Equatable { var range: NSRange; var query: String }
 
     struct Completion: Identifiable {
-        enum Kind { case command, skill, file }
+        enum Kind { case workflow, command, skill, file }
         var id: String
         var kind: Kind
         var name: String
         var detail: String?
         var help: String
+        /// A small label after the row, such as where a workflow comes from.
+        var tag: String?
     }
 
     @Binding var text: String
@@ -798,7 +807,7 @@ struct AssistantPromptField: NSViewRepresentable {
             guard parent.items.indices.contains(i) else { return }
             let c = parent.items[i]
             switch c.kind {
-            case .command, .skill:
+            case .workflow, .command, .skill:
                 parent.text = "/\(c.name) "
             case .file:
                 guard let q = parent.query, let path = RelPath(c.id) else { return }
@@ -818,7 +827,8 @@ struct AssistantPromptField: NSViewRepresentable {
 
         // MARK: Completion panel
 
-        /// Shows the completions under the start of what they complete (above it when the screen ends below).
+        /// Shows the completions under the start of what they complete, or above it when they would leave the window
+        /// (the prompt sits at the window's bottom edge).
         func updatePopup() {
             let items = parent.items
             guard !items.isEmpty, let window = textView.window, window.firstResponder === textView else { return hidePopup() }
@@ -827,9 +837,9 @@ struct AssistantPromptField: NSViewRepresentable {
             host?.rootView = list
             let anchor = parent.query?.range.location ?? 0
             let caret = textView.firstRect(forCharacterRange: NSRange(location: anchor, length: 0), actualRange: nil)
-            let size = NSSize(width: 240, height: CGFloat(min(items.count, 9)) * 22 + 10)
+            let size = NSSize(width: 320, height: CGFloat(min(items.count, 9)) * 22 + 10)
             var origin = NSPoint(x: caret.minX - 10, y: caret.minY - 4 - size.height)
-            if let screen = window.screen, origin.y < screen.visibleFrame.minY { origin.y = caret.maxY + 4 }
+            if origin.y < window.frame.minY + 8 { origin.y = caret.maxY + 4 }
             panel.setFrame(NSRect(origin: origin, size: size), display: true)
             if panel.parent == nil { window.addChildWindow(panel, ordered: .above) }
             panel.invalidateShadow()
@@ -932,6 +942,7 @@ struct AssistantCompletionList: View {
                             Text(c.name).foregroundStyle(i == selected ? .primary : .secondary).lineLimit(1).truncationMode(.middle).layoutPriority(1)
                             if let d = c.detail { Text(d).font(.system(size: 11)).foregroundStyle(.tertiary).lineLimit(1) }
                             Spacer(minLength: 0)
+                            if let tag = c.tag { Text(tag).font(.system(size: 11)).foregroundStyle(.secondary) }
                         }
                         .font(.system(size: 13))
                         .padding(.horizontal, 6)
@@ -955,6 +966,7 @@ struct AssistantCompletionList: View {
 
     @ViewBuilder private func icon(_ c: AssistantPromptField.Completion) -> some View {
         switch c.kind {
+        case .workflow: Image(systemName: "bolt.horizontal").foregroundStyle(.secondary)
         case .command: Image(systemName: "gearshape").foregroundStyle(.secondary)
         case .skill: Image(systemName: "rosette").foregroundStyle(.secondary)
         case .file: AssistantFileIcon(path: c.id)

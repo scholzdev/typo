@@ -129,4 +129,19 @@ import TypoTestSupport
         b.undoManager.redo()
         check(true)
     }
+
+    @Test func movesASectionIntoAnotherFile() async throws {
+        let (p, _) = try await TestEnv.project(files: ["main.typ": "= A\na\n\n= B\nb\n", "ch.typ": "= C\nc\n"])
+        let main = RelPath("main.typ")!, ch = RelPath("ch.typ")!
+        func item(_ id: Int, _ file: RelPath, _ offset: Int) -> OutlineItem {
+            OutlineItem(id: id, level: 1, numbering: "", title: "", page: 0, y: 0, file: file, offset: offset)
+        }
+        let b = try await p.open(main), c = try await p.open(ch)
+        let message = await p.moveSection(item(1, main, at("= B", in: b.storage.string)), .after, item(2, ch, 0))
+        #expect(message == nil)
+        #expect(b.storage.string == "= A\na\n")
+        #expect(c.storage.string == "= C\nc\n\n= B\nb\n")
+        c.undoManager.undo()
+        #expect(c.storage.string == "= C\nc\n")
+    }
 }

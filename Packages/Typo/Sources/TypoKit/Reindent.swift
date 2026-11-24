@@ -12,17 +12,19 @@ public enum Reindent {
         var scope = -1                           // offset of the innermost open bracket, -1 at the top level
         var markup = true                        // inside `[` or at the top level: indentation is meaningful to Typst
         var closer = false, solo = false, keep = false
+        var anchor: Int?                         // the list item line this markup line belongs to, by its indentation
         var comment: NSRange?                    // a comment starting on this line after its first character
     }
 
     /// Re-indents the lines `sel` reaches: one level per open bracket (one per line, however many it opens), a line
-    /// starting with a closer back at its opener's line. Code lines get exactly that; markup lines (top level and
-    /// inside `[`) move as a group and keep their offsets, because list nesting and continuations depend on them.
+    /// starting with a closer back at its opener's line. Code lines get exactly that, and so do markup lines (top level
+    /// and inside `[`), except those indented under a list item: they keep their offset from it, because Typst reads
+    /// that indentation as nesting and continuation. Elsewhere in markup indentation means nothing and goes.
     /// Lines inside raw blocks, strings and block comments, and blank lines, are never touched. Nil when nothing changes.
     static func edits(in text: String, selection sel: NSRange, spans: [SyntaxSpan], settings: IndentSettings) -> (edits: [Replacement], selection: NSRange)? {
         let ns = text as NSString
         guard sel.location <= ns.length else { return nil }
-        var brackets: [Int] = []
+        var brackets: [Int] = [], listItems: Set<Int> = []
         var opaque: [(range: NSRange, tag: SyntaxTag)] = []
         for s in spans {
             switch s.tag {
@@ -30,6 +32,7 @@ public enum Reindent {
                 for i in s.range.location..<NSMaxRange(s.range) where openers.contains(ns.character(at: i)) || closers.contains(ns.character(at: i)) {
                     brackets.append(i)
                 }
+            case .listMarker: listItems.insert(s.range.location)
             case .raw, .string, .comment:
                 // A raw block arrives as one leaf per line: merge touching leaves so its inner line starts lie inside.
                 if let last = opaque.last, last.tag == s.tag, NSMaxRange(last.range) == s.range.location {
@@ -40,6 +43,7 @@ public enum Reindent {
         }
 
         var lines: [Line] = [], openerLine: [Int: Int] = [:], stack: [Int] = []
+        var items: [Int: [Int]] = [:]                           // per scope: the open list items, as line indices
         var bi = 0, oi = 0, pos = 0
         while true {
             let lr = ns.lineRange(for: NSRange(location: pos, length: 0))
@@ -60,6 +64,14 @@ public enum Reindent {
             let lineBrackets = brackets[bi...].prefix { $0 < l.end }
             l.closer = lineBrackets.first == l.first && closers.contains(ns.character(at: l.first))
             l.solo = l.end - l.first == 1 && lineBrackets.first == l.first && openers.contains(ns.character(at: l.first))
+            if l.markup, !l.keep, !l.closer {
+                // An item ends at the first line that is not indented past its marker.
+                var open = items[l.scope] ?? []
+                while let i = open.last, lines[i].old >= l.old { open.removeLast() }
+                l.anchor = open.last
+                if listItems.contains(l.first) { open.append(lines.count) }
+                items[l.scope] = open
+            }
             for b in lineBrackets {
                 if openers.contains(ns.character(at: b)) { stack.append(b); openerLine[b] = lines.count }
                 else if !stack.isEmpty { stack.removeLast() }
@@ -72,16 +84,13 @@ public enum Reindent {
         }
 
         let targets = Set(Indent.lineStarts(ns, sel))
-        var base: [Int: Int] = [:]                              // least indented markup line per scope
-        for l in lines where l.markup && !l.keep && !l.closer { base[l.scope] = min(base[l.scope] ?? .max, l.old) }
         var cols: [Int] = [], edits: [Replacement] = []
         for l in lines {
             guard targets.contains(l.start), !l.keep else { cols.append(l.old); continue }
             let open = l.scope < 0 ? nil : openerLine[l.scope].map { cols[$0] }
             var c: Int
-            if l.closer { c = open ?? 0 } else {
+            if l.closer { c = open ?? 0 } else if let a = l.anchor { c = cols[a] + l.old - lines[a].old } else {
                 c = open.map { $0 + settings.levelWidth } ?? 0
-                if l.markup { c += l.old - (base[l.scope] ?? l.old) }
                 if l.solo { c += settings.soloBraceIndent }
             }
             cols.append(c)

@@ -5,6 +5,7 @@ import PackageDescription
 // JSONRPC <- ACPProtocol, MCPProtocol; TypstEngine <- TypoKit <- TypoAssistant <- TypoACP (+ ACPProtocol); TypoKit <- TypoMCP (+ MCPProtocol).
 let package = Package(
     name: "Typo",
+    defaultLocalization: "en",
     platforms: [.macOS("27.0")],
     products: [
         .library(name: "JSONRPC", targets: ["JSONRPC"]),

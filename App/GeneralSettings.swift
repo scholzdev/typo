@@ -92,6 +92,24 @@ struct GeneralSettings: View {
 
     var body: some View {
         Form {
+            // As at the top of System Settings › General: a large tile, the name and what the area covers, centred.
+            Section {
+                VStack(spacing: 6) {
+                    Image(systemName: "gear")
+                        .font(.system(size: 34, weight: .medium)).foregroundStyle(.white)
+                        .frame(width: 60, height: 60)
+                        .background(Color.gray.gradient, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
+                        .padding(.bottom, 4)
+                        .accessibilityHidden(true)
+                    Text("General").font(.system(size: 22, weight: .bold))
+                    Text("Choose what Typo restores at launch, how files and issues are shown, and when your document is checked.")
+                        .foregroundStyle(.secondary).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14).padding(.horizontal, 24)
+                .accessibilityElement(children: .combine)
+            }
             Section("Starting Points") {
                 Picker("Restore open projects", selection: $restore) {
                     Text("Use System Setting").tag("system")

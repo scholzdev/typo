@@ -110,6 +110,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
         NSWindow.allowsAutomaticWindowTabbing = false    // the editor has its own tabs (design/14h); no native Show Tab Bar
         AppAppearance.apply()
+        _ = Updates.shared    // starts the daily update check
         NotificationCenter.default.addObserver(forName: NSApplication.didUpdateNotification, object: nil, queue: .main) { _ in
             MainActor.assumeIsolated { SystemCloseItem.suppress() }
         }

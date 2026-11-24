@@ -127,6 +127,7 @@ private func update(_ u: JSONValue) -> JSONValue { ["sessionId": "s1", "update":
         _ = try await a.connect(cwd: URL(fileURLWithPath: "/p"), meta: meta)
         #expect(fake.metas.all == [#"{"claudeCode":{"options":{"plugins":[{"path":"/c/typo","type":"local"},{"path":"/c/typo-user","type":"local"}]}}}"#])
         #expect(ACPAgent.claudeCodeMeta(plugins: []) == nil)
+        #expect(ACPAgent.claudeCodeMeta(plugins: [], userSetup: false) == ["claudeCode": ["options": ["settingSources": ["project", "local"]]]])
         let bare = FakeAgent()
         _ = try await bare.agent(host: nil)
         #expect(bare.metas.all == ["null"])

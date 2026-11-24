@@ -248,7 +248,7 @@ struct LibraryView: View {
     }
 
     private var commandSections: [LibrarySection] {
-        func row(_ c: AppCommand) -> LibraryRow { LibraryRow(id: c.id, title: c.title, tile: .symbol(c.systemImage), badge: c.shortcut?.display, checked: c.isOn == true) }
+        func row(_ c: AppCommand) -> LibraryRow { LibraryRow(id: c.id, title: String(localized: c.title), tile: .symbol(c.systemImage), badge: c.shortcut?.display, checked: c.isOn == true) }
         let pool = commands.filter(\.isEnabled)
         let recent = recent(recentStorage)
         if !isSearching {
@@ -256,7 +256,7 @@ struct LibraryView: View {
             let recents = recent.compactMap { id in pool.first { $0.id == id } }.prefix(5)
             if !recents.isEmpty { result.append(("Recently Used", recents.map(row))) }
             for menu in Self.menus {
-                let items = pool.filter { $0.menu == menu }
+                let items = pool.filter { $0.menuKey == menu }
                 if !items.isEmpty { result.append((menu, items.map(row))) }
             }
             return result
@@ -517,7 +517,7 @@ struct LibraryView: View {
         case .commands:
             guard let command = commands.first(where: { $0.id == row.id }) else { return nil }
             return AnyView(VStack(alignment: .leading, spacing: 12) {
-                detailHeader(command.title, command.help)
+                detailHeader(String(localized: command.title), command.help)
                 Grid(alignment: .leadingFirstTextBaseline, horizontalSpacing: 10, verticalSpacing: 6) {
                     GridRow { label("Menu"); Text(command.menu) }
                     GridRow { label("Shortcut"); Text(command.shortcut?.display ?? "None") }

@@ -175,7 +175,7 @@ private struct ShortcutEntry: Identifiable {
     /// Fixed keys that are no menu item (the editor's own).
     var isEditorKey = false
 
-    var isText: Bool { isEditorKey || command.map { Self.textMenus.contains($0.menu) || Self.textCommands.contains($0.id) } == true }
+    var isText: Bool { isEditorKey || command.map { Self.textMenus.contains($0.menuKey) || Self.textCommands.contains($0.id) } == true }
 
     // One place for the Text scope: these menus, plus the fold commands.
     private static let textMenus: Set = ["Edit", "Format"]
@@ -217,7 +217,7 @@ struct ShortcutsSettings: View {
                     fixed("Editor", "Indent", "increase.indent", "⇥", editor: true), fixed("Editor", "Outdent", "decrease.indent", "⇧⇥", editor: true)]
         // Export is File's submenu.
         let menu = commands.map { c in
-            ShortcutEntry(id: c.id, section: c.menu == "Export" ? "File" : c.menu, title: c.menu == "Export" ? "Export ▸ \(c.title)" : c.title, systemImage: c.systemImage, command: c)
+            ShortcutEntry(id: c.id, section: c.menuKey == "Export" ? "File" : c.menuKey, title: c.menuKey == "Export" ? "Export ▸ \(String(localized: c.title))" : String(localized: c.title), systemImage: c.systemImage, command: c)
         }
         return (app + menu + keys).enumerated().sorted { (Self.rank($0.element.section), $0.offset) < (Self.rank($1.element.section), $1.offset) }.map(\.element)
     }

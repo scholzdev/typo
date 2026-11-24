@@ -335,6 +335,8 @@ extension FocusedValues {
         }
     }
 
+    static let onDeviceWorkflowNotice = "Workflows need project access, which the on-device model doesn't have. Choose another model."
+
     /// Sends `text` (the draft by default) with the attachments; nothing leaves the Mac before the provider's notice was accepted.
     /// `search` is the answer to the search question, once it was asked.
     func send(_ text: String? = nil, diagnostics: Bool = false, search: Bool? = nil) {
@@ -342,6 +344,10 @@ extension FocusedValues {
         guard !question.isEmpty, !isStreaming, let provider, providers.isReady(provider) else { return }
         guard !isBusy else { notice = "Another conversation is still working. Wait for it or stop it first."; return }
         notice = nil
+        let workflows = WorkflowStore.shared
+        workflows.reload()
+        let workflow = workflows.resolve(question)
+        if workflow != nil, provider.isOnDevice { notice = Self.onDeviceWorkflowNotice; return }
         // Mentioned files are attached like picked ones, so the provider or agent gets them.
         let mentioned = text == nil ? mentions : []
         for m in mentioned where !attachments.contains(m) { attachments.append(m) }
@@ -375,6 +381,7 @@ extension FocusedValues {
                 let id = conversation ?? start(provider: provider, model: model, title: question)
                 var message = AssistantMessage(role: .user, text: question, context: context)
                 message.created = .now
+                message.prompt = workflow?.workflow.prompt(arguments: workflow?.arguments ?? "")
                 if !mentioned.isEmpty { message.mentions = mentioned.map(\.raw) }
                 Self.entrance { change(id) { [message] in $0.messages.append(message); $0.updated = .now } }
                 preparing = false
@@ -550,6 +557,8 @@ extension FocusedValues {
             if !provider.isAgent, !Task.isCancelled, conversations.first(where: { $0.id == id })?.messages.first(where: { $0.id == current })?.error == nil {
                 for m in rounds + [current] { await applyAutomatically(id, m) }
             }
+            // The session may have started before the conversation existed (the warm-up), so it is kept here.
+            if provider.isAgent, let agent = await agents.running(id.uuidString) { remember(agentSession: agent.sessionID, in: id) }
             finish(id, current)
         }
     }
@@ -564,10 +573,11 @@ extension FocusedValues {
         return ACPClient(provider: p, sessions: agents, attachments: attachments.map(project.url(for:)) + externalAttachments, changeFiles: permissions.policy(.changeFiles),
                          mode: agentMode) { [weak self] in
             // Only the Claude Code adapter reads plugin folders from session/new; the skills are assembled when the agent starts.
-            let meta = claude ? ACPAgent.claudeCodeMeta(plugins: SkillStore.agentPlugins()) : nil
-            let agent = try await ACPAgent.launch(command: command, cwd: root, host: self, mcp: mcp, meta: meta, resume: resume).agent
-            await self?.remember(agentSession: agent.sessionID, in: id)
-            return agent
+            let userSetup = UserDefaults.standard.bool(forKey: SettingsKey.claudeUserSetup)
+            let meta = claude ? ACPAgent.claudeCodeMeta(plugins: ClaudeSkillStore.agentPlugins(), userSetup: userSetup) : nil
+            // Without the user's setup, Claude would still keep its own auto memory in ~/.claude.
+            let environment = claude && !userSetup ? ["CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1"] : [:]
+            return try await ACPAgent.launch(command: command, cwd: root, host: self, mcp: mcp, meta: meta, resume: resume, environment: environment).agent
         }
     }
 
@@ -609,7 +619,12 @@ extension FocusedValues {
     private func request(_ c: AssistantConversation, provider: AssistantProvider, tools: [ClientTool] = []) async throws -> AssistantRequest {
         if provider.isAgent {
             // No system prompt: its edit format would have the agent write edit blocks instead of files.
-            var r = AssistantRequest(model: c.model, system: "", files: nil, messages: c.wireMessages())
+            // Only the newest message carries its editor context; a recap of earlier ones keeps just what the user wrote.
+            var messages = c.wireMessages(context: false)
+            if let context = c.messages.last(where: { $0.role == .user })?.context, messages.last?.role == .user {
+                messages[messages.count - 1].text = context + "\n\n" + messages[messages.count - 1].text
+            }
+            var r = AssistantRequest(model: c.model, system: "", files: nil, messages: messages)
             r.session = c.id.uuidString
             return r
         }

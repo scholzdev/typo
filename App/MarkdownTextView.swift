@@ -27,7 +27,7 @@ struct MarkdownTextView: NSViewRepresentable {
         tv.delegate = context.coordinator
         tv.string = text
         context.coordinator.restyle(tv)
-        tv.setAccessibilityLabel("Skill text")
+        tv.setAccessibilityLabel("Workflow text")
         scroll.drawsBackground = false
         tv.drawsBackground = false
         context.coordinator.textView = tv

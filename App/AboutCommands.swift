@@ -14,6 +14,9 @@ struct AboutCommands: Commands {
                 NSApp.orderFrontStandardAboutPanel(options: [.credits: NSAttributedString(string: credits, attributes: [.font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize), .foregroundColor: NSColor.secondaryLabelColor])])
             }
             Button("Acknowledgements") { openWindow(id: "acknowledgements") }
+            Divider()
+            Button("Check for Updates…") { Updates.shared.controller.checkForUpdates(nil) }
+                .disabled(!Updates.enabled)
         }
     }
 }

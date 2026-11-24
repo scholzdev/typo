@@ -54,6 +54,13 @@ for d in deps {
     out += "\(d["name"] as! String) \(d["version"] as! String) — \((d["license"] as? String) ?? "see crate")\n"
 }
 let rule = String(repeating: "=", count: 80)
+// Sparkle is a Swift package; ./build.sh checks it out next to the build.
+let sparkleCheckout = "build/DerivedData/SourcePackages/checkouts/Sparkle"
+guard let sparkle = try? String(contentsOfFile: "\(sparkleCheckout)/LICENSE", encoding: .utf8) else {
+    fatalError("Sparkle's LICENSE is missing. Run ./build.sh first.")
+}
+let resolved = try? String(contentsOfFile: "Typo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved", encoding: .utf8)
+let sparkleVersion = resolved?.firstMatch(of: #/"sparkle"[\s\S]*?"version" : "([^"]+)"/#).map { String($0.1) } ?? ""
 out += """
 
 
@@ -74,6 +81,12 @@ Fonts and other assets bundled with Typst (NOTICE as shipped with typst-assets)
 \(rule)
 
 \(fontNotice)
+
+\(rule)
+Sparkle \(sparkleVersion), software updates (MIT License)
+\(rule)
+
+\(sparkle)
 """
 try out.write(toFile: "App/Acknowledgements.txt", atomically: true, encoding: .utf8)
 print("wrote App/Acknowledgements.txt with \(deps.count) packages")

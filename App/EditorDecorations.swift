@@ -478,7 +478,7 @@ private struct ColorWheel: View {
     }
 }
 
-/// How the swatch popover picks: a colour wheel (hue and saturation, then brightness) or one slider per channel.
+/// Whether the swatch popover shows the colour wheel (hue and saturation, then brightness) above the channel sliders.
 enum ColorPickerStyle: String, CaseIterable {
     case wheel, sliders
     var title: String { self == .wheel ? "Color Wheel" : "RGB Sliders" }
@@ -509,18 +509,20 @@ struct ColorPopoverView: View {
                 HStack {
                     Text("Bright").frame(width: 44, alignment: .leading)
                     Slider(value: Binding(get: { hsb[2] }, set: { setHSB([hsb[0], hsb[1], $0]) }), in: 0...1).accessibilityLabel("Brightness")
-                    Spacer().frame(width: 64)
+                    TextField("Brightness", value: Binding(get: { Int((hsb[2] * 100).rounded()) },
+                                                           set: { setHSB([hsb[0], hsb[1], Double(min(max($0, 0), 100)) / 100]) }),
+                              format: .number)
+                        .textFieldStyle(.roundedBorder).multilineTextAlignment(.trailing).monospacedDigit()
+                        .frame(width: 48).labelsHidden()
+                        .accessibilityLabel("Brightness value")
+                    Text("%").foregroundStyle(.secondary).frame(width: 12, alignment: .leading)
                 }
             }
             ForEach(Array(Self.channels.enumerated()), id: \.offset) { i, ch in
                 HStack {
                     Text(ch.name).frame(width: 44, alignment: .leading)
-                    if style == .sliders || i == 3 {
-                        Slider(value: Binding(get: { rgba[i] }, set: { set(i, $0) }), in: 0...1)
-                            .accessibilityLabel(ch.name)
-                    } else {
-                        Spacer()
-                    }
+                    Slider(value: Binding(get: { rgba[i] }, set: { set(i, $0) }), in: 0...1)
+                        .accessibilityLabel(ch.name)
                     TextField(ch.name, value: Binding(get: { Int((rgba[i] * ch.scale).rounded()) },
                                                       set: { set(i, Double(min(max($0, 0), Int(ch.scale))) / ch.scale) }),
                               format: .number)

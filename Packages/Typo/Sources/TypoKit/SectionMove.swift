@@ -73,26 +73,25 @@ public enum Sections {
     /// `level`, the moved headings shift so the first one has that level (none below 1). Two edits, one removing and one
     /// inserting, so the sections in between stay untouched. Nil when `boundary` is not a section boundary outside it.
     public static func move(_ line: Int, to boundary: Int, level: Int? = nil, in text: String, headings: [SectionHeading]) -> SectionMove? {
+        let n = (text as NSString).length
+        guard let s = range(of: line, in: headings, length: n), boundary < s.location || boundary > NSMaxRange(s),
+              boundary == n || headings.contains(where: { $0.line == boundary }),
+              let c = cut(line, level: level, in: text, headings: headings) else { return nil }
+        let p = paste(c.block, at: boundary, in: text)
+        let shift = boundary < s.location ? 0 : (c.removal.text as NSString).length - c.removal.range.length
+        let heading = p.heading + shift
+        return SectionMove(edits: [p.insertion, c.removal].sorted { $0.range.location < $1.range.location }, heading: heading,
+                           carry: MarkCarry(from: s.location, length: c.length, to: heading, steps: c.steps))
+    }
+
+    /// The section of the heading at `line` as text to put elsewhere (its headings shifted like `move`'s), and the edit
+    /// that takes it out of `text`, leaving one blank line where it was. `length`: the section's length here.
+    public static func cut(_ line: Int, level: Int? = nil, in text: String, headings: [SectionHeading])
+        -> (block: String, length: Int, steps: [MarkCarry.Step], removal: Replacement)? {
         let ns = text as NSString, n = ns.length
         guard let s = range(of: line, in: headings, length: n), let first = headings.first(where: { $0.line == line }),
-              boundary < s.location || boundary > NSMaxRange(s),
-              boundary == n || headings.contains(where: { $0.line == boundary }) else { return nil }
-        let nl = ns.range(of: "\r\n").location != NSNotFound ? "\r\n" : "\n"
-        let endsWithNewline = n > 0 && ns.character(at: n - 1) == 10
-        func blank(_ i: Int) -> Bool { [10, 13, 32, 9].contains(ns.character(at: i)) }
-        // End of the last non-blank character before `x`, then the start of the blank lines that follow it.
-        func contentEnd(before x: Int) -> Int? {
-            var k = x
-            while k > 0, blank(k - 1) { k -= 1 }
-            return k > 0 ? k : nil
-        }
-        func gap(before x: Int) -> (start: Int, content: Bool, newline: Bool) {
-            guard let e = contentEnd(before: x) else { return (0, false, false) }
-            let r = ns.range(of: "\n", range: NSRange(location: e, length: x - e))
-            return r.location == NSNotFound ? (x, true, false) : (NSMaxRange(r), true, true)
-        }
-
-        var block = ns.substring(with: NSRange(location: s.location, length: contentEnd(before: NSMaxRange(s))! - s.location)) as NSString
+              let end = contentEnd(ns, before: NSMaxRange(s)), end > s.location else { return nil }
+        var block = ns.substring(with: NSRange(location: s.location, length: end - s.location)) as NSString
         let length = block.length
         var steps: [MarkCarry.Step] = []
         if let level, level != first.level {
@@ -103,26 +102,47 @@ public enum Sections {
                 steps.append(MarkCarry.Step(end: h.marker - s.location + h.level, delta: max(1, h.level + delta) - h.level))
             }
         }
-
-        let before = gap(before: s.location)
+        let endsWithNewline = n > 0 && ns.character(at: n - 1) == 10
+        let before = gap(ns, before: s.location)
         let removal: Replacement
         if !before.content {
             removal = Replacement(range: NSRange(location: 0, length: NSMaxRange(s)), text: "")
         } else if NSMaxRange(s) < n {
-            removal = Replacement(range: NSRange(location: before.start, length: NSMaxRange(s) - before.start), text: nl)
+            removal = Replacement(range: NSRange(location: before.start, length: NSMaxRange(s) - before.start), text: newline(ns))
         } else {
-            let from = endsWithNewline ? before.start : contentEnd(before: s.location)!
+            let from = endsWithNewline ? before.start : contentEnd(ns, before: s.location)!
             removal = Replacement(range: NSRange(location: from, length: n - from), text: "")
         }
+        return (block as String, length, steps, removal)
+    }
 
-        let at = gap(before: boundary)
+    /// The edit that puts `block` at `boundary` of `text` with one blank line on each side, and where the block starts
+    /// in the text after that edit alone.
+    public static func paste(_ block: String, at boundary: Int, in text: String) -> (insertion: Replacement, heading: Int) {
+        let ns = text as NSString, n = ns.length, nl = newline(ns)
+        let endsWithNewline = n > 0 && ns.character(at: n - 1) == 10
+        let at = gap(ns, before: boundary)
         let lead = !at.content ? "" : at.newline ? nl : nl + nl
-        let tail = boundary < n ? nl + nl : endsWithNewline ? nl : ""
-        let insertion = Replacement(range: NSRange(location: at.start, length: boundary - at.start), text: lead + (block as String) + tail)
-        let shift = boundary < s.location ? 0 : (removal.text as NSString).length - removal.range.length
-        let heading = at.start + shift + (lead as NSString).length
-        return SectionMove(edits: [insertion, removal].sorted { $0.range.location < $1.range.location }, heading: heading,
-                           carry: MarkCarry(from: s.location, length: length, to: heading, steps: steps))
+        let tail = boundary < n ? nl + nl : endsWithNewline || n == 0 ? nl : ""
+        return (Replacement(range: NSRange(location: at.start, length: boundary - at.start), text: lead + block + tail),
+                at.start + (lead as NSString).length)
+    }
+
+    private static func newline(_ ns: NSString) -> String { ns.range(of: "\r\n").location != NSNotFound ? "\r\n" : "\n" }
+    private static func blank(_ ns: NSString, _ i: Int) -> Bool { [10, 13, 32, 9].contains(ns.character(at: i)) }
+
+    /// End of the last non-blank character before `x`; nil when there is none.
+    private static func contentEnd(_ ns: NSString, before x: Int) -> Int? {
+        var k = x
+        while k > 0, blank(ns, k - 1) { k -= 1 }
+        return k > 0 ? k : nil
+    }
+
+    /// The start of the blank lines before `x`, whether any text comes before them, and whether a line break ends that text.
+    private static func gap(_ ns: NSString, before x: Int) -> (start: Int, content: Bool, newline: Bool) {
+        guard let e = contentEnd(ns, before: x) else { return (0, false, false) }
+        let r = ns.range(of: "\n", range: NSRange(location: e, length: x - e))
+        return r.location == NSNotFound ? (x, true, false) : (NSMaxRange(r), true, true)
     }
 }
 
@@ -198,10 +218,10 @@ extension Buffer {
 public enum SectionDrop: Sendable { case before, after }
 
 extension Project {
-    /// Moves `item`'s section before or after `target`'s, within one file (two files would be two undo steps in two
-    /// undo histories). `adoptLevel`: the moved headings take `target`'s level. Returns a message when it cannot move.
+    /// Moves `item`'s section before or after `target`'s, also into another file of the project. `adoptLevel`: the
+    /// moved headings take `target`'s level. Returns a message when it cannot move.
     public func moveSection(_ item: OutlineItem, _ drop: SectionDrop, _ target: OutlineItem, adoptLevel: Bool = false) async -> String? {
-        guard item.file == target.file else { return "Sections can only be moved within one file." }
+        guard item.file == target.file else { return await moveSectionAcrossFiles(item, drop, target, adoptLevel: adoptLevel) }
         guard item.id != target.id, let b = try? await open(item.file) else { return nil }
         let text = b.storage.string as NSString, heads = b.sectionHeadings
         func line(_ o: Int) -> Int? { o <= text.length ? text.lineRange(for: NSRange(location: o, length: 0)).location : nil }
@@ -210,6 +230,30 @@ extension Project {
         let level = adoptLevel ? heads.first { $0.line == to }?.level : nil
         guard let new = b.moveSection(from, to: drop == .before ? to : NSMaxRange(t), level: level) else { return nil }
         show(item.file, range: NSRange(location: new, length: 0))
+        return nil
+    }
+
+    /// The section lands in `target`'s file first, then leaves `item`'s: each file gets one undo step of its own, and
+    /// a failure in between leaves a copy rather than losing the text. Marks inside it (bookmarks, folds) stay behind.
+    private func moveSectionAcrossFiles(_ item: OutlineItem, _ drop: SectionDrop, _ target: OutlineItem, adoptLevel: Bool) async -> String? {
+        let refusal = "Only headings written with `=` can be moved."
+        guard let src = try? await open(item.file), let dst = try? await open(target.file), src.isTypst, dst.isTypst else { return refusal }
+        let from = src.storage.string as NSString, into = dst.storage.string as NSString
+        func line(_ o: Int, _ t: NSString) -> Int? { o <= t.length ? t.lineRange(for: NSRange(location: o, length: 0)).location : nil }
+        let srcHeads = src.sectionHeadings, dstHeads = dst.sectionHeadings
+        guard let start = line(item.offset, from), srcHeads.contains(where: { $0.line == start }), let to = line(target.offset, into),
+              let s = Sections.range(of: start, in: srcHeads, length: from.length),
+              let t = Sections.range(of: to, in: dstHeads, length: into.length) else { return refusal }
+        let boundary = drop == .before ? to : NSMaxRange(t)
+        // A heading inside a content block (`#[ … ]`) has no section that can leave or enter the block whole.
+        func inBlock(_ b: Buffer, _ xs: [Int]) -> Bool { xs.contains { x in b.foldRegions.contains { $0.kind == .bracket && $0.heading < x && x < $0.end } } }
+        guard !inBlock(src, [s.location, NSMaxRange(s)]), !inBlock(dst, [boundary]) else { return "This section is inside a content block and can't leave it." }
+        let level = adoptLevel ? dstHeads.first { $0.line == to }?.level : nil
+        guard let c = Sections.cut(start, level: level, in: src.storage.string, headings: srcHeads) else { return refusal }
+        let p = Sections.paste(c.block, at: boundary, in: dst.storage.string)
+        dst.apply([p.insertion], actionName: "Move Section")
+        src.apply([c.removal], actionName: "Move Section")
+        show(target.file, range: NSRange(location: p.heading, length: 0))
         return nil
     }
 

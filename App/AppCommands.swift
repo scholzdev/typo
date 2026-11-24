@@ -5,8 +5,13 @@ import TypstEngine
 
 /// One menu command; the menus and the command palette (⇧⌘P) both render from these.
 struct AppCommand: Identifiable {
-    let menu: String
-    let title: String
+    /// Display values: translated by the String Catalog.
+    let menu: LocalizedStringResource
+    let title: LocalizedStringResource
+    /// Stable and never translated: "Menu/Title" in English. Keys the help texts, stored shortcut overrides and palette recents.
+    let id: String
+    /// The menu's English name, for grouping and comparisons.
+    let menuKey: String
     let systemImage: String
     var shortcut: KeyboardShortcut? = nil
     var isEnabled = true
@@ -16,8 +21,14 @@ struct AppCommand: Identifiable {
     var help = ""
     let action: @MainActor () -> Void
 
-    var id: String { "\(menu)/\(title)" }
-    var entry: PaletteEntry { PaletteEntry(id: id, title: title, menu: menu, isEnabled: isEnabled) }
+    /// `idTitle` replaces the title's catalog key in the id when the title interpolates a value.
+    init(menu: LocalizedStringResource, title: LocalizedStringResource, idTitle: String? = nil, systemImage: String, shortcut: KeyboardShortcut? = nil,
+         isEnabled: Bool = true, isOn: Bool? = nil, help: String = "", action: @escaping @MainActor () -> Void) {
+        self.menu = menu; self.title = title; self.menuKey = menu.key; self.id = "\(menu.key)/\(idTitle ?? title.key)"
+        self.systemImage = systemImage; self.shortcut = shortcut; self.isEnabled = isEnabled; self.isOn = isOn; self.help = help; self.action = action
+    }
+
+    var entry: PaletteEntry { PaletteEntry(id: id, title: String(localized: title), menu: String(localized: menu), isEnabled: isEnabled) }
 }
 
 /// What commands act on: the focused window's objects (FocusedValues), passed in by each Commands struct or the palette.
@@ -108,9 +119,14 @@ struct AppCommand: Identifiable {
           AppCommand(menu: "Window", title: "Show Previous Tab", systemImage: "chevron.left", shortcut: KeyboardShortcut("[", modifiers: [.command, .shift]), isEnabled: ctx.project != nil) { moveTab(ctx, -1) }]]
     }
 
+    static func print(_ ctx: AppCommandContext) -> [[AppCommand]] {
+        let project = ctx.project
+        return [[AppCommand(menu: "File", title: "Print…", systemImage: "printer", shortcut: KeyboardShortcut("p"), isEnabled: project != nil) { if let project { Task { await ProjectExporter.print(project) } } }]]
+    }
+
     static func export(_ ctx: AppCommandContext) -> [[AppCommand]] {
         let project = ctx.project
-        func item(_ title: String, _ symbol: String, _ shortcut: KeyboardShortcut? = nil, _ run: @escaping @MainActor (Project) async -> Void) -> AppCommand {
+        func item(_ title: LocalizedStringResource, _ symbol: String, _ shortcut: KeyboardShortcut? = nil, _ run: @escaping @MainActor (Project) async -> Void) -> AppCommand {
             AppCommand(menu: "Export", title: title, systemImage: symbol, shortcut: shortcut, isEnabled: project != nil) { if let project { Task { await run(project) } } }
         }
         return [[item("PDF…", "doc.richtext", KeyboardShortcut("e", modifiers: [.command, .shift])) { await ProjectExporter.pdf($0, .plain) },
@@ -263,14 +279,14 @@ struct AppCommand: Identifiable {
                  AppCommand(menu: "Navigate", title: "Previous Bookmark", systemImage: "chevron.up", shortcut: KeyboardShortcut(.upArrow, modifiers: [.command, .control]), isEnabled: project?.bookmarks.isEmpty == false) { jumpToBookmark(ctx, forward: false) }],
                 // ⌘1…⌘6; Changes stays last, so hiding it (source control off) leaves no gap in the numbers.
                 SidebarTab.allCases.enumerated().filter { $0.element != .changes || UserDefaults.standard.object(forKey: SettingsKey.sourceControl) as? Bool ?? true }.map { i, tab in
-                    AppCommand(menu: "Navigate", title: "Show \(tab.title) Navigator", systemImage: tab.symbol, shortcut: KeyboardShortcut(KeyEquivalent(Character("\(i + 1)"))), isEnabled: ctx.sidebar != nil) { ctx.sidebar?.tab = tab }
+                    AppCommand(menu: "Navigate", title: "Show \(tab.title) Navigator", idTitle: "Show \(tab.title) Navigator", systemImage: tab.symbol, shortcut: KeyboardShortcut(KeyEquivalent(Character("\(i + 1)"))), isEnabled: ctx.sidebar != nil) { ctx.sidebar?.tab = tab }
                 }]
     }
 
     /// Everything the palette offers: all menu commands except the palette itself and Close Window.
     /// `forPalette: false` is the Shortcuts catalog: Close Window included, shortcuts still the defaults from code.
     static func all(_ ctx: AppCommandContext, forPalette: Bool = true) -> [AppCommand] {
-        let groups = newProject(ctx) + open(ctx) + fileItems(ctx) + save(ctx) + tabs(ctx) + export(ctx) + snapshots(ctx) + multiCursor() + format(ctx)
+        let groups = newProject(ctx) + open(ctx) + fileItems(ctx) + save(ctx) + tabs(ctx) + print(ctx) + export(ctx) + snapshots(ctx) + multiCursor() + format(ctx)
             + preview(ctx) + editorView(ctx) + navigate(ctx) + tabSwitching(ctx) + git(ctx)
         return groups.flatMap { $0 }.filter { !forPalette || $0.id != "File/Close Window" }
             .map { var c = $0; c.help = helpTexts[c.id] ?? ""; if forPalette { c.shortcut = ShortcutStore.shared.resolved(c) }; return c }
@@ -294,6 +310,7 @@ struct AppCommand: Identifiable {
         "File/Snapshots…": "Opens the project's saved snapshots to browse or restore earlier versions.",
         "Window/Show Next Tab": "Switches to the tab on the right of the current one.",
         "Window/Show Previous Tab": "Switches to the tab on the left of the current one.",
+        "File/Print…": "Prints the project's pages, or saves them as a PDF from the print panel.",
         "Export/PDF…": "Compiles the project and saves it as a PDF file.",
         "Export/PDF/A-2b for Archiving…": "Saves the project as a PDF/A-2b file, a standard for long-term archiving.",
         "Export/PDF/A-3b for Archiving…": "Saves the project as a PDF/A-3b file, an archiving standard that allows embedded files.",

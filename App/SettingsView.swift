@@ -35,7 +35,7 @@ enum SettingsTab: String, CaseIterable {
 
     var symbol: String {
         switch self {
-        case .general: "gearshape"
+        case .general: "gear"
         // Xcode's Appearance icon; it ships in the system's private symbol set, so fall back where it doesn't resolve.
         case .appearance: NSImage(systemSymbolName: "appearance.lightmode", accessibilityDescription: nil) != nil ? "appearance.lightmode" : "circle.lefthalf.filled"
         case .intelligence: "sparkles"
@@ -228,4 +228,8 @@ private struct WindowStyler: NSViewRepresentable {
     }
     func makeNSView(context: Context) -> V { V() }
     func updateNSView(_ v: V, context: Context) { v.style() }
+}
+
+#Preview {
+    SettingsView()
 }

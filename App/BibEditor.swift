@@ -63,7 +63,7 @@ struct BibEditorView: View {
                         .font(.caption).foregroundStyle(.secondary).padding(.vertical, 6)
                         .frame(maxWidth: .infinity)
                 }
-                .frame(minWidth: 240, idealWidth: 300, maxWidth: 380)
+                .frame(minWidth: 180, idealWidth: 280, maxWidth: 340)
                 Divider()
                 Group {
                     if let selection, entries.indices.contains(selection) {
@@ -76,7 +76,7 @@ struct BibEditorView: View {
                                                description: Text("Choose an entry to edit its fields."))
                     }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .background(.background)
@@ -220,7 +220,10 @@ struct BibEntryForm: View {
         VStack(spacing: 0) {
             detailHeader
             Form {
-                Section("Citation Key") {
+                Section("Entry") {
+                    Picker("Type", selection: Binding(get: { entry.type.lowercased() }, set: { t in change { $0.type = t } })) {
+                        ForEach(types, id: \.self) { Label("@\($0)", systemImage: bibKindSymbol($0)).tag($0) }
+                    }
                     FieldEditor(label: "Key", value: entry.key, monospaced: true, isValid: isValidKey) { k in change { $0.key = k } }
                 }
                 Section("Fields") {
@@ -250,22 +253,19 @@ struct BibEntryForm: View {
             Image(systemName: bibKindSymbol(entry.type)).font(.system(size: 34)).foregroundStyle(.secondary)
                 .frame(width: 48).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 4) {
-                Text(s.title.isEmpty ? "Untitled" : s.title).font(.title2.bold()).lineLimit(2)
+                Text(s.title.isEmpty ? "Untitled" : s.title).font(.title2.bold()).lineLimit(3)
                     .foregroundStyle(s.title.isEmpty ? .secondary : .primary).textSelection(.enabled)
                 if !sub.isEmpty { Text(sub).foregroundStyle(.secondary).lineLimit(1) }
                 HStack(spacing: 8) {
-                    Text("@" + entry.key).font(.callout.monospaced()).textSelection(.enabled)
+                    Text("@" + entry.key).font(.callout.monospaced()).lineLimit(1).truncationMode(.middle).textSelection(.enabled)
                         .padding(.horizontal, 8).padding(.vertical, 2).background(.quaternary, in: .capsule)
+                        .layoutPriority(1)
                     Button(copied ? "Copied" : "Copy @key", systemImage: copied ? "checkmark" : "doc.on.doc", action: copyKey)
                         .buttonStyle(.borderless).controlSize(.small)
                 }
                 .padding(.top, 2)
             }
             Spacer(minLength: 8)
-            Picker("Type", selection: Binding(get: { entry.type.lowercased() }, set: { t in change { $0.type = t } })) {
-                ForEach(types, id: \.self) { Label("@\($0)", systemImage: bibKindSymbol($0)).tag($0) }
-            }
-            .pickerStyle(.menu).fixedSize()
             Button("Delete Entry", systemImage: "trash", role: .destructive, action: delete)
                 .labelStyle(.iconOnly).help("Delete Entry (undo with Edit › Undo)")
         }

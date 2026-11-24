@@ -59,7 +59,7 @@ extension AppCommands {
              },
              AppCommand(menu: "Git", title: "New Branch…", systemImage: "plus", isEnabled: idle) { changesTab(); model?.showNewBranchSheet = true }]
                 + branches.map { b in
-                    AppCommand(menu: "Git", title: "Switch to “\(b.name)”", systemImage: "arrow.triangle.branch", isEnabled: idle) {
+                    AppCommand(menu: "Git", title: "Switch to “\(b.name)”", idTitle: "Switch to “\(b.name)”", systemImage: "arrow.triangle.branch", isEnabled: idle) {
                         run("Couldn’t Switch to “\(b.name)”") { try await $0.switchBranch(b.name) }
                     }
                 },

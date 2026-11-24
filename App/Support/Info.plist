@@ -39,6 +39,12 @@
 	<string>public.app-category.productivity</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2026 Typo</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://scholzdev.github.io/typo/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>3Mg1P8okDsET8qxCLjM1cPRt5PMBLRVrzDwQXn/hhFg=</string>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>

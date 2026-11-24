@@ -10,7 +10,7 @@ struct AssistantConversationList: View {
     @State private var selection: Set<UUID> = []
     @State private var renaming: AssistantConversation?
     @State private var newTitle = ""
-    @State private var deleting: AssistantConversation?
+    @State private var deleting: [AssistantConversation] = []
     @State private var renamingGroup: UUID?
     @State private var groupName = ""
     @FocusState private var groupFieldFocused: Bool
@@ -61,11 +61,17 @@ struct AssistantConversationList: View {
             Button("Rename") { if let c = renaming { model.rename(c.id, to: newTitle) } }
             Button("Cancel", role: .cancel) {}
         }
-        .alert("Delete Conversation?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })) {
-            Button("Delete", role: .destructive) { if let c = deleting { model.delete(c.id) } }
+        .onDeleteCommand { delete(selection) }
+        .alert(deleting.count > 1 ? "Delete \(deleting.count) Conversations?" : "Delete Conversation?",
+               isPresented: Binding(get: { !deleting.isEmpty }, set: { if !$0 { deleting = [] } })) {
+            Button("Delete", role: .destructive) {
+                for c in deleting { model.delete(c.id) }
+                selection.subtract(deleting.map(\.id))
+            }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Are you sure you want to permanently delete “\(deleting?.title ?? "")”? This cannot be undone.")
+            Text(deleting.count > 1 ? "Are you sure you want to permanently delete these \(deleting.count) conversations? This cannot be undone."
+                                    : "Are you sure you want to permanently delete “\(deleting.first?.title ?? "")”? This cannot be undone.")
         }
     }
 
@@ -138,8 +144,15 @@ struct AssistantConversationList: View {
                 Divider()
                 Button(c.archived ? "Unarchive Conversation" : "Archive Conversation") { model.setArchived(c.id, !c.archived) }
                 Divider()
-                Button("Delete Conversation", role: .destructive) { deleting = c }
+                Button(selection.contains(c.id) && selection.count > 1 ? "Delete \(selection.count) Conversations" : "Delete Conversation", role: .destructive) {
+                    delete(selection.contains(c.id) ? selection : [c.id])
+                }
             }
+    }
+
+    /// Asks before deleting the given conversations; the context menu acts on the whole selection when its row is part of it.
+    private func delete(_ ids: Set<UUID>) {
+        deleting = model.conversations.filter { ids.contains($0.id) }
     }
 }
 

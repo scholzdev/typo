@@ -8,6 +8,7 @@ public enum QuickFixes {
         case unknownLabel(String)
         case unknownVariable(String)
         case fileNotFound
+        case unknownFont(String)
         case accessibility(Accessibility.Rule)
         case packageUpdate(name: String, version: String)
     }
@@ -17,6 +18,7 @@ public enum QuickFixes {
             let name = message.dropFirst("unknown variable: ".count).trimmingCharacters(in: .whitespaces)
             return name.isEmpty ? nil : .unknownVariable(name)
         }
+        if let name = missingFont(in: message) { return .unknownFont(name) }
         if message.hasPrefix("file not found") { return .fileNotFound }
         if let u = PackageUpdates.parseHint(message) { return .packageUpdate(name: u.name, version: u.version) }
         if message.hasSuffix("(PDF/UA)"), let rule = Accessibility.rule(of: message) { return .accessibility(rule) }
@@ -27,6 +29,27 @@ public enum QuickFixes {
             return name.isEmpty ? nil : .unknownLabel(name)
         }
         return nil
+    }
+
+    /// The family of a compiler "unknown font family: <name>" warning.
+    public static func missingFont(in message: String) -> String? {
+        guard message.hasPrefix("unknown font family: ") else { return nil }
+        let name = message.dropFirst("unknown font family: ".count).trimmingCharacters(in: .whitespaces)
+        return name.isEmpty ? nil : name
+    }
+
+    /// The distinct missing families named by `diagnostics`, in order.
+    public static func missingFonts(in diagnostics: [Diagnostic]) -> [String] {
+        var seen = Set<String>()
+        return diagnostics.compactMap { missingFont(in: $0.message) }.filter { seen.insert($0.lowercased()).inserted }
+    }
+
+    /// Installed families starting with `name` (case-insensitive) first, then the closest by edit distance; at most 3.
+    static func fontSuggestions(_ name: String, installed: [String]) -> [String] {
+        let lower = name.lowercased()
+        let prefixed = Array(installed.filter { $0.lowercased().hasPrefix(lower) && $0 != name }.sorted { ($0.count, $0) < ($1.count, $1) }.prefix(3))
+        let ordered = prefixed + closest(name, in: installed.filter { !prefixed.contains($0) }, limit: 3)
+        return Array(ordered.prefix(3))
     }
 
     /// Cheap, message-only: whether `d` is a kind we may fix (for the lightbulb).
@@ -77,6 +100,13 @@ extension Project {
         case .unknownLabel(let name): return await labelFixes(name, loc, shown)
         case .unknownVariable(let name): return await variableFixes(name, loc, text)
         case .fileNotFound: return pathFixes(loc, shown)
+        case .unknownFont(let name):
+            guard shown.count >= 3, shown.hasPrefix("\""), shown.hasSuffix("\"") else { return [] }
+            let inner = NSRange(location: loc.range.location + 1, length: loc.range.length - 2)
+            let installed = await fontFamilyNames(host: loc.file).filter { !$0.hasPrefix(".") && !$0.contains("\"") }
+            return QuickFixes.fontSuggestions(name, installed: installed).map {
+                QuickFix(title: "Use \u{201C}\($0)\u{201D}", edits: [loc.file: [Replacement(range: inner, text: $0)]])
+            }
         case .packageUpdate(let name, let version):
             let sources = textSources(where: FileKind.isTypst).compactMap(\.loaded)
             return await Task.detached { PackageUpdates.fixes(name: name, to: version, at: loc, sources: sources) }.value

@@ -14,9 +14,9 @@ enum TextEditingPage: String, Hashable, CaseIterable {
 
     var symbol: String {
         switch self {
-        case .display: "sidebar.right"
-        case .completion: "textformat.abc"
-        case .indentation: "increase.indent"
+        case .display: "inset.filled.trailingthird.rectangle"    // Xcode's own symbols for these pages
+        case .completion: "characters.lowercase"
+        case .indentation: "arrow.right.to.line.compact"
         }
     }
 

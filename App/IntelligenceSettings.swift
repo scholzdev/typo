@@ -6,7 +6,7 @@ import TypoMCP
 import TypstEngine
 
 /// Settings › Intelligence, laid out like Xcode's: agents, model providers, the defaults for new conversations,
-/// what agents may do in Typo, and the MCP server. Sub-pages: a provider, Permissions, Skills and Plug-ins.
+/// what agents may do in Typo, and the MCP server. Sub-pages: a provider, Permissions, Workflows and Claude's skills.
 struct IntelligenceSettings: View {
     @Environment(SettingsNavigation.self) private var nav
     @State private var addingCustom = false
@@ -17,19 +17,20 @@ struct IntelligenceSettings: View {
     @AppStorage(SettingsKey.assistantDefaultModel) private var defaultModel = ""
 
     /// The fixed sub-pages; any other page id is a provider's UUID.
-    enum Page: String { case permissions, skills, plugins }
+    enum Page: String { case permissions, workflows, claudeSkills }
 
     var body: some View {
         let page = nav.page?.tab == .intelligence ? nav.page : nil
-        switch page.flatMap({ Page(rawValue: $0.id) }) {
-        case .permissions: AgentPermissionsSettings()
-        case .skills: SkillsSettings()
-        case .plugins: PluginsSettings()
-        case nil:
-            if let id = page.flatMap({ UUID(uuidString: $0.id) }), let p = store.provider(id) {
-                ProviderSettings(provider: p) { nav.page = nil }
-            } else {
-                list
+        let provider = page.flatMap { UUID(uuidString: $0.id) }.flatMap { store.provider($0) }
+        let open = page.flatMap { Page(rawValue: $0.id) } != nil || provider != nil
+        // The list stays underneath a sub-page, so Back returns to where it was scrolled.
+        ZStack {
+            list.opacity(open ? 0 : 1).disabled(open).accessibilityHidden(open)
+            switch page.flatMap({ Page(rawValue: $0.id) }) {
+            case .permissions: AgentPermissionsSettings()
+            case .workflows: WorkflowsSettings()
+            case .claudeSkills: ClaudeSkillsSettings()
+            case nil: if let provider { ProviderSettings(provider: provider) { nav.page = nil } }
             }
         }
     }
@@ -101,8 +102,7 @@ struct IntelligenceSettings: View {
             }
             Section("Agents in Typo") {
                 SettingsPageRow(title: "Permissions", subtitle: "Control what the assistant and agents may do in your projects.") { go(.permissions, "Permissions") }
-                SettingsPageRow(title: "Skills", subtitle: "Typo's skills and your own, written in plain words.") { go(.skills, "Skills") }
-                SettingsPageRow(title: "Plug-ins", subtitle: "Add and manage plug-ins that bring skills to agents.") { go(.plugins, "Plug-ins") }
+                SettingsPageRow(title: "Workflows", subtitle: "Commands you start with /, for any model.") { go(.workflows, "Workflows") }
             }
             MCPServerSection()
         }
@@ -227,6 +227,7 @@ private struct ProviderSettings: View {
     @State private var found: (ok: Bool, text: String)?
     @State private var showingPrivacy = false
     @State private var showingLogin = false
+    @AppStorage(SettingsKey.claudeUserSetup) private var claudeUserSetup = false
 
     private var preset: AssistantPreset { provider.preset }
     private var baseURLEditable: Bool { preset.baseURL == nil }
@@ -296,6 +297,18 @@ private struct ProviderSettings: View {
                 HStack {
                     if busy { ProgressView().controlSize(.small); Text("Testing…").foregroundStyle(.secondary) }
                     if let result, !busy { Text(result.text).foregroundStyle(result.ok ? Color.secondary : .red).textSelection(.enabled) }
+                }
+            }
+        }
+        if provider.presetID == "acp-claude" {
+            Section {
+                Toggle("Use my Claude Code setup", isOn: $claudeUserSetup)
+            } footer: {
+                Text("Loads your own CLAUDE.md, skills, plug-ins, hooks, memory and settings from ~/.claude, as in the terminal. Off, Claude sees only this project's setup and the skills turned on under Skills. Applies to new conversations.")
+            }
+            Section {
+                SettingsPageRow(title: "Skills", subtitle: "The skills from ~/.claude/skills that Claude loads.") {
+                    nav.page = SettingsSubpage(tab: .intelligence, id: IntelligenceSettings.Page.claudeSkills.rawValue, title: "Skills")
                 }
             }
         }

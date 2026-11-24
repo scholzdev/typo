@@ -15,6 +15,8 @@ public struct AssistantMessage: Codable, Identifiable, Hashable, Sendable {
     public var role: Role
     /// What the user typed, or the answer as it streamed.
     public var text: String
+    /// User turns: what a workflow expanded `text` into, which is what the model gets; nil for a plain question.
+    public var prompt: String?
     /// User turns: the selection or diagnostics block sent before `text`, not shown in the transcript.
     public var context: String?
     public var reasoning: String?
@@ -91,7 +93,7 @@ public struct AssistantConversation: Codable, Identifiable, Hashable, Sendable {
             out[out.count - 1].results += m.results
         }
         for m in messages {
-            let text = m.role == .user ? [context ? m.context : nil, m.text].compactMap { $0 }.joined(separator: "\n\n") : m.text
+            let text = m.role == .user ? [context ? m.context : nil, m.prompt ?? m.text].compactMap { $0 }.joined(separator: "\n\n") : m.text
             let exchanges = tools && m.role == .assistant ? m.toolCalls ?? [] : []
             guard m.error == nil, !text.isEmpty || !exchanges.isEmpty else { continue }
             let role: AssistantRequest.Message.Role = m.role == .user ? .user : .assistant

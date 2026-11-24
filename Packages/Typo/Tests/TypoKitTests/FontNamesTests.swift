@@ -60,3 +60,22 @@ import TypoTestSupport
         return out
     }
 }
+
+struct FontWarningTests {
+    @Test func parsesFamilyFromWarning() {
+        #expect(QuickFixes.missingFont(in: "unknown font family: geist") == "geist")
+        #expect(QuickFixes.missingFont(in: "unknown variable: x") == nil)
+        let d = ["unknown font family: a", "unknown font family: A", "unknown font family: b", "other"].enumerated().map {
+            Diagnostic(id: $0, severity: .warning, message: $1, hints: [], origin: .detached)
+        }
+        #expect(QuickFixes.missingFonts(in: d) == ["a", "b"])
+    }
+
+    @Test func ranksClosestInstalledFamilies() {
+        let installed = ["Helvetica Neue", "Helvetica", "Arial", "Menlo", "Geist Mono"]
+        #expect(QuickFixes.fontSuggestions("helvetica", installed: installed) == ["Helvetica", "Helvetica Neue"])
+        #expect(QuickFixes.fontSuggestions("Helvetia", installed: installed) == ["Helvetica"])
+        #expect(QuickFixes.fontSuggestions("geist", installed: installed) == ["Geist Mono"])
+        #expect(QuickFixes.fontSuggestions("Comic Sans", installed: installed).isEmpty)
+    }
+}

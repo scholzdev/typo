@@ -1,15 +1,21 @@
 name: Typo
 options:
+  developmentLanguage: en
   deploymentTarget:
     macOS: "27.0"
 packages:
   Typo:
     path: Packages/Typo
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    majorVersion: 2.6.0
 settings:
   base:
     SWIFT_VERSION: "6.0"
     SWIFT_STRICT_CONCURRENCY: complete
     MACOSX_DEPLOYMENT_TARGET: "27.0"
+    SWIFT_EMIT_LOC_STRINGS: YES
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
 targets:
   Typo:
     type: application
@@ -17,8 +23,8 @@ targets:
     sources:
       - path: App
         excludes: ["Support"]
-      # Typo's own skills, a Claude plugin folder: Contents/Resources/Skills.
-      - path: Skills
+      # Typo's built-in workflows: Contents/Resources/Workflows.
+      - path: Workflows
         type: folder
         buildPhase: resources
     dependencies:
@@ -32,6 +38,7 @@ targets:
       - target: typo-mcp
         copy:
           destination: executables
+      - package: Sparkle
     entitlements:
       path: App/Support/Typo.entitlements
       properties:
@@ -44,6 +51,10 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSApplicationCategoryType: public.app-category.productivity
         NSHumanReadableCopyright: "© 2026 Typo"
+        # Updates (App/Updates.swift): the appcast that release.sh writes, and the public half of its signing key.
+        SUFeedURL: https://scholzdev.github.io/typo/appcast.xml
+        SUPublicEDKey: 3Mg1P8okDsET8qxCLjM1cPRt5PMBLRVrzDwQXn/hhFg=
+        SUEnableAutomaticChecks: true
         CFBundleDocumentTypes:
           - CFBundleTypeName: Typst Source
             CFBundleTypeRole: Editor

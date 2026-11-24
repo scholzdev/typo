@@ -174,10 +174,11 @@ public final class ACPAgent: Sendable {
     /// `mcp`: the path of the bundled typo-mcp, which the session gets as an MCP server for `cwd`.
     /// `meta`: the `_meta` of `session/new`, such as `claudeCodeMeta(plugins:)`.
     /// `resume`: a session id from an earlier launch to reattach (see `connect`).
-    public static func launch(command: String, cwd: URL, host: (any ACPHost)?, mcp: String? = nil, meta: JSONValue? = nil, resume: String? = nil) async throws -> (agent: ACPAgent, info: String) {
+    /// `environment`: variables set on top of the app's own for the agent process.
+    public static func launch(command: String, cwd: URL, host: (any ACPHost)?, mcp: String? = nil, meta: JSONValue? = nil, resume: String? = nil, environment: [String: String] = [:]) async throws -> (agent: ACPAgent, info: String) {
         let words = ACPProcess.words(command)
         guard let name = words.first else { throw ACPError(ACPError.closed, "The agent has no command. Enter it in Settings › Intelligence.") }
-        let env = ACPProcess.environment()
+        let env = ACPProcess.environment().merging(environment) { _, new in new }
         guard let executable = ACPProcess.locate(name, path: env["PATH"] ?? "") else {
             throw ACPError(ACPError.closed, "“\(name)” was not found. " + (name == "npx" ? "Install Node.js, which brings npx." : "Install it, or enter its full path in Settings › Intelligence."))
         }
@@ -246,9 +247,14 @@ public final class ACPAgent: Sendable {
     }
 
     /// The `session/new` `_meta` with which the Claude Code ACP adapter loads the plugin folders `plugins`
-    /// (its `claudeCode.options` go into the Claude Agent SDK's options); nil without plugins.
-    public static func claudeCodeMeta(plugins: [URL]) -> JSONValue? {
-        plugins.isEmpty ? nil : ["claudeCode": ["options": ["plugins": .array(plugins.map { ["type": "local", "path": .string($0.path)] })]]]
+    /// (its `claudeCode.options` go into the Claude Agent SDK's options); nil when it changes nothing.
+    /// Without `userSetup` the agent skips the user's own Claude Code setup (~/.claude: CLAUDE.md, skills, plugins,
+    /// hooks, settings) and reads only the project's; the adapter's default loads all three.
+    public static func claudeCodeMeta(plugins: [URL], userSetup: Bool = true) -> JSONValue? {
+        var options: [String: JSONValue] = [:]
+        if !plugins.isEmpty { options["plugins"] = .array(plugins.map { ["type": "local", "path": .string($0.path)] }) }
+        if !userSetup { options["settingSources"] = ["project", "local"] }
+        return options.isEmpty ? nil : ["claudeCode": ["options": .object(options)]]
     }
 
     /// The agent's mode for the "Change files" permission: it asks before edits, accepts them, or only plans.

@@ -116,6 +116,13 @@ private func marked(_ m: String) -> (String, NSRange) {
     @Test func markupKeepsRelativeIndentation() {
         #expect(reindent("<#block[\n- a\n    cont\n  - b\n]>") == "#block[\n  - a\n      cont\n    - b\n]")
         #expect(reindent("<- a\n  - b>") == nil)                               // top-level list nesting stays
+        #expect(reindent("<  - a\n    - b\n      more>") == "- a\n  - b\n    more")   // a moved list keeps its shape
+    }
+
+    @Test func markupOutsideListsLosesItsIndentation() {
+        #expect(reindent("<= Title\n    #line(length: 100%)\n  Text>") == "= Title\n#line(length: 100%)\nText")
+        #expect(reindent("<#block[\n      #line()\n]>") == "#block[\n  #line()\n]")
+        #expect(reindent("<- a\nb\n  c>") == "- a\nb\nc")                      // a line at the marker's column ends the item
     }
 
     @Test func soloBrace() {

@@ -11,9 +11,9 @@ enum CaretShape: String, CaseIterable, Identifiable {
 
 /// The app-wide light or dark appearance (Settings, Appearance).
 enum AppAppearance: String, CaseIterable, Identifiable {
-    case system, light, dark
+    case light, dark, system    // in System Settings' order
     var id: String { rawValue }
-    var title: String { switch self { case .system: "System"; case .light: "Light"; case .dark: "Dark" } }
+    var title: String { switch self { case .system: "Auto"; case .light: "Light"; case .dark: "Dark" } }
 
     @MainActor static func apply() {
         let a = AppAppearance(rawValue: UserDefaults.standard.string(forKey: SettingsKey.appAppearance) ?? "") ?? .system
