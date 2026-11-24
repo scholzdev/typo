@@ -4,12 +4,12 @@
     <title>Typo</title>
     <item>
       <title>Typo 0.1</title>
-      <pubDate>Tue, 24 Nov 2026 09:56:30 +0000</pubDate>
+      <pubDate>Tue, 24 Nov 2026 13:42:02 +0000</pubDate>
       <sparkle:version>1</sparkle:version>
       <sparkle:shortVersionString>0.1</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
       <sparkle:releaseNotesLink>https://scholzdev.github.io/typo/guide/release-notes.html</sparkle:releaseNotesLink>
-      <enclosure url="https://github.com/scholzdev/typo/releases/download/v0.1/Typo-0.1.zip" sparkle:edSignature="HoamVmUEUy2O/8KiXnVrfFoqWSSgDYqCgOm105kniBEuGQKbGB/WdJ8dTDyIidjSwIatKHGtc4yO6ERJIs8BBw==" length="41846320" type="application/octet-stream"/>
+      <enclosure url="https://github.com/scholzdev/typo/releases/download/v0.1/Typo-0.1.zip" sparkle:edSignature="h6y40yUz/fKsVzzrv9TqELUur/t9+9kp3sWm5NepoO/BG9dCloiNopb82Dyb5uuwE6ivKhjZN2Hg3Fi4bReFDQ==" length="42405966" type="application/octet-stream"/>
     </item>
   </channel>
 </rss>
