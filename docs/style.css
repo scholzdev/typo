@@ -187,7 +187,14 @@ html.js .hero-shot { transform: rotateX(calc((1 - var(--p, 1)) * 16deg)) scale(c
 }
 .card.wide { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; overflow: hidden; }
 .card-art { margin: -38px -36px -40px 0; align-self: stretch; display: flex; align-items: flex-end; justify-content: flex-end; }
-.card-art img { width: 100%; height: 100%; object-fit: cover; object-position: left top; border-top-left-radius: 14px; box-shadow: 0 0 0 1px var(--tile-line); margin-top: 38px; }
+/* The screenshot sits in the tile like a window, framed and shadowed as in the dark section, running off the bottom right. */
+.card-art { padding-top: 40px; }
+.card-art img {
+  width: 100%; height: 100%; object-fit: cover; object-position: left top;
+  border-top-left-radius: 14px; background: var(--shot-bg);
+  border: 1px solid var(--line); border-right: 0; border-bottom: 0;
+  box-shadow: -18px -6px 50px -24px color-mix(in srgb, rgba(43, 31, 122, 0.35), rgba(0, 0, 0, 0.8) var(--m));
+}
 .card h3 { margin: 0; font-size: 24px; line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; }
 .card.wide h3 { font-size: 32px; max-width: 16ch; }
 .card p { margin: 12px 0 0; color: var(--muted); font-size: 17px; line-height: 1.47; max-width: 46ch; }
