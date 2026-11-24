@@ -285,7 +285,7 @@ extension FocusedValues {
     func choose(_ p: AssistantProvider, model: String) {
         agentCommands = []
         if let id = currentID {
-            if current?.providerID != p.id { agents.close(id.uuidString); change(id) { $0.agentMode = nil } }
+            if current?.providerID != p.id { agents.close(id.uuidString); change(id) { $0.agentMode = nil; $0.agentSession = nil } }
             change(id) { $0.providerID = p.id; $0.model = model }
             if p.isAgent, !model.isEmpty { Task { await agents.running(id.uuidString)?.select(model: model) } }
         } else {
@@ -480,7 +480,7 @@ extension FocusedValues {
                 var request = try await request(conversation, provider: provider, tools: tools)
                 if search, AssistantPermissions.supportsWebSearch(provider: provider, model: conversation.model) { request.tools = [.webSearch] }
                 if !provider.isOnDevice { request.clientTools = tools }
-                try await AssistantAgent.run(client: client(for: provider), request: request, execute: { await self.runTool($0) }) { step in
+                try await AssistantAgent.run(client: client(for: provider, in: id), request: request, execute: { await self.runTool($0) }) { step in
                     switch step {
                     case .nextRound:
                         let next = AssistantMessage(role: .assistant, text: "")
@@ -538,16 +538,26 @@ extension FocusedValues {
     }
 
     /// An agent's client shares this window's running agents; a model's is built fresh for each turn.
-    private func client(for p: AssistantProvider) -> any AssistantClient {
+    /// `id`: the conversation, whose stored agent session a newly started agent reattaches.
+    private func client(for p: AssistantProvider, in id: UUID) -> any AssistantClient {
         guard p.isAgent else { return providers.client(for: p) }
         let command = p.command ?? "", root = project.rootURL, mcp = Bundle.main.path(forAuxiliaryExecutable: "typo-mcp")
+        let resume = conversations.first { $0.id == id }?.agentSession
         let claude = p.presetID == "acp-claude"
         return ACPClient(provider: p, sessions: agents, attachments: attachments.map(project.url(for:)) + externalAttachments, changeFiles: permissions.policy(.changeFiles),
                          mode: current?.agentMode) { [weak self] in
             // Only the Claude Code adapter reads plugin folders from session/new; the skills are assembled when the agent starts.
             let meta = claude ? ACPAgent.claudeCodeMeta(plugins: SkillStore.agentPlugins()) : nil
-            return try await ACPAgent.launch(command: command, cwd: root, host: self, mcp: mcp, meta: meta).agent
+            let agent = try await ACPAgent.launch(command: command, cwd: root, host: self, mcp: mcp, meta: meta, resume: resume).agent
+            await self?.remember(agentSession: agent.sessionID, in: id)
+            return agent
         }
+    }
+
+    /// Keeps the agent's session id with the conversation, so the agent started after a restart picks it up again.
+    private func remember(agentSession: String, in id: UUID) {
+        // Saved with the turn's end, not with the half-streamed answer.
+        if conversations.first(where: { $0.id == id })?.agentSession != agentSession { change(id, save: false) { $0.agentSession = agentSession } }
     }
 
     private func request(_ c: AssistantConversation, provider: AssistantProvider, tools: [ClientTool] = []) async throws -> AssistantRequest {
