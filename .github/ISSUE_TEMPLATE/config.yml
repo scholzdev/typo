@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Problem with Typst itself
+    url: https://github.com/typst/typst/issues
+    about: Layout, syntax or compiler behavior that is the same in the Typst CLI or web app.
+  - name: Security problem
+    url: https://github.com/scholzdev/typo/security/advisories/new
+    about: Report it privately, not in a public issue.

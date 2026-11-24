@@ -1,151 +1,153 @@
-# Typo – Features
+# Typo features
 
-Stand: 23.11.2026. Nativer Typst-Editor für macOS (Swift 6, SwiftUI + AppKit/TextKit 2, Typst-Engine über eine Rust-Bridge).
+As of 24 November 2026. Native Typst editor for macOS (Swift 6, SwiftUI + AppKit/TextKit 2, Typst engine through a Rust bridge).
 
-## Fenster und Layout (Xcode-Stil)
+## Window and layout (Xcode style)
 
-- Toolbar wie Xcode: Navigator- und Assistant-Umschalter neben den Ampelknöpfen. Sie tauschen nur den Inhalt der Seitenleiste, der Editor bleibt stehen.
-- Scheme-Kapsel in der Toolbar mit Hauptdatei und Exportziel.
-- Umschalter für Vorschau und Inspector.
-- Navigator als Liquid-Glass-TabView mit Slide-to-Select: Files, Search, Outline, Issues (mit Badge), Changes. VoiceOver liest die Tab-Namen.
-- Dateibaum wie Xcode mit Filter-Leiste und „Open in New Tab“.
-- Editor-Tabs wie Xcode: gleich breite Tabs, Schließen-Knopf beim Hover, Pinnen. Die Tab-Leiste erscheint erst ab zwei Tabs.
-- Jump Bar mit farbigen Icons und Menüs.
-- Inspector als rechte Spalte (File, Selection, …). Er zeigt Figure, Tabelle, Farbe, Label oder Funktionsaufruf unter dem Caret.
-- Untere Leiste nur mit Issues, ohne Compile-Log.
-- Split Editor und Fokus-Modus.
+- Toolbar like Xcode: navigator and assistant toggles next to the traffic lights. They only swap the sidebar content. The editor stays in place.
+- Scheme capsule in the toolbar with the main file and export target.
+- Toggles for preview and inspector.
+- Navigator as a Liquid Glass TabView with slide-to-select: Files, Search, Outline, Issues (with badge), Changes. VoiceOver reads the tab names.
+- File tree like Xcode with filter bar and "Open in New Tab".
+- Editor tabs like Xcode: equal-width tabs, close button on hover, pinning. The tab bar appears only from two tabs.
+- Jump bar with colored icons and menus.
+- Inspector as a right column (File, Selection, …). It shows the figure, table, color, label or function call under the caret.
+- Bottom bar with Issues only, no compile log.
+- Split editor and focus mode.
 
 ## Editor
 
-- TextKit-2-Editor mit Syntax-Highlighting.
-- Vervollständigung:
-  - scope-aware über die Typst-Engine (Rust): Variablen, Funktionen aus Imports, Built-ins, Labels;
-  - Labels und Bib-Keys nur, wenn sie erreichbar sind;
-  - `#names` aus anderen Dateien mit Auto-Import.
+- TextKit 2 editor with syntax highlighting.
+- Completion:
+  - scope-aware through the Typst engine (Rust): variables, functions from imports, built-ins, labels;
+  - labels and bib keys only when they are reachable;
+  - `#names` from other files with auto-import.
 - Snippets.
-- Multi-Cursor mit Blinken (⌘D, ⌃⌘G, ⌃⇧↑/↓).
-- Vim-Modus mit Mode-Kapsel im Xcode-Stil und Tasten-Hinweisen.
-- Minimap mit Scroller rechts daneben.
-- Sticky Headings (Code-Struktur-Kopfzeilen).
-- Scope Guides, Rainbow Brackets, Klammer-Hervorhebung.
-- Markieren gleicher Symbole mit einstellbarer Verzögerung.
-- Inlay Hints.
-- Farb-Swatches direkt neben `rgb(...)` und Co. Ein Klick öffnet einen Farbwähler als Popover neben der Zeile:
-  - Zahlen und Hex-Wert sind editierbar;
-  - Farbrad oder Schieberegler, einstellbar.
-- Rechtschreibprüfung in der Sprache aus `#set text(lang:)`, ohne rote Unterstreichung in Mathe.
-- Formatieren (typstyle) mit Zeilenbreite und Hilfslinie, optional beim Speichern oder beim Vervollständigen.
-- Zeilenumbruch mit Einrückung, Overscroll, animierter Caret, Schreibmaschinen-Scrollen im Fokus-Modus.
-- Lint-Hinweise und Diagnosen inline, abschaltbar.
-- Quick Fixes, Jump to Definition, Find References, Rename Symbol, Go Back/Forward.
-- Wortzählung, die nur deinen Text zählt, nicht den von Typst erzeugten, auch über Includes.
+- Multi-cursor with blinking (⌘D, ⌃⌘G, ⌃⇧↑/↓).
+- Vim mode with an Xcode-style mode capsule and key hints.
+- Minimap with the scroller next to it on the right.
+- Sticky headings (code structure headers).
+- Scope guides, rainbow brackets, bracket highlighting.
+- Highlighting of matching symbols with an adjustable delay.
+- Inlay hints.
+- Color swatches right next to `rgb(...)` and similar. One click opens a color picker as a popover next to the line:
+  - numbers and hex value are editable;
+  - color wheel or sliders, configurable.
+- Spell checking in the language from `#set text(lang:)`, with no red underline in math.
+- Formatting (typstyle) with line width and guide line, optionally on save or on completion.
+- Line wrapping with indentation, overscroll, animated caret, typewriter scrolling in focus mode.
+- Lint hints and diagnostics inline, can be turned off.
+- Quick fixes, Jump to Definition, Find References, Rename Symbol, Go Back/Forward.
+- Word count that counts only your text, not the text Typst generates, also across includes.
 
-## Falten
+## Folding
 
-- Falten von Überschriften, Klammern, Figures, Tabellen, Mathe, Raw-Blöcken, Kommentaren und Listen.
-- Fold-Ribbon mit verschachtelten Kapseln, `{ ··· }`-Badge und Pfeil-Zacken.
-- Animation nach Xcodes Prinzip:
-  - ein Platzhalter im echten Layout, Papierfaltung als Snapshot;
-  - der Text darunter fließt in jedem Frame nach;
-  - ein Display-Link mit bis zu 120 Hz.
-- Animationsdauer einstellbar (Editing › Display).
-- Fold/Unfold Section und Fold/Unfold All im View-Menü.
+- Folding of headings, brackets, figures, tables, math, raw blocks, comments and lists.
+- Fold ribbon with nested capsules, `{ ··· }` badge and arrow tips.
+- Animation based on Xcode's approach:
+  - a placeholder in the real layout, paper fold as a snapshot;
+  - the text below reflows in every frame;
+  - a display link at up to 120 Hz.
+- Adjustable animation duration (Editing › Display).
+- Fold/Unfold Section and Fold/Unfold All in the View menu.
 
-## Assistant (KI)
+## Assistant (AI)
 
-- Anbieter: On-Device (Apple Intelligence), OpenRouter, OpenCode Zen, OpenCode Go und weitere OpenAI- bzw. Anthropic-kompatible Anbieter. API-Keys liegen nur im Schlüsselbund.
-- Nichts wird gesendet, bevor du dem jeweiligen Anbieter zugestimmt hast.
-- Fragen werden beantwortet, ohne etwas zu ändern (On-Device-Klassifizierer).
-- Web-Suche.
-- Rechte-Übersicht („darf ich x, darf ich y“): Dateien ändern oder anlegen, Vorschau ansehen, Projekt lesen, suchen, Diagnosen.
+- Providers: on-device (Apple Intelligence), OpenRouter, OpenCode Zen, OpenCode Go and other OpenAI- or Anthropic-compatible providers. API keys are stored only in the keychain.
+- Nothing is sent until you have agreed to the provider in question.
+- Questions are answered without changing anything (on-device classifier).
+- Web search.
+- Permissions overview ("may I do x, may I do y"): change or create files, view the preview, read the project, search, diagnostics.
 - Tools:
-  - `typst_docs` mit kuratiertem Doku-Index;
-  - Projekt lesen und durchsuchen;
-  - `view_preview` und `compile`;
-  - On-Device- und Gemini-Tools.
-- Änderungen im Xcode-Stil: sofort angewendet, mit Datei-Header und Code-Block, „N Changes in M Files“, Revert-Leiste und Glow.
-- Inline-Diff und Rainbow-Ribbon für KI-Änderungen im Gutter.
-- Konversationsliste in der Seitenleiste.
+  - `typst_docs` with a curated docs index;
+  - read and search the project;
+  - `view_preview` and `compile`;
+  - on-device and Gemini tools.
+- Changes in Xcode style: applied immediately, with file header and code block, "N Changes in M Files", revert bar and glow.
+- Inline diff and rainbow ribbon for AI changes in the gutter.
+- Conversation list in the sidebar.
 
-## Tabellen-Editor
+## Table editor
 
-- Visueller Editor für `table(...)` und `grid(...)` (Format › Edit Table…, Rechtsklick oder Inspector).
-- Raster wie in Numbers:
-  - Spaltenleiste A, B, C… und Zeilennummern, Header-Zeile H;
-  - Header, Leiste und Gutter bleiben beim Scrollen stehen.
-- Zellen werden von Typst selbst gerendert: Mathe, Fett und Kursiv, aufgelöste Verweise, deine `#set`-Regeln. Markup erscheint nur beim Bearbeiten.
-- Tastatur wie in einer Tabellenkalkulation:
-  - Pfeile, Shift-Pfeile, Return, Tab, Esc;
-  - Tippen ersetzt den Inhalt;
+- Visual editor for `table(...)` and `grid(...)` (Format › Edit Table…, right-click or inspector).
+- Grid like in Numbers:
+  - column bar A, B, C… and row numbers, header row H;
+  - header, bar and gutter stay in place while scrolling.
+- Cells are rendered by Typst itself: math, bold and italic, resolved references, your `#set` rules. Markup appears only while editing.
+- Keyboard like in a spreadsheet:
+  - arrows, Shift-arrows, Return, Tab, Esc;
+  - typing replaces the content;
   - ⌘C/⌘V/⌘X, ⌘A, ⌘B/⌘I, Undo/Redo.
-- Einfügen von TSV/CSV, auch aus Numbers und Excel. Die Tabelle wächst dabei mit.
-- Zeilen und Spalten einfügen, löschen, duplizieren und verschieben (auch per Drag). Backspace auf eine ganze markierte Zeile oder Spalte löscht sie.
-- Zellen verbinden und trennen (`table.cell(colspan:, rowspan:)`).
-- Formatleiste:
-  - horizontale und vertikale Ausrichtung pro Spalte;
-  - Fett, Kursiv;
-  - Stilvorlagen: Plain, Grid, Header Line, Booktabs, Striped;
-  - Einfügen-Menü.
-- Spaltenbreite per Ziehen (`fr` oder `pt`) oder über das Spaltenmenü (Auto, 1fr, 2fr, fest).
-- Felder für Figure-Caption, Label und Placement.
-- ✨ Intelligence-Popover:
-  - Auftrag in eigenen Worten oder per Vorschlag: Sortieren, Summenzeile, Transponieren, Leere Zellen füllen, Übersetzen, Großschreibung, Beispieldaten, Zahlen formatieren;
-  - Anbieter wählbar;
-  - Ergebnis als ein einziger Undo-Schritt mit Zusammenfassung;
-  - Zahlen in Mathe-Modus.
-- Ein einziger, rückgängig machbarer Edit im Dokument bei „Done“. Fehlende Imports werden ergänzt.
-- Fenstergröße wird gemerkt. VoiceOver-Unterstützung für das Raster.
-- Zellen-Vervollständigung mit Engine-Unterstützung.
+- Pasting TSV/CSV, also from Numbers and Excel. The table grows to fit.
+- Insert, delete, duplicate and move rows and columns (also by dragging). Backspace on a fully selected row or column deletes it.
+- Merge and split cells (`table.cell(colspan:, rowspan:)`).
+- Format bar:
+  - horizontal and vertical alignment per column;
+  - bold, italic;
+  - style presets: Plain, Grid, Header Line, Booktabs, Striped;
+  - Insert menu.
+- Column width by dragging (`fr` or `pt`) or through the column menu (Auto, 1fr, 2fr, fixed).
+- Fields for figure caption, label and placement.
+- ✨ Intelligence popover:
+  - task in your own words or from a suggestion: Sort, Total row, Transpose, Fill empty cells, Translate, Capitalization, Sample data, Format numbers;
+  - choice of provider;
+  - result as a single undo step with a summary;
+  - numbers in math mode.
+- A single undoable edit in the document on "Done". Missing imports are added.
+- Window size is remembered. VoiceOver support for the grid.
+- Cell completion with engine support.
 
-## Bibliografie
+## Bibliography
 
-- BibTeX-Editor in SwiftUI mit Feldern und „More Fields“ sowie Prüfung der Pflichtfelder.
-- Zitat einfügen (⇧⌘C).
+- BibTeX editor in SwiftUI with fields and "More Fields", plus a check of required fields.
+- Insert citation (⇧⌘C).
+- Add Reference: looks up a DOI, arXiv ID or ISBN and appends the entry to a .bib file of the project.
+- Zotero sync (File › Connect Zotero…): fills a .bib file of the project from the local Zotero app or a Zotero account and keeps it in sync.
 
 ## Packages
 
-- Universe-Browser mit Detailansicht pro Package.
-- Lokaler Packages-Ordner (`@local` und eigene Namespaces).
-- Index der `@preview`-Packages mit Offline-Cache.
+- Universe browser with a detail view per package.
+- Local packages folder (`@local` and custom namespaces).
+- Index of `@preview` packages with offline cache.
 
-## Vorschau und Export
+## Preview and export
 
-- Live-Vorschau mit Klick auf eine Stelle, die zur Quelle springt, Zoom, Fit Width/Page, zwei Seiten, Seitenminiaturen und dunklen Seiten.
-- Präsentation im Vollbild und mit Presenter View.
-- Export als PDF, PDF/A und PDF/UA-1 (barrierefrei), PNG und SVG.
+- Live preview with click-to-source (click a spot to jump to the source), zoom, Fit Width/Page, two pages, page thumbnails and dark pages.
+- Presentation in full screen and with Presenter View.
+- Export as PDF, PDF/A and PDF/UA-1 (accessible), PNG and SVG.
 
-## Projekt und Dateien
+## Project and files
 
-- Projekte, zuletzt geöffnete Projekte, Willkommensfenster, Vorlagen.
-- Autosave, Snapshots (lokale Historie), Kodierung und Zeilenenden, Aufräumen von Leerzeichen.
-- Git: Änderungen im Gutter, Changes-Navigator, Pull, Branches, Accounts.
-- Live-Vorschau während des Tippens oder erst beim Speichern (einstellbar).
+- Projects, recent projects, welcome window, templates.
+- Autosave, snapshots (local history), encoding and line endings, whitespace cleanup.
+- Git: changes in the gutter, Changes navigator, pull, branches, accounts.
+- Live preview while typing or only on save (configurable).
 
-## Einstellungen
+## Settings
 
-- Kopfzeile in der Titelleiste wie bei Xcode mit Zurück/Vor und Titel. Die Einstellungen öffnen auf General.
+- Header bar in the title bar like Xcode with back/forward and title. Settings open on General.
 - General:
-  - offene Projekte wiederherstellen;
-  - Dateiendungen im Dateibaum;
-  - Zeilenzahl in Find- und Issue-Navigator;
-  - Issues inline anzeigen oder nicht;
-  - Live-Vorschau beim Tippen oder beim Speichern;
-  - Einstellungen exportieren und importieren;
-  - Einstellungen zurücksetzen.
-- Appearance: Theme, Schrift, Stile, Cursor, Hell/Dunkel, gedimmte Split-Panes.
-- Intelligence: Anbieter, Modelle, Keys, Rechte.
-- Navigation, Editing (Display, Completion, Indentation, Dateien), Snippets, Packages, Source Control, Components.
-- Shortcuts wie in Xcode:
-  - Shortcut-Sets (Default, eigene Sets duplizieren, umbenennen, löschen);
-  - „Adapt to current keyboard“;
-  - Filter All/Menu/Text/Customized/Conflicts;
-  - Aufnahme per Doppelklick.
-- Segmentierte Kapsel-Controls, Unterseiten behalten die Kopfzeile, kein Fokusring in der Seitenleiste.
+  - restore open projects;
+  - file extensions in the file tree;
+  - line count in the Find and Issue navigators;
+  - show issues inline or not;
+  - live preview while typing or on save;
+  - export and import settings;
+  - reset settings.
+- Appearance: theme, font, styles, cursor, light/dark, dimmed split panes.
+- Intelligence: providers, models, keys, permissions.
+- Navigation, Editing (Display, Completion, Indentation, Files), Snippets, Packages, Source Control, Components.
+- Shortcuts like in Xcode:
+  - shortcut sets (Default, duplicate, rename and delete your own sets);
+  - "Adapt to current keyboard";
+  - filter All/Menu/Text/Customized/Conflicts;
+  - recording by double-click.
+- Segmented capsule controls, subpages keep the header bar, no focus ring in the sidebar.
 
-## Bekannte Einschränkungen
+## Known limitations
 
-- Fehler beim PDF/UA-1-Export haben oft keine Zeilenangabe; Typst liefert dafür keine Position.
+- Errors during PDF/UA-1 export often have no line number. Typst gives no position for them.
 
-## Bewusst nicht geplant (vorerst)
+## Intentionally not planned (for now)
 
-iCloud-Sync, Live-Kollaboration, Zotero-Anbindung, PDF-Vergleich, Spotlight-Indexierung, HTML-Export.
+iCloud sync, live collaboration, PDF comparison, Spotlight indexing, HTML export.

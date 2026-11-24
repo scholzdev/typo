@@ -33,12 +33,12 @@ macOS 27 and Xcode 27 to build. The Typst engine is a Rust library in `bridge/`,
 ## Building
 
 ```bash
-cd bridge && ./build-xcframework.sh && cd ..
-xcodegen generate
-open Typo.xcodeproj
+./build.sh
 ```
 
-The first bridge build compiles Typst and takes 20 to 30 minutes. The Swift package with the editor logic has its own tests:
+This builds the Typst bridge when it is missing or its Rust sources changed, generates the Xcode project and puts the app in `build/Typo.app`. Add `--open` to start it afterwards, `--debug` for a debug build, `--test` to run the package tests first, and `--help` for the rest. To work in Xcode instead, run `./build.sh` once (or `xcodegen generate` when the bridge is already built) and open `Typo.xcodeproj`.
+
+The first bridge build compiles Typst, which takes a few minutes. `./release.sh <version>` builds a release zip, signs it for Sparkle updates and adds it to `docs/appcast.xml`. The Swift package with the editor logic has its own tests:
 
 ```bash
 cd Packages/Typo && swift test

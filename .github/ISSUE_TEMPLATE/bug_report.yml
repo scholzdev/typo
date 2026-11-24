@@ -1,0 +1,64 @@
+name: Bug report
+description: Something in Typo doesn't work as it should.
+labels: [bug, needs triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please search the existing issues first. If the problem is in how Typst lays out your document, it may belong to [Typst itself](https://github.com/typst/typst/issues): check whether the same document behaves the same in the Typst CLI or the web app.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+      placeholder: |
+        1. Open a project with …
+        2. Press …
+        Expected: …
+        Instead: …
+    validations:
+      required: true
+  - type: textarea
+    id: typst
+    attributes:
+      label: Smallest Typst source that shows it
+      description: If the bug depends on the document, paste the shortest source that still shows it. Leave out anything private.
+      render: typst
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Editor (typing, completion, formatting)
+        - Preview
+        - Export or printing
+        - Navigation, search, outline
+        - Tables, images, bibliography
+        - Packages and templates
+        - Assistant and agents
+        - Git and file history
+        - Settings
+        - Accessibility
+        - Something else
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Typo version
+      description: Typo › About Typo shows it, together with the Typst version.
+      placeholder: "0.1 (Typst 0.14)"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version and Mac
+      placeholder: "macOS 27.1, MacBook Air M3"
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots, recordings or crash log
+      description: Drag files here. A crash log is in Console › Crash Reports under "Typo".
