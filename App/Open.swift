@@ -5,7 +5,7 @@ import UniformTypeIdentifiers
 import TypstEngine
 
 extension UTType {
-    static let typstSource = UTType(exportedAs: "com.example.typst-source", conformingTo: .plainText)
+    static let typstSource = UTType(exportedAs: "me.florianscholz.typo.typst-source", conformingTo: .plainText)
 }
 
 @MainActor func showAlert(_ title: LocalizedStringResource, _ detail: LocalizedStringResource) {

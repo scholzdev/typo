@@ -737,6 +737,7 @@ struct EditorView: NSViewRepresentable {
                 return false
             }
             if !accepting, !view.hasMarkedText(), let s = replacementString, s.count == 1 { typed = s.first }
+            if !accepting, NSApp.currentEvent?.type == .keyDown, noteCards.deletePill(touching: range, replacement: replacementString) { return false }
             noteEdit(range, replacementString)
             return true
         }

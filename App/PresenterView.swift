@@ -70,6 +70,7 @@ private struct OnScreen: NSViewRepresentable {
 
 private struct PresenterContent: View {
     let session: PresentationSession
+    @Environment(\.openWindow) private var openWindow
     @AppStorage(SettingsKey.presenterCurrent) private var showsCurrent = true
     @AppStorage(SettingsKey.presenterNext) private var showsNext = true
     @AppStorage(SettingsKey.presenterNotes) private var showsNotes = true
@@ -138,7 +139,7 @@ private struct PresenterContent: View {
             TimelineView(.periodic(from: .now, by: 1)) { context in
                 HStack(spacing: h * 0.2) {
                     if showsClock {
-                        Text(context.date, format: .dateTime.hour().minute().second())
+                        Text(context.date, format: .dateTime.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits).second(.twoDigits))
                             .foregroundStyle(Self.clockColor)
                             .accessibilityLabel("Clock")
                     }
@@ -243,7 +244,11 @@ private struct PresenterContent: View {
                         .accessibilityLabel("Larger Notes Font")
                     Button("Invert Colors") { notesInverted.toggle() }
                     Spacer()
-                    Button("Edit") { if let note { session.project.reveal(note) } }
+                    Button("Edit") {
+                        guard let note else { return }
+                        session.project.reveal(note)
+                        openWindow(value: session.project.id)   // brings the project window forward, over the slides
+                    }
                         .disabled(note == nil)
                         .help("Show the note in the editor")
                 }

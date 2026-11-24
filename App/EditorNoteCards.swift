@@ -80,6 +80,17 @@ enum NoteDisplay: String, CaseIterable {
         NSLocationInRange(p, line) || (p == length && NSMaxRange(line) == length)
     }
 
+    /// A single-character delete (Backspace, Forward Delete) that would cut into a shown pill's hidden code takes the
+    /// whole note instead, as one undo step; true when it did.
+    func deletePill(touching range: NSRange, replacement: String?) -> Bool {
+        guard replacement == "", range.length <= 1, !edited, let tv = textView, let buffer = editor?.buffer, editor?.readOnly == false,
+              linesStorage === tv.textContentStorage?.textStorage,
+              let pill = pills.first(where: { !sourceShown.contains($0.lineStart) && NSIntersectionRange($0.call, range).length > 0 })
+        else { return false }
+        buffer.apply([PresenterNotes.replacement(for: pill.call, in: tv.string, writing: "")], actionName: String(localized: "Delete Presenter Note"))
+        return true
+    }
+
     /// The pills to draw: those of the shown file whose line is not switched to its code.
     var shownPills: [PresenterNotes.InlineNote] {
         linesStorage === textView?.textContentStorage?.textStorage ? pills.filter { !sourceShown.contains($0.lineStart) } : []

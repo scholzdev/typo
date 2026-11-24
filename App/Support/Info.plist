@@ -17,7 +17,7 @@
 			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>com.example.typst-source</string>
+				<string>me.florianscholz.typo.typst-source</string>
 			</array>
 		</dict>
 	</array>
@@ -55,7 +55,7 @@
 			<key>UTTypeDescription</key>
 			<string>Typst Source</string>
 			<key>UTTypeIdentifier</key>
-			<string>com.example.typst-source</string>
+			<string>me.florianscholz.typo.typst-source</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>

@@ -59,9 +59,9 @@ targets:
           - CFBundleTypeName: Typst Source
             CFBundleTypeRole: Editor
             LSHandlerRank: Default
-            LSItemContentTypes: [com.example.typst-source]
+            LSItemContentTypes: [me.florianscholz.typo.typst-source]
         UTExportedTypeDeclarations:
-          - UTTypeIdentifier: com.example.typst-source
+          - UTTypeIdentifier: me.florianscholz.typo.typst-source
             UTTypeDescription: Typst Source
             UTTypeConformsTo: [public.plain-text]
             UTTypeTagSpecification:
@@ -77,6 +77,10 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         MARKETING_VERSION: "0.1"
         CURRENT_PROJECT_VERSION: "1"
+      configs:
+        # Builds from Xcode keep their own settings, file associations and history beside an installed release.
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: me.florianscholz.typo.debug
   typo-mcp:
     type: tool
     platform: macOS
