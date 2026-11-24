@@ -2,6 +2,7 @@
 
 <h1 align="center">Typo</h1>
 <p align="center">Typst, at home on the Mac.</p>
+<p align="center"><b>English</b> · <a href="README.de.md">Deutsch</a></p>
 
 <p align="center"><img src="marketing/typo-bento.png" alt="Typo: the editor, the table editor with AI, folding, the bibliography editor, settings and the assistant"></p>
 
@@ -12,10 +13,10 @@ Typo is a native macOS editor for [Typst](https://typst.app), written in Swift a
 - Live preview with click-to-source, completion from the Typst engine, spell checking in the document's language
 - A spreadsheet-like table editor with AI assist, Xcode-style folding, outline drag and drop, bookmarks, Open Quickly
 - A BibTeX editor with DOI, arXiv and ISBN lookup, a Typst Universe package browser
-- An optional assistant: on-device with Apple Intelligence, with your own API key, or your own agent (Claude Code, Codex, Gemini CLI) through the Agent Client Protocol
-- Export to PDF, PDF/A, PDF/UA-1, PNG and SVG, presentation mode with presenter notes
+- An optional assistant: on-device with Apple Intelligence, with your own API key, or Claude Code through the Agent Client Protocol, with workflows like `/check` and `/submit`
+- Export to PDF (also a page range), PDF/A, PDF/UA-1, PNG and SVG, printing, presentation mode with presenter notes
 
-The full list is in [FEATURES.md](FEATURES.md).
+The full list is in [FEATURES.md](FEATURES.md), and the [user guide](https://scholzdev.github.io/typo/guide/) shows how to use them.
 
 ## Privacy
 
@@ -23,12 +24,12 @@ Typo collects no analytics or usage data, and it sends nothing anywhere until yo
 
 - Apple Intelligence runs on your Mac; nothing leaves it.
 - A model provider you add with an API key receives your messages, the conversation and the files you attach or let it read. The key is kept in your Keychain.
-- An agent (Claude Code, Codex, Gemini CLI and others) runs on your Mac in the project folder and sends what it reads to its own provider, under that provider's terms.
+- An agent such as Claude Code runs on your Mac in the project folder and sends what it reads to its own provider, under that provider's terms.
 - Conversations are stored on your Mac and can be deleted at any time.
 
 ## Requirements
 
-macOS 27 and Xcode 27 to build. The Typst engine is a Rust library in `bridge/`, so building also needs a Rust toolchain (`rustup`) and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
+Typo runs on macOS 27 on a Mac with Apple silicon. Building needs Xcode 27. The Typst engine is a Rust library in `bridge/`, so building also needs a Rust toolchain (`rustup`) and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ## Installing
 
