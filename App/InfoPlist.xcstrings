@@ -27,6 +27,12 @@
             "state" : "new",
             "value" : "Typo"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typo"
+          }
         }
       }
     },
@@ -48,7 +54,14 @@
       }
     },
     "Typst Source" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typst-Quelltext"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
