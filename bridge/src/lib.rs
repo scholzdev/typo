@@ -924,8 +924,11 @@ pub unsafe extern "C" fn tb_snapshot_pdf(s: *const TbSnapshot) -> TbBytes {
 }
 
 /// PDF with `standard` 0 plain, 1 PDF/A-2b, 2 PDF/A-3b, 3 PDF/UA-1. On failure `*ok` is false and the bytes are the error text.
+/// `ranges`: `range_count` pairs of one-based first and last page, 0 for an open end; null or no pairs for every page.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn tb_snapshot_export_pdf(s: *const TbSnapshot, standard: u8, ok: *mut bool) -> TbBytes {
+pub unsafe extern "C" fn tb_snapshot_export_pdf(s: *const TbSnapshot, standard: u8, ranges: *const u32, range_count: usize, ok: *mut bool) -> TbBytes {
+    use std::num::NonZeroUsize;
+    use typst::layout::PageRanges;
     use typst_pdf::{PdfOptions, PdfStandard, PdfStandards};
     let fail = |m: String| {
         unsafe { *ok = false };
@@ -944,7 +947,16 @@ pub unsafe extern "C" fn tb_snapshot_export_pdf(s: *const TbSnapshot, standard: 
     };
     // PDF/A requires a creation date, which the document may not set itself.
     let timestamp = typst_kit::datetime::Time::system().today(None).map(typst_pdf::Timestamp::new_utc);
-    match typst_pdf::pdf(d, &PdfOptions { standards, timestamp, ..PdfOptions::default() }) {
+    let page_ranges = (!ranges.is_null() && range_count > 0).then(|| {
+        let v = unsafe { std::slice::from_raw_parts(ranges, range_count * 2) };
+        PageRanges::new(v.chunks(2).map(|p| NonZeroUsize::new(p[0] as usize)..=NonZeroUsize::new(p[1] as usize)).collect())
+    });
+    // Typst can't tag part of a document: a page range exports untagged, and PDF/UA (always tagged) only whole.
+    if page_ranges.is_some() && standard == 3 {
+        return fail("An accessible PDF (PDF/UA-1) is always exported with every page. Choose all pages, or export a plain PDF.".into());
+    }
+    let tagged = page_ranges.is_none();
+    match typst_pdf::pdf(d, &PdfOptions { standards, timestamp, page_ranges, tagged, ..PdfOptions::default() }) {
         Ok(v) => {
             unsafe { *ok = true };
             to_bytes(v)

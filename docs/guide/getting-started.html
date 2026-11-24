@@ -66,8 +66,10 @@
       <ol>
         <li>Download the latest release from <a href="https://github.com/scholzdev/typo/releases/latest">GitHub Releases</a>. Typo requires macOS 27.</li>
         <li>Move Typo to your Applications folder and open it.</li>
+        <li>The first time, macOS says it can't check Typo for malicious software, because Typo isn't notarized by Apple yet. Choose <strong>Done</strong>, then open <span class="path">System Settings › Privacy &amp; Security</span>, scroll to Security and click <strong>Open Anyway</strong> next to the message about Typo. You only do this once.</li>
         <li>The welcome window opens. It has the buttons Open…, New Project… and Templates…, and a list of your recent projects.</li>
       </ol>
+      <p class="note"><strong>Tip:</strong> If you prefer the Terminal, this does the same as Open Anyway: <code>xattr -dr com.apple.quarantine /Applications/Typo.app</code></p>
       <figure class="shot">
         <img class="shot-light" width="440" height="560" src="images/welcome-light.webp" alt="The welcome window with the Open, New Project and Templates buttons and an empty recent-projects list" loading="lazy" decoding="async">
         <img class="shot-dark" width="440" height="560" src="images/welcome-dark.webp" alt="The welcome window with the Open, New Project and Templates buttons and an empty recent-projects list" loading="lazy" decoding="async">

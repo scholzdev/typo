@@ -318,9 +318,11 @@ public final class Snapshot: @unchecked Sendable {      // handle immutable; TbS
     /// Words of all page text. Walks the whole document (~9 ms for 150 pages), so never on the compile path.
     @concurrent func words() async -> Int { Int(tb_snapshot_word_count(handle)) }
 
-    @concurrent public func pdf(standard: PDFStandard) async -> Result<Data, ProjectError> {
+    /// `pages`: the pages to export; nil exports every page.
+    @concurrent public func pdf(standard: PDFStandard, pages: [PageSpan]? = nil) async -> Result<Data, ProjectError> {
         var ok = false
-        let b = tb_snapshot_export_pdf(handle, standard.rawValue, &ok)
+        let flat = (pages ?? []).flatMap { [UInt32($0.first ?? 0), UInt32($0.last ?? 0)] }
+        let b = flat.withUnsafeBufferPointer { tb_snapshot_export_pdf(handle, standard.rawValue, $0.baseAddress, flat.count / 2, &ok) }
         defer { tb_bytes_free(b) }
         let data = b.ptr.map { Data(bytes: $0, count: b.len) } ?? Data()
         return ok ? .success(data) : .failure(.exportFailed(String(decoding: data, as: UTF8.self)))
@@ -367,6 +369,13 @@ public enum SyntaxTag: UInt8, CaseIterable, Sendable {
 
 /// What the caret edits, from the syntax mirror: decides which delimiters auto-close.
 public enum SyntaxMode: UInt8, Sendable { case markup, code, math, text }
+
+/// A one-based, inclusive run of pages; a nil end is open ("5-" is page 5 to the last).
+public struct PageSpan: Equatable, Sendable {
+    public var first: Int?
+    public var last: Int?
+    public init(first: Int?, last: Int?) { self.first = first; self.last = last }
+}
 
 public struct SyntaxSpan: Equatable {
     public let range: NSRange

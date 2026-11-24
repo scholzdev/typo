@@ -55,11 +55,21 @@ struct ExportCommands: Commands {
     static func pdf(_ project: Project, _ standard: PDFStandard) async {
         guard confirmFonts(project, ok: "Export Anyway") else { return }
         do {
-            let pdf = try await project.exportPDF(standard: standard)
+            let count = try await project.exportPageCount()
             let panel = NSSavePanel()
             panel.allowedContentTypes = [.pdf]
             panel.nameFieldStringValue = project.pdfFileName
+            // PDF/UA is tagged, and Typst tags only whole documents.
+            let pages = standard == .ua1 || count < 2 ? nil : PagesAccessory(pageCount: count)
+            panel.accessoryView = pages?.view
             guard panel.runModal() == .OK, let url = panel.url else { return }
+            var spans: [PageSpan]?
+            switch PageSelection.parse(pages?.text ?? "", pageCount: count) {
+            case .failure(let f)?: return showAlert("Check the Pages", f.message)
+            case .success(let s)?: spans = s
+            case nil: spans = nil
+            }
+            let pdf = try await project.exportPDF(standard: standard, pages: spans)
             try pdf.write(to: url)
         } catch {
             showExportFailure(error, pdfUA: standard == .ua1)
@@ -117,6 +127,22 @@ struct ExportCommands: Commands {
 }
 
 /// "Resolution: 300 ppi" under the panel's file list.
+/// The pages field under the PDF save panel: empty for every page, or "1-3, 7, 9-".
+@MainActor private final class PagesAccessory {
+    private let field = NSTextField()
+    let view: NSView
+    var text: String { field.stringValue }
+
+    init(pageCount: Int) {
+        field.placeholderString = "All \(pageCount) pages, or e.g. 1-3, 7, 9-"
+        field.setAccessibilityLabel("Pages to export")
+        field.widthAnchor.constraint(equalToConstant: 240).isActive = true
+        let stack = NSStackView(views: [NSTextField(labelWithString: "Pages:"), field])
+        stack.edgeInsets = NSEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
+        view = stack
+    }
+}
+
 @MainActor private final class PPIAccessory {
     static let choices = [72, 150, 300, 600]
     private let popup = NSPopUpButton(frame: .zero, pullsDown: false)

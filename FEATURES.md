@@ -115,6 +115,7 @@ As of 24 November 2026. Native Typst editor for macOS (Swift 6, SwiftUI + AppKit
 - Live preview with click-to-source (click a spot to jump to the source), zoom, Fit Width/Page, two pages, page thumbnails and dark pages.
 - Presentation in full screen and with Presenter View.
 - Export as PDF, PDF/A and PDF/UA-1 (accessible), PNG and SVG.
+- Export a page range as PDF ("1-3, 7, 9-"); PDF/UA-1 always exports every page.
 
 ## Project and files
 

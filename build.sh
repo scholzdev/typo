@@ -52,6 +52,10 @@ step "Building Typo ($config)"
 derived=build/DerivedData
 log=build/xcodebuild.log
 mkdir -p build
+# Xcode keeps a copy of the bridge header and doesn't notice when the bridge changes it.
+for d in "$derived"/Build/Products/*/include; do
+    [[ -f $d/module.modulemap ]] && cp bridge/include/typst_bridge.h "$d/"
+done
 if ! xcodebuild -project Typo.xcodeproj -scheme Typo -configuration "$config" -derivedDataPath "$derived" build >"$log" 2>&1; then
     grep -E "error:|BUILD FAILED" "$log" | head -20 >&2
     echo "Build failed. Full log: $log" >&2

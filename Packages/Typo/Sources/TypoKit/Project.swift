@@ -808,8 +808,9 @@ public struct FileNode: Identifiable, Sendable, Equatable {
     public func exportPageCount() async throws(ProjectError) -> Int { try await settledSnapshot().pageCount }
 
     /// Renders the PDF off-main.
-    public func exportPDF(standard: PDFStandard = .plain) async throws(ProjectError) -> Data {
-        try await settledSnapshot().pdf(standard: standard).get()
+    /// `pages`: the pages to export; nil exports every page.
+    public func exportPDF(standard: PDFStandard = .plain, pages: [PageSpan]? = nil) async throws(ProjectError) -> Data {
+        try await settledSnapshot().pdf(standard: standard, pages: pages).get()
     }
 
     /// One file's data per page, in page order.

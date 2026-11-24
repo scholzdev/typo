@@ -30,6 +30,10 @@ Typo collects no analytics or usage data, and it sends nothing anywhere until yo
 
 macOS 27 and Xcode 27 to build. The Typst engine is a Rust library in `bridge/`, so building also needs a Rust toolchain (`rustup`) and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
+## Installing
+
+Download the latest release from [GitHub Releases](https://github.com/scholzdev/typo/releases/latest) and move Typo to Applications. Typo isn't notarized by Apple yet, so the first launch needs your OK once: open it, choose Done, then click **Open Anyway** in System Settings › Privacy & Security. Or run `xattr -dr com.apple.quarantine /Applications/Typo.app`.
+
 ## Building
 
 ```bash

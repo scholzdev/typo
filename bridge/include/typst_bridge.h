@@ -71,7 +71,7 @@ TbBytes tb_snapshot_render(const TbSnapshot *, uint32_t page, float pixel_per_pt
                            uint32_t *width, uint32_t *height);
 TbBytes tb_snapshot_pdf(const TbSnapshot *);
 // standard: 0 plain, 1 PDF/A-2b, 2 PDF/A-3b, 3 PDF/UA-1. On failure *ok is false and the bytes are the readable error.
-TbBytes tb_snapshot_export_pdf(const TbSnapshot *, uint8_t standard, bool *ok);
+TbBytes tb_snapshot_export_pdf(const TbSnapshot *, uint8_t standard, const uint32_t *ranges, size_t range_count, bool *ok);
 TbBytes tb_snapshot_svg(const TbSnapshot *, uint32_t page);   // UTF-8 SVG; empty on a bad page
 // JSON [{"title","level","words","page"}] per heading section (entry 0, level 0: text before the first heading).
 TbBytes tb_snapshot_section_words(const TbSnapshot *);
