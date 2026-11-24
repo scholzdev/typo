@@ -385,6 +385,7 @@ extension FocusedValues {
 
     private func start(provider: AssistantProvider, model: String, title: String) -> UUID {
         var c = AssistantConversation(providerID: provider.id, model: model)
+        if !provider.isAgent { agents.close(draftID.uuidString) }    // a warm agent the conversation won't use
         c.id = draftID    // the session warmed up for it
         draftID = UUID()
         c.permissions = draftPermissions
@@ -577,6 +578,8 @@ extension FocusedValues {
     func warmUp() {
         guard currentID == nil else { return }
         let key = draftID.uuidString
+        // The same client and start as a turn's, so the first message finds this session; a new conversation has no
+        // stored session to resume.
         guard let target = warmTarget, let p = provider, let agentClient = client(for: p) as? ACPClient else { warmup.cancel(); agents.close(key); return }
         let model = model
         let started = warmup.warm(target) { [weak self] in
