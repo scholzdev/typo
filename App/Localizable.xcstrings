@@ -409,22 +409,6 @@
         }
       }
     },
-    "%lld / %lld" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld / %lld"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld / %2$lld"
-          }
-        }
-      }
-    },
     "%lld Alternates" : {
       "localizations" : {
         "de" : {
@@ -1033,6 +1017,16 @@
         }
       }
     },
+    "+  /  −" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+  /  −"
+          }
+        }
+      }
+    },
     "+%lld" : {
       "localizations" : {
         "de" : {
@@ -1139,6 +1133,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "8 Leerzeichen"
+          }
+        }
+      }
+    },
+    "?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "?"
           }
         }
       }
@@ -2761,6 +2765,16 @@
         }
       }
     },
+    "B" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "B"
+          }
+        }
+      }
+    },
     "Back" : {
       "localizations" : {
         "de" : {
@@ -3167,6 +3181,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Beschriftung"
+          }
+        }
+      }
+    },
+    "Cards" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Karten"
           }
         }
       }
@@ -3677,6 +3701,26 @@
         }
       }
     },
+    "Click to pause or resume the timer; R resets it" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicken, um den Timer anzuhalten oder fortzusetzen; R setzt ihn zurück"
+          }
+        }
+      }
+    },
+    "Clock" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uhr"
+          }
+        }
+      }
+    },
     "Close" : {
       "localizations" : {
         "de" : {
@@ -4063,6 +4107,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zu pushende (↑) und zu pullende (↓) Commits"
+          }
+        }
+      }
+    },
+    "Compact" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kompakt"
           }
         }
       }
@@ -4919,6 +4973,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erstellen …"
+          }
+        }
+      }
+    },
+    "Current Slide" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Folie"
+          }
+        }
+      }
+    },
+    "Current: Slide %lld of %lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuell: Folie %lld von %lld"
           }
         }
       }
@@ -5865,6 +5939,16 @@
         }
       }
     },
+    "Duration" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dauer"
+          }
+        }
+      }
+    },
     "Edit" : {
       "localizations" : {
         "de" : {
@@ -6035,12 +6119,12 @@
         }
       }
     },
-    "Elapsed time" : {
+    "Elapsed" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verstrichene Zeit"
+            "value" : "Verstrichen"
           }
         }
       }
@@ -6095,12 +6179,32 @@
         }
       }
     },
-    "End of presentation" : {
+    "End Presentation" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Präsentation beenden"
+          }
+        }
+      }
+    },
+    "End of Show" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ende der Präsentation"
+          }
+        }
+      }
+    },
+    "End presentation" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Präsentation beenden"
           }
         }
       }
@@ -6221,6 +6325,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fehler in dieser Datei"
+          }
+        }
+      }
+    },
+    "Esc" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "esc"
           }
         }
       }
@@ -7277,12 +7391,62 @@
         }
       }
     },
+    "Go to Slide %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gehe zu Folie %@"
+          }
+        }
+      }
+    },
     "Go to a page" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zu einer Seite gehen"
+          }
+        }
+      }
+    },
+    "Go to first or last slide" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zur ersten oder letzten Folie"
+          }
+        }
+      }
+    },
+    "Go to next slide" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zur nächsten Folie"
+          }
+        }
+      }
+    },
+    "Go to previous slide" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zur vorherigen Folie"
+          }
+        }
+      }
+    },
+    "Go to that slide" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu dieser Folie"
           }
         }
       }
@@ -7447,6 +7611,16 @@
         }
       }
     },
+    "Hidden" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeblendet"
+          }
+        }
+      }
+    },
     "Hide .typ" : {
       "localizations" : {
         "de" : {
@@ -7497,32 +7671,32 @@
         }
       }
     },
+    "Hide Navigator" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigator ausblenden"
+          }
+        }
+      }
+    },
+    "Hide Notes Strip" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizbereich ausblenden"
+          }
+        }
+      }
+    },
     "Hide Others" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Andere ausblenden"
-          }
-        }
-      }
-    },
-    "Hide Presenter Notes" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moderatornotizen ausblenden"
-          }
-        }
-      }
-    },
-    "Hide Source" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quelltext ausblenden"
           }
         }
       }
@@ -7593,6 +7767,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hinweise zu fehlendem Alternativtext, übersprungenen Überschriftenebenen, Tabellen ohne Kopfzeile sowie fehlendem Titel oder fehlender Sprache."
+          }
+        }
+      }
+    },
+    "Home  /  End" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pos1  /  Ende"
           }
         }
       }
@@ -8173,6 +8357,16 @@
         }
       }
     },
+    "Invert Colors" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farben umkehren"
+          }
+        }
+      }
+    },
     "Issue navigator detail" : {
       "localizations" : {
         "de" : {
@@ -8453,6 +8647,16 @@
         }
       }
     },
+    "Keyboard Shortcuts" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastaturkurzbefehle"
+          }
+        }
+      }
+    },
     "Keywords" : {
       "localizations" : {
         "de" : {
@@ -8509,6 +8713,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Groß"
+          }
+        }
+      }
+    },
+    "Larger Notes Font" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größere Notizenschrift"
+          }
+        }
+      }
+    },
+    "Larger or smaller notes font" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizenschrift größer oder kleiner"
           }
         }
       }
@@ -9975,6 +10199,16 @@
         }
       }
     },
+    "Next Slide" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächste Folie"
+          }
+        }
+      }
+    },
     "No" : {
       "localizations" : {
         "de" : {
@@ -10501,6 +10735,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Noch nicht geladen"
+          }
+        }
+      }
+    },
+    "Not ready to advance" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht bereit zum Weitergehen"
           }
         }
       }
@@ -11241,16 +11485,6 @@
         }
       }
     },
-    "Pause Timer" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Timer anhalten"
-          }
-        }
-      }
-    },
     "Pending" : {
       "localizations" : {
         "de" : {
@@ -11483,6 +11717,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Moderatornotizen"
+          }
+        }
+      }
+    },
+    "Presenter Notes in Editor" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen im Editor"
           }
         }
       }
@@ -11867,6 +12111,16 @@
         }
       }
     },
+    "R" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "R"
+          }
+        }
+      }
+    },
     "RGB Sliders" : {
       "localizations" : {
         "de" : {
@@ -12023,6 +12277,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bereit"
+          }
+        }
+      }
+    },
+    "Ready to Advance Indicator" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinweis, wenn bereit"
+          }
+        }
+      }
+    },
+    "Ready to advance" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereit zum Weitergehen"
           }
         }
       }
@@ -12283,6 +12557,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Relative Zeilennummern"
+          }
+        }
+      }
+    },
+    "Remaining" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbleibend"
           }
         }
       }
@@ -12717,16 +13001,6 @@
         }
       }
     },
-    "Reset Timer" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Timer zurücksetzen"
-          }
-        }
-      }
-    },
     "Reset Typo" : {
       "localizations" : {
         "de" : {
@@ -12743,6 +13017,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alle Einstellungen zurücksetzen?"
+          }
+        }
+      }
+    },
+    "Reset timer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timer zurücksetzen"
           }
         }
       }
@@ -13247,6 +13531,16 @@
         }
       }
     },
+    "Scroll notes up or down" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen nach oben oder unten blättern"
+          }
+        }
+      }
+    },
     "Scrolls the preview to the position of the editor's caret as you move it." : {
       "localizations" : {
         "de" : {
@@ -13717,6 +14011,16 @@
         }
       }
     },
+    "Show Navigator" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigator einblenden"
+          }
+        }
+      }
+    },
     "Show Next Tab" : {
       "localizations" : {
         "de" : {
@@ -13727,22 +14031,22 @@
         }
       }
     },
+    "Show Notes Strip" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizbereich einblenden"
+          }
+        }
+      }
+    },
     "Show Only Incomplete Bookmarks" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nur unvollständige Lesezeichen einblenden"
-          }
-        }
-      }
-    },
-    "Show Presenter Notes" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moderatornotizen einblenden"
           }
         }
       }
@@ -13763,16 +14067,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Korrekturvorschläge einblenden"
-          }
-        }
-      }
-    },
-    "Show Source" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quelltext zeigen"
           }
         }
       }
@@ -13863,6 +14157,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unteren Bereich ein- oder ausblenden"
+          }
+        }
+      }
+    },
+    "Show or hide a black screen" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schwarzen Bildschirm ein- oder ausblenden"
+          }
+        }
+      }
+    },
+    "Show or hide a white screen" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weißen Bildschirm ein- oder ausblenden"
+          }
+        }
+      }
+    },
+    "Show or hide keyboard shortcuts" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastaturkurzbefehle ein- oder ausblenden"
           }
         }
       }
@@ -13973,6 +14297,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Den Navigator einblenden"
+          }
+        }
+      }
+    },
+    "Show the note in the editor" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notiz im Editor zeigen"
           }
         }
       }
@@ -14233,6 +14567,16 @@
         }
       }
     },
+    "Slide number, then Return" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foliennummer, dann Return"
+          }
+        }
+      }
+    },
     "Slides are black – press B" : {
       "localizations" : {
         "de" : {
@@ -14243,12 +14587,32 @@
         }
       }
     },
+    "Slides are white – press W" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folien sind weiß – W drücken"
+          }
+        }
+      }
+    },
     "Small" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Klein"
+          }
+        }
+      }
+    },
+    "Smaller Notes Font" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kleinere Notizenschrift"
           }
         }
       }
@@ -14365,16 +14729,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Leerzeichen"
-          }
-        }
-      }
-    },
-    "Speaker notes" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sprechernotizen"
           }
         }
       }
@@ -14505,16 +14859,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Präsentation mit Referentenansicht starten"
-          }
-        }
-      }
-    },
-    "Start Timer" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Timer starten"
           }
         }
       }
@@ -14745,6 +15089,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zusammenfassung"
+          }
+        }
+      }
+    },
+    "Swap Displays" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirme tauschen"
+          }
+        }
+      }
+    },
+    "Swap displays" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirme tauschen"
           }
         }
       }
@@ -15677,12 +16041,32 @@
         }
       }
     },
-    "Time of day" : {
+    "Time Elapsed" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tageszeit"
+            "value" : "Verstrichene Zeit"
+          }
+        }
+      }
+    },
+    "Time Remaining" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbleibende Zeit"
+          }
+        }
+      }
+    },
+    "Timer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timer"
           }
         }
       }
@@ -16103,6 +16487,16 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "TypstEngine %1$@ — speaks Typst %2$@"
+          }
+        }
+      }
+    },
+    "U  /  D" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "U  /  D"
           }
         }
       }
@@ -16877,6 +17271,16 @@
         }
       }
     },
+    "W" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W"
+          }
+        }
+      }
+    },
     "Warning" : {
       "localizations" : {
         "de" : {
@@ -17343,6 +17747,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ohne Klammern geschrieben: eine Zahl, ein @string-Makro oder eine #-Verkettung"
+          }
+        }
+      }
+    },
+    "X" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X"
           }
         }
       }
@@ -17889,6 +18303,16 @@
         }
       }
     },
+    "←  ↑  Page Up" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "←  ↑  Bild auf"
+          }
+        }
+      }
+    },
     "↑%lld ↓%lld" : {
       "localizations" : {
         "de" : {
@@ -17901,6 +18325,16 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "↑%1$lld ↓%2$lld"
+          }
+        }
+      }
+    },
+    "→  ↓  Space  Page Down" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "→  ↓  Leertaste  Bild ab"
           }
         }
       }

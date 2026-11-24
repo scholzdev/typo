@@ -18,6 +18,26 @@ public struct PresentationClock: Equatable, Sendable {
     public mutating func reset() { self = PresentationClock() }
 }
 
+extension PresentationClock {
+    /// `HH:MM:SS` of the time elapsed, or with `duration` of the time left; past zero it counts on with a minus.
+    public func readout(at now: Date, remainingOf duration: Int? = nil) -> String {
+        let e = Int(elapsed(at: now)), s = duration.map { $0 - e } ?? e, a = abs(s)
+        return (s < 0 ? "-" : "") + String(format: "%02d:%02d:%02d", a / 3600, a / 60 % 60, a % 60)
+    }
+
+    /// Seconds from `m`, `m:ss` or `h:mm:ss`; nil for anything else.
+    public static func seconds(from text: String) -> Int? {
+        let parts = text.trimmingCharacters(in: .whitespaces).split(separator: ":", omittingEmptySubsequences: false).map { Int($0) }
+        guard (1...3).contains(parts.count), parts.allSatisfy({ ($0 ?? -1) >= 0 }) else { return nil }
+        let n = parts.map { $0! }
+        guard n.dropFirst().allSatisfy({ $0 < 60 }) else { return nil }
+        return n.count == 1 ? n[0] * 60 : n.reduce(0) { $0 * 60 + $1 }
+    }
+
+    /// `mm:ss`, minutes not wrapped into hours, as the duration field shows it.
+    public static func minutesSeconds(_ seconds: Int) -> String { String(format: "%02d:%02d", seconds / 60, seconds % 60) }
+}
+
 /// Which slide a presentation shows, and its clock. The page count is passed in because the document can change underneath.
 public struct SlideShow: Equatable, Sendable {
     private var page: Int

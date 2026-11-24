@@ -187,7 +187,7 @@ private struct ThumbnailStrip: View {
                 LazyVStack(spacing: 10) {
                     ForEach(preview.pages) { page in
                         Button { preview.jump(toPage: page.id) } label: {
-                            Thumbnail(page: page, preview: preview, selected: page.id == preview.visiblePage)
+                            Thumbnail(page: page, preview: preview, selected: page.id == preview.visiblePage, width: Self.width)
                         }
                         .buttonStyle(.plain)
                         .id(page.id)
@@ -201,18 +201,19 @@ private struct ThumbnailStrip: View {
     }
 }
 
-private struct Thumbnail: View {
+struct Thumbnail: View {
     let page: PageInfo
     let preview: PreviewModel
     let selected: Bool
+    let width: CGFloat
     @Environment(\.displayScale) private var displayScale
 
     var body: some View {
-        let key = ImageKey(page.hash, pixelsPerPoint: displayScale * ThumbnailStrip.width / page.size.width)
+        let key = ImageKey(page.hash, pixelsPerPoint: displayScale * width / page.size.width)
         VStack(spacing: 4) {
             PageImage(image: preview.image(for: key), dark: preview.darkPages)
                 .aspectRatio(page.size, contentMode: .fit)
-                .frame(width: ThumbnailStrip.width)
+                .frame(width: width)
                 .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
                 .padding(3)
                 .overlay { if selected { RoundedRectangle(cornerRadius: 4).stroke(Color.accentColor, lineWidth: 2) } }
@@ -235,14 +236,19 @@ struct PresenterID: Hashable, Codable { let project: ProjectID }
 
     let project: Project
     var show: SlideShow
-    /// B blanks the slides; the presenter view keeps showing them.
-    var blackout = false
-    /// Speaker notes by page, filled in by the presenter view.
-    var notes: [Int: String] = [:]
+    /// B or W blanks the slides black or white; the presenter view keeps showing them.
+    var blank: Color?
+    /// Presenter notes, filled in by the presenter view.
+    var notes: [PresenterNote] = []
+    /// The page the slides window has rendered ahead at full size, for the ready-to-advance indicator.
+    var readyPage: Int?
     /// Set by `end`; the presenter view closes itself on it.
     private(set) var ended = false
     /// The screen the presentation was started from; the presenter view opens there.
     @ObservationIgnored var home: NSScreen?
+    /// The presenter view's window number, for Swap Displays. A number, not a weak reference: the window reports
+    /// itself while SwiftUI tears it down, and a weak reference to a window in deallocation traps.
+    @ObservationIgnored var presenterWindow = 0
     @ObservationIgnored private var slides: NSWindow?
     @ObservationIgnored private var savedOptions: NSApplication.PresentationOptions = []
     @ObservationIgnored private var windows = 0
@@ -319,6 +325,17 @@ struct PresenterID: Hashable, Codable { let project: ProjectID }
         if Self.sessions[project.id] === self { Self.sessions[project.id] = nil }
     }
 
+    /// Keynote's Swap Displays (X): the slides go to the presenter view's display and the presenter view to theirs.
+    func swapDisplays() {
+        guard let slides, let presenter = NSApp.window(withWindowNumber: presenterWindow), let a = slides.screen, let b = presenter.screen, a != b else { return }
+        slides.level = b != NSScreen.screens.first ? .mainMenu + 1 : .normal
+        slides.setFrame(b.frame, display: true)
+        let size = presenter.frame.size, area = a.visibleFrame
+        presenter.setFrameOrigin(NSPoint(x: area.midX - size.width / 2, y: area.midY - size.height / 2))
+        home = a
+    }
+
+    var showsSlides: Bool { slides != nil }
     var count: Int { project.preview.pages.count }
     var page: Int { show.current(count: count) }
     func move(_ delta: Int) { show.move(by: delta, count: count, at: .now) }
@@ -326,16 +343,18 @@ struct PresenterID: Hashable, Codable { let project: ProjectID }
 }
 
 extension PresentationSession {
-    /// Starts a presentation of `project`. With a presenter view and a second display the slides go there and the
-    /// presenter view stays on this one; with one display the presenter view alone is shown, as a rehearsal, because
-    /// slides over it would hide the notes.
+    /// Starts a presentation of `project`. As in Keynote, a second display gets the slides and this one the presenter
+    /// view, also when `presenter` was not asked for. With one display, `presenter` shows the presenter view alone, as
+    /// a rehearsal, because slides over it would hide the notes; otherwise the slides fill this display.
     static func start(_ project: Project, presenter: Bool, openWindow: OpenWindowAction) {
         let s = session(for: project)
         guard let home = NSApp.keyWindow?.screen ?? NSScreen.main else { return }
         s.home = home
-        if presenter { openWindow(value: PresenterID(project: project.id)) }
+        let other = NSScreen.screens.first(where: { $0 != home })
+        let withPresenter = presenter || other != nil
+        if withPresenter { openWindow(value: PresenterID(project: project.id)) }
         // With a presenter view the keys go to it; the slides only show.
-        if let screen = presenter ? NSScreen.screens.first(where: { $0 != home }) : home { s.showSlides(on: screen, key: !presenter) }
+        if let screen = withPresenter ? other : home { s.showSlides(on: screen, key: !withPresenter) }
     }
 }
 
@@ -354,10 +373,14 @@ private final class SlidesWindow: NSWindow {
     }
 }
 
-/// The keys of both presentation windows: arrows, space and page keys move, B blanks the slides, Escape ends.
+/// The keys of both presentation windows, Keynote's: arrows, space and page keys move, a number and Return go to
+/// that slide, B and W blank the slides, R resets the timer, X swaps the displays, Escape ends.
 struct SlideKeys: ViewModifier {
     let session: PresentationSession?
+    /// Bumped by a view whose popover or overlay took the focus, to take it back.
+    var refocus = 0
     @FocusState private var focused: Bool
+    @State private var typed = ""
 
     func body(content: Content) -> some View {
         content
@@ -368,9 +391,41 @@ struct SlideKeys: ViewModifier {
             .onKeyPress(keys: [.leftArrow, .upArrow, .pageUp]) { _ in session?.move(-1); return .handled }
             .onKeyPress(.home) { session?.go(to: 0); return .handled }
             .onKeyPress(.end) { session?.go(to: .max); return .handled }
-            .onKeyPress(characters: CharacterSet(charactersIn: "bB.")) { _ in session?.blackout.toggle(); return .handled }
+            .onKeyPress(characters: CharacterSet(charactersIn: "bB.")) { _ in blank(.black) }
+            .onKeyPress(characters: CharacterSet(charactersIn: "wW,")) { _ in blank(.white) }
+            .onKeyPress(characters: CharacterSet(charactersIn: "rR")) { _ in session?.show.clock.reset(); return .handled }
+            .onKeyPress(characters: .decimalDigits) { press in typed += press.characters; return .handled }
+            .onKeyPress(.return) {
+                guard let n = Int(typed) else { return .ignored }
+                typed = ""
+                session?.go(to: n - 1)
+                return .handled
+            }
+            .onKeyPress(.delete) {
+                guard !typed.isEmpty else { return .ignored }
+                typed = ""
+                return .handled
+            }
+            .onKeyPress(characters: CharacterSet(charactersIn: "xX")) { _ in session?.swapDisplays(); return .handled }
             .onKeyPress(.escape) { session?.end(); return .handled }
             .onChange(of: session != nil, initial: true) { _, ready in focused = ready }
+            .onChange(of: session?.page) { typed = "" }
+            .onChange(of: refocus) { focused = true }
+            .overlay(alignment: .bottom) {
+                if !typed.isEmpty {
+                    Text("Go to Slide \(typed)")
+                        .font(.title).monospacedDigit()
+                        .padding(.horizontal, 20).padding(.vertical, 10)
+                        .background(.black.opacity(0.8), in: .capsule)
+                        .foregroundStyle(.white)
+                        .padding(.bottom, 40)
+                }
+            }
+    }
+
+    private func blank(_ color: Color) -> KeyPress.Result {
+        session?.blank = session?.blank == color ? nil : color
+        return .handled
     }
 }
 
@@ -381,16 +436,16 @@ struct PresentationWindow: View {
 
     var body: some View {
         ZStack {
-            Color.black
+            session.blank ?? .black
             let pages = session.project.preview.pages, page = session.page
             if pages.indices.contains(page) {
                 Slide(preview: session.project.preview, page: pages[page])
-                    .opacity(session.blackout ? 0 : 1)
+                    .opacity(session.blank == nil ? 1 : 0)
                     .onTapGesture { session.move(1) }
             }
             // The next page renders ahead so a key press shows it at once.
             if pages.indices.contains(page + 1) {
-                Slide(preview: session.project.preview, page: pages[page + 1]).hidden()
+                Slide(preview: session.project.preview, page: pages[page + 1]) { session.readyPage = $0 }.hidden()
             }
         }
         .ignoresSafeArea()
@@ -402,6 +457,8 @@ struct PresentationWindow: View {
 struct Slide: View {
     let preview: PreviewModel
     let page: PageInfo
+    /// nil while the page renders, then its index.
+    var rendered: ((Int?) -> Void)?
     @Environment(\.displayScale) private var displayScale
 
     var body: some View {
@@ -412,7 +469,11 @@ struct Slide: View {
                 .frame(width: page.size.width * scale, height: page.size.height * scale)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .accessibilityLabel("Slide \(page.id + 1) of \(preview.pages.count)")
-                .task(id: key) { await preview.render(page, key) }
+                .task(id: key) {
+                    rendered?(nil)
+                    await preview.render(page, key)
+                    if !Task.isCancelled { rendered?(page.id) }
+                }
         }
     }
 }

@@ -30,6 +30,22 @@ import TypoTestSupport
         c.reset()
         #expect(c.isUntouched && c.elapsed(at: t0 + 50) == 0)
     }
+
+    @Test func readsOutElapsedAndRemaining() {
+        var c = PresentationClock()
+        c.start(at: t0)
+        #expect(c.readout(at: t0 + 3725.9) == "01:02:05")
+        #expect(c.readout(at: t0 + 50, remainingOf: 120) == "00:01:10")
+        #expect(c.readout(at: t0 + 125, remainingOf: 120) == "-00:00:05")
+    }
+
+    @Test func parsesDurations() {
+        #expect(PresentationClock.seconds(from: "20") == 1200)
+        #expect(PresentationClock.seconds(from: " 5:30 ") == 330)
+        #expect(PresentationClock.seconds(from: "1:02:03") == 3723)
+        for bad in ["", "a", "5:60", "-1", "1:2:3:4", "5:"] { #expect(PresentationClock.seconds(from: bad) == nil) }
+        #expect(PresentationClock.minutesSeconds(4530) == "75:30")
+    }
 }
 
 @Suite struct PresentationSlideShowTests {
